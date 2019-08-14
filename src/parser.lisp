@@ -120,7 +120,8 @@
       (progn
         (setf *paranthese* (1+ *paranthese*))
         (parse-call (cdr expr-list)))
-      (if (equal (or "mod" "%") (car expr-list))
+      (if (or (equal "mod" (car expr-list))
+              (equal "%" (car expr-list)))
           (progn
             (setf *call* (append *call* (list "mod")))
             (setf *call* (append *call* (list "(")))
