@@ -13,7 +13,11 @@
      #:parse-expression
      #:parse-call
      #:parse-arguments
+     #:load-data
+     #:save-data
      #:*call*
      #:*code*
+     #:*def-template*
+     #:*impl-template*
 ))
 

@@ -35,34 +35,12 @@
     (strs -> () (str) (strs))
     (letter -> a b c d e f g h i j k l m n o p q r s t u v w x y z)))
 
-
-(defun random-elt (set)
-  (elt set (random (length set))))
-
-(defun mappend (fn col)
-  (apply 'append (mapcar fn col)))
-
-(defun rule-lhs (rule)
-  (first rule))
-
-(defun rule-rhs (rule)
-  (rest (rest rule)))
-
-(defun rewrites (category)
-  (rule-rhs (assoc category *grammar*)))
-
-(defun generate (phrase)
-  "Generate a random seeuence."
-  (cond ((listp phrase)
-         (mappend #'generate phrase))
-        ((rewrites phrase)
-         (generate (random-elt (rewrites phrase))))
-        (t (list phrase))))
-
 (defvar *call* '("    "))
 (defvar *code* nil)
 (defvar *paranthese* 0)
 (defvar *arguments* 0)
+;(defvar *def-template* (load-data "../templates/code.h"))
+;(defvar *impl-template* (load-data "../templates/code.c"))
 
 (defun split-expr (expression)
   (let* ((new-expr1 (regex-replace-all "\\(" expression ";(;"))
@@ -71,11 +49,9 @@
     (remove-if #'(lambda(x) (= (length x) 0)) expr-list)))
 
 (defun emit-code-call (call)
-  (format t "~a~{~a~}" (car call) (cdr call))
-  (format t ";")
+  (format t "~a~{~a~};" (car call) (cdr call))
   (setf *code*
         (format nil "~a~{~a~};" (car call) (cdr call))))
-
 
 (defun dec-arg ()
   (setf (gethash *paranthese* *arguments*)
@@ -142,5 +118,5 @@
     (setf *arguments* (make-hash-table))
     (setf (gethash *paranthese* *arguments*) 0)
     (parse-expression expr-list)
-    (emit-code-call *call*)
+    (setf *code* (emit-code-call *call*))
     *code*))
