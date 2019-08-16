@@ -25,7 +25,7 @@ void print_double(double val) {
 }
 
 void print_str(const char* str) {
-    printf(str);
+    printf("%s", str);
 }
 
 void println_int(int val) {

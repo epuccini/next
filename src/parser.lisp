@@ -74,7 +74,7 @@
 
 (defun emit-code-call (call)
   (if call
-      (format t "~a~{~a~};~%" (car call) (cdr call)))
+      (format t "~a~{~a~}~%" (car call) (cdr call)))
   (if (not (is-main-defined-p))
       (setf *code* (format nil "int main () {"))) 
   (if call
@@ -158,6 +158,8 @@
          (progn
            (setf *paranthese* (1- *paranthese*))
            (setf *call* (append *call* (list ")")))
+           (if (= *paranthese* 0)
+               (setf *call* (append *call* (list (format nil ";~%")))))
            (dec-arg)))
         ((equal "\n" (car expr-list))
          (parse-expression (cdr expr-list)))
