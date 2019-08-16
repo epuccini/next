@@ -7,6 +7,26 @@ int mod(int a, int b) {
 int int_mod_int(int a, int b) {
 	return a % b;
 }
-int main() {
-    return mod(13,mod(13,5));
+
+void print_int(int val) {
+    printf("%d", val);
+}
+
+void print_long(long val) {
+    printf("%l", val);
+}
+
+void print_float(float val) {
+    printf("%f", val);
+}
+
+void print_double(double val) {
+    printf("%d", val);
+}
+
+void print_str(char* str) {
+    printf("%s", str);
+}
+int main () {
+    print_str("HelloWorld");mod(4,mod(11,5));
 }

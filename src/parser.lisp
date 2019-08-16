@@ -41,20 +41,47 @@
 (defvar *arguments* 0)
 (defvar *def-template* (load-binary-data "../templates/code.h"))
 (defvar *impl-template* (load-binary-data "../templates/code.c"))
+(defvar *is-main-defined* nil)
+
+(defun is-main-defined-p ()
+  *is-main-defined*)
+
+(defun print-stack ()
+  "Use swank to log a stack-trace."
+  (let ((trace ""))
+    (let* ((msg-lst (remove-if #'null
+                               (swank-backend:call-with-debugging-environment
+                                (lambda () (swank:backtrace 0 5)))))
+           (stack-msg 
+            (progn
+              (mapcar (lambda (msg)
+                        (setf trace (concatenate 'string trace 
+                                                   (format nil "~{~A ~}~%" msg))))
+                      msg-lst) trace)))
+      (print stack-msg))))
+
+(defun error-parameter-max (cnt max)
+  (format t "Error too many parameter to function (~a). Only ~a parameter expected!~%" cnt max)
+  (print-stack))
 
 (defun split-expr (expression)
   (let* ((new-expr1 (regex-replace-all "\\(" expression "°(°"))
          (new-expr2 (regex-replace-all "\\)" new-expr1 "°)°"))
-         (new-expr3 (regex-replace-all (format nil "~a" #\newline) new-expr2 ""))
-         (expr-list (split " |°" new-expr3)))
+         (new-expr3 (regex-replace-all "\"" new-expr2 "°\"°"))
+         (new-expr4 (regex-replace-all (format nil "~a" #\newline) new-expr3 ""))
+         (expr-list (split " |°" new-expr4)))
     (remove-if #'(lambda(x) (= (length x) 0)) expr-list)))
 
 (defun emit-code-call (call)
   (if call
       (format t "~a~{~a~};~%" (car call) (cdr call)))
+  (if (not (is-main-defined-p))
+      (setf *code* (format nil "int main () {"))) 
   (if call
       (setf *code*
-            (format nil "~a~{~a~};~%" (car call) (cdr call))))
+            (format nil "~a~%~a~{~a~};~%" *code* (car call) (cdr call))))
+  (if (not (is-main-defined-p))
+      (setf *code* (format nil "~a}" *code*))) 
   *code*)
 
 (defun dec-arg ()
@@ -74,7 +101,15 @@
          (parse-expression (cdr expr-list)))
         ((stringp (car expr-list))
          (parse-multiline-comment (cdr expr-list)))))
-         
+
+(defun parse-cstr (expr-list)
+  (cond ((equal "\"" (car expr-list))
+         (setf *call* (append *call* (list "\"")))
+         (parse-arguments (cdr expr-list) 1))
+        ((stringp (car expr-list))
+         (setf *call* (append *call* (list (car expr-list))))
+         (parse-cstr (cdr expr-list)))))
+
 (defun parse-arguments (expr-list max)
   (cond ((equal "(" (car expr-list))
          (progn
@@ -83,24 +118,29 @@
            (if (and *paranthese* (not (equal "(" (car (last *call*)))))
                (setf *call* (append *call* (list ","))))
            (parse-call (cdr expr-list))))
+        ((equal "\"" (car expr-list))
+         (setf *call* (append *call* (list "\"")))
+         (parse-cstr (cdr expr-list)))
         ((equal ")" (car expr-list))
          (progn
            (setf *paranthese* (1- *paranthese*))
            (setf *call* (append *call* (list ")")))
+           (if (= *paranthese* 0)
+               (setf *call* (append *call* (list ";"))))
            (dec-arg)
            (parse-call (cdr expr-list))))
-        ((numberp (parse-integer (car expr-list)))
+        ((numberp (parse-integer (car expr-list) :junk-allowed t))
          (progn
            (inc-arg)
            (if (and (gethash *paranthese* *arguments*)
                     (not (equal "(" (car (last *call*)))))
                (setf *call* (append *call* (list ","))))
            (if (> (gethash *paranthese* *arguments*) max)
-               (progn
-                 (format t "Error too many parameter to function (~a). Only ~a parameter expected!~%" (gethash *paranthese* *arguments*) max))
-                    (progn
-                      (setf *call* (append *call* (list (car expr-list))))
-                      (parse-arguments (cdr expr-list) max))))))
+               (error-parameter-max (gethash *paranthese* *arguments*)
+                                    max))
+           (progn
+             (setf *call* (append *call* (list (car expr-list))))
+             (parse-arguments (cdr expr-list) max)))))
   nil)
 
 (defun parse-call (expr-list)
@@ -113,6 +153,11 @@
            (setf *paranthese* (1- *paranthese*))
            (setf *call* (append *call* (list ")")))
            (dec-arg)))
+        ((equal "print" (car expr-list))
+         (progn
+           (setf *call* (append *call* (list "print_str")))
+           (setf *call* (append *call* (list "(")))
+           (parse-arguments (cdr expr-list) 1)))
         ((or (equal "mod" (car expr-list))
              (equal "%" (car expr-list)))
          (progn
