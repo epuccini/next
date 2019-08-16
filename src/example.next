@@ -1,1 +1,5 @@
+;| Muiltiline comment
+Next example file
+by Edward Puccini |;
+
 (mod 4 (mod 10 5))

@@ -43,15 +43,18 @@
 (defvar *impl-template* (load-binary-data "../templates/code.c"))
 
 (defun split-expr (expression)
-  (let* ((new-expr1 (regex-replace-all "\\(" expression ";(;"))
-         (new-expr2 (regex-replace-all "\\)" new-expr1 ";);"))
-         (expr-list (split " |;" new-expr2)))
+  (let* ((new-expr1 (regex-replace-all "\\(" expression "°(°"))
+         (new-expr2 (regex-replace-all "\\)" new-expr1 "°)°"))
+         (new-expr3 (regex-replace-all (format nil "~a" #\newline) new-expr2 ""))
+         (expr-list (split " |°" new-expr3)))
     (remove-if #'(lambda(x) (= (length x) 0)) expr-list)))
 
 (defun emit-code-call (call)
-  (format t "~a~{~a~};" (car call) (cdr call))
-  (setf *code*
-        (format nil "~a~{~a~};" (car call) (cdr call))))
+  (if call
+      (format t "~a~{~a~};" (car call) (cdr call)))
+  (if *code*
+      (setf *code*
+            (format nil "~a~{~a~};" (car call) (cdr call)))))
 
 (defun dec-arg ()
   (setf (gethash *paranthese* *arguments*)
@@ -65,6 +68,12 @@
   (setf (gethash *paranthese* *arguments*)
         (1+ (gethash *paranthese* *arguments*))))
 
+(defun parse-multiline-comment (expr-list)
+  (cond ((equal "|;" (car expr-list))
+         (parse-expression (cdr expr-list)))
+        ((stringp (car expr-list))
+         (parse-multiline-comment (cdr expr-list)))))
+         
 (defun parse-arguments (expr-list max)
   (cond ((equal "(" (car expr-list))
          (progn
@@ -108,7 +117,11 @@
          (progn
            (inc-arg)
            (setf *paranthese* (1+ *paranthese*))
-           (parse-call (cdr expr-list))))))
+           (parse-call (cdr expr-list))))
+        ((equal ";|" (car expr-list))
+         (parse-multiline-comment (cdr expr-list)))
+        ((> (length (cdr expr-list)) 0)
+         (parse-expression (cdr expr-list)))))
 
 (defun parse (expression)
   "Parse expression."
