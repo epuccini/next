@@ -120,3 +120,21 @@
     (parse-expression expr-list)
     (setf *code* (emit-code-call *call*))
     *code*))
+
+(defun repl ()
+  (format t "~%>")
+  (loop for input = (read-line)
+       while input do
+       (parse input)
+       (format t "~%>")))
+
+(defun evaluate (expression)
+  (parse expression))
+
+
+(defun compile-next (infile outfile)
+  (let* ((infile-data (load-data infile))
+         (code (parse infile-data))
+         (outfile-data (concatenate 'string *impl-template* code)))
+    (save-data "../experiment/ouput.h" *def-template*)
+    (save-data outfile outfile-data)))

@@ -10,12 +10,9 @@
 (require 'flood)
 (require 'argparse)
 
-(eval-when (:load-toplevel :compile-toplevel :execute)
-  (use-package :argparse))
-
 (defun main()
     (let ((param
-           (with-arguments-hash-table
+           (argparse:with-arguments-hash-table
                "next"
              "Next programming languge compiler, repl and evaluatior."
              "v1.0.0.0"
@@ -23,17 +20,27 @@
                :description "Compile file"
                :group "Compilation"
                :type 'string)
+             '(:argument "--output"
+               :description "Output file"
+               :group "Compilation"
+               :type 'string)
              '(:argument "--repl"
                :description "Read-eval-print-loop flag"
                :group "Read-eval-print-loop"
                :type 'flag)
-	     '(:argument "--eval"
+	         '(:argument "--eval"
                :description "Evaluate expression"
                :group "Evaluation"
                :type 'string))))
-      (handle-unknown-arguments param)
-      (handle-missing-arguments param)
-      (print (get-argument-value param "--eval"))))
+      (argparse:handle-unknown-arguments param)
+      (argparse:handle-missing-arguments param)
+      (cond ((argparse:get-argument-value param "--repl")
+             (next:repl))
+            ((argparse:get-argument-value param "--eval")
+             (next:evaluate (argparse:get-argument-value param "--eval")))
+            ((argparse:get-argument-value param "--compile")
+             (next:compile-next (argparse:get-argument-value param "--compile")
+                          (argparse:get-argument-value param "--output"))))))
 
 (defun build ()
   "Save executable with necessary options."
