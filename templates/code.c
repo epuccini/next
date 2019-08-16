@@ -24,6 +24,26 @@ void print_double(double val) {
     printf("%d", val);
 }
 
-void print_str(char* str) {
-    printf("%s", str);
+void print_str(const char* str) {
+    printf(str);
+}
+
+void println_int(int val) {
+    printf("%d\n", val);
+}
+
+void println_long(long val) {
+    printf("%l\n", val);
+}
+
+void println_float(float val) {
+    printf("%f\n", val);
+}
+
+void println_double(double val) {
+    printf("%d\n", val);
+}
+
+void println_str(const char* str) {
+    printf("%s\n", str);
 }

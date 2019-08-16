@@ -79,7 +79,7 @@
       (setf *code* (format nil "int main () {"))) 
   (if call
       (setf *code*
-            (format nil "~a~%~a~{~a~};~%" *code* (car call) (cdr call))))
+            (format nil "~a~%~a~{~a~}~%" *code* (car call) (cdr call))))
   (if (not (is-main-defined-p))
       (setf *code* (format nil "~a}" *code*))) 
   *code*)
@@ -126,7 +126,7 @@
            (setf *paranthese* (1- *paranthese*))
            (setf *call* (append *call* (list ")")))
            (if (= *paranthese* 0)
-               (setf *call* (append *call* (list ";"))))
+               (setf *call* (append *call* (list (format nil ";~%")))))
            (dec-arg)
            (parse-call (cdr expr-list))))
         ((numberp (parse-integer (car expr-list) :junk-allowed t))
@@ -153,9 +153,18 @@
            (setf *paranthese* (1- *paranthese*))
            (setf *call* (append *call* (list ")")))
            (dec-arg)))
+        ((equal "println" (car expr-list))
+         (progn
+           (if (numberp (parse-integer (cadr expr-list) :junk-allowed t))
+               (setf *call* (append *call* (list "println_int")))
+               (setf *call* (append *call* (list "println_str"))))
+           (setf *call* (append *call* (list "(")))
+           (parse-arguments (cdr expr-list) 1)))
         ((equal "print" (car expr-list))
          (progn
-           (setf *call* (append *call* (list "print_str")))
+           (if (numberp (parse-integer (cadr expr-list) :junk-allowed t))
+               (setf *call* (append *call* (list "println_int")))
+               (setf *call* (append *call* (list "print_str"))))
            (setf *call* (append *call* (list "(")))
            (parse-arguments (cdr expr-list) 1)))
         ((or (equal "mod" (car expr-list))

@@ -13,7 +13,7 @@ void print_int(int val) {
 }
 
 void print_long(long val) {
-    printf("%ld", val);
+    printf("%l", val);
 }
 
 void print_float(float val) {
@@ -21,12 +21,34 @@ void print_float(float val) {
 }
 
 void print_double(double val) {
-    printf("%e", val);
+    printf("%d", val);
 }
 
-void print_str(char* str) {
-    printf("%s", str);
+void print_str(const char* str) {
+    printf(str);
+}
+
+void println_int(int val) {
+    printf("%d\n", val);
+}
+
+void println_long(long val) {
+    printf("%l\n", val);
+}
+
+void println_float(float val) {
+    printf("%f\n", val);
+}
+
+void println_double(double val) {
+    printf("%d\n", val);
+}
+
+void println_str(const char* str) {
+    printf("%s\n", str);
 }
 int main () {
-    print_str("HelloWorld");mod(4,mod(11,5));
+    println_str("HelloWorld");
+println_int(10);
+
 }
