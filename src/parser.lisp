@@ -68,7 +68,7 @@
   (let* ((new-expr1 (regex-replace-all "\\(" expression "°(°"))
          (new-expr2 (regex-replace-all "\\)" new-expr1 "°)°"))
          (new-expr3 (regex-replace-all "\"" new-expr2 "°\"°"))
-         (new-expr4 (regex-replace-all (format nil "~a" #\newline) new-expr3 ""))
+         (new-expr4 (regex-replace-all (format nil "~a" #\newline) new-expr3 (format nil "°\n°")))
          (expr-list (split " |°" new-expr4)))
     (remove-if #'(lambda(x) (= (length x) 0)) expr-list)))
 
@@ -101,6 +101,12 @@
          (parse-expression (cdr expr-list)))
         ((stringp (car expr-list))
          (parse-multiline-comment (cdr expr-list)))))
+
+(defun parse-single-line-comment (expr-list)
+  (cond ((equal "\n" (car expr-list))
+         (parse-expression (cdr expr-list)))
+        ((stringp (car expr-list))
+         (parse-single-line-comment (cdr expr-list)))))
 
 (defun parse-cstr (expr-list)
   (cond ((equal "\"" (car expr-list))
@@ -153,6 +159,8 @@
            (setf *paranthese* (1- *paranthese*))
            (setf *call* (append *call* (list ")")))
            (dec-arg)))
+        ((equal "\n" (car expr-list))
+         (parse-expression (cdr expr-list)))
         ((equal "println" (car expr-list))
          (progn
            (if (numberp (parse-integer (cadr expr-list) :junk-allowed t))
@@ -182,6 +190,8 @@
            (parse-call (cdr expr-list))))
         ((equal ";|" (car expr-list))
          (parse-multiline-comment (cdr expr-list)))
+        ((equal ";" (car expr-list))
+         (parse-single-line-comment (cdr expr-list)))
         ((> (length (cdr expr-list)) 0)
          (parse-expression (cdr expr-list)))))
 

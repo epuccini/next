@@ -2,6 +2,8 @@
 Next example file
 by Edward Puccini |;
 
+; single line comment
+
 (println "Hello World")
 (println 10)
 ;(println 10.2)
