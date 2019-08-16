@@ -22,6 +22,14 @@
                                     (format nil "~a" (code-char line))))))
 	store))
 
+
+(defun save-binary-data (path data)
+  "Load binary file from path."
+  (cl-binary:with-open-binary-file (out path :direction :output)
+    (loop for x from 0 to (1- (length data)) do
+         (cl-binary:write-u8 out (char-code (elt data x))))))
+
+
 (defun load-data (path)
   "Load ascii file from path."
   (let ((store))

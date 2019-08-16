@@ -1,4 +1,4 @@
-#include "code.h"
+#include "$(OUTPUT_H)"
 
 int mod(int a, int b) {
 	return a % b;

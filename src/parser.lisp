@@ -133,8 +133,18 @@
 
 
 (defun compile-next (infile outfile)
-  (let* ((infile-data (load-data infile))
+  (let* ((infile-data (load-binary-data infile))
          (code (parse infile-data))
-         (outfile-data (concatenate 'string *impl-template* code)))
-    (save-data "../experiment/ouput.h" *def-template*)
-    (save-data outfile outfile-data)))
+         (outfile-data (concatenate 'string *impl-template* code))
+         (outfilename (pathname-name outfile))
+         (outfilepath (directory-namestring outfile)))
+    (setf outfile-data (regex-replace-all "\\$\\(OUTPUT_H\\)"
+                                          outfile-data
+                                          (concatenate 'string
+                                                       outfilename ".h")))
+    (save-binary-data (concatenate 'string
+                                   outfilepath
+                                   outfilename ".h") *def-template*)
+    (save-binary-data (concatenate 'string
+                                   outfilepath
+                                   outfilename ".c") outfile-data)))
