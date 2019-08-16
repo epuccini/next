@@ -51,10 +51,11 @@
 
 (defun emit-code-call (call)
   (if call
-      (format t "~a~{~a~};" (car call) (cdr call)))
-  (if *code*
+      (format t "~a~{~a~};~%" (car call) (cdr call)))
+  (if call
       (setf *code*
-            (format nil "~a~{~a~};" (car call) (cdr call)))))
+            (format nil "~a~{~a~};~%" (car call) (cdr call))))
+  *code*)
 
 (defun dec-arg ()
   (setf (gethash *paranthese* *arguments*)
