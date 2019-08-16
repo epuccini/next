@@ -13,7 +13,7 @@ void print_int(int val) {
 }
 
 void print_long(long val) {
-    printf("%l", val);
+    printf("%ld", val);
 }
 
 void print_float(float val) {
@@ -21,7 +21,7 @@ void print_float(float val) {
 }
 
 void print_double(double val) {
-    printf("%d", val);
+    printf("%e", val);
 }
 
 void print_str(char* str) {
