@@ -6,4 +6,7 @@ int mod(int a, int b) {
 
 int int_mod_int(int a, int b) {
 	return a % b;
-}    mod(4,mod(10,5);
+}
+int main() {
+    return mod(13,mod(13,5));
+}

@@ -1,10 +1,18 @@
-CC=gcc
-CFLAGS=-I.
-DEPS = output.h
-OBJ = output.o
+APPLICATION 	= output
+VERSION 	= 4.7.0
+CC      	= /usr/bin/g++
+CFLAGS  	= -Wall -g -c -std=c++11 -D_REENTRANT -DVERSION=\"$(VERSION)\"
+LDFLAGS 	= -pthread -lm
+SRCDIR 		= /usr/local/src/async
 
-%.o: %.c $(DEPS)
-	$(CC) -c -o $@ $< $(CFLAGS)
+OBJ		= output.o
 
-hellomake: $(OBJ)
-	$(CC) -o $@ $^ $(CFLAGS)
+$(APPLICATION): $(OBJ)
+	$(CC) -o $(APPLICATION) $(OBJ) $(LDFLAGS)
+
+clean:
+	rm -f $(APPLICATION)
+	rm -f *.o
+
+%.o: %.c
+	$(CC) $(CFLAGS) -c $<

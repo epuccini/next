@@ -87,7 +87,8 @@
          (progn
            (setf *paranthese* (1- *paranthese*))
            (setf *call* (append *call* (list ")")))
-           (dec-arg)))
+           (dec-arg)
+           (parse-call (cdr expr-list))))
         ((numberp (parse-integer (car expr-list)))
          (progn
            (inc-arg)
@@ -99,13 +100,19 @@
                  (format t "Error too many parameter to function (~a). Only ~a parameter expected!~%" (gethash *paranthese* *arguments*) max))
                     (progn
                       (setf *call* (append *call* (list (car expr-list))))
-                      (parse-arguments (cdr expr-list) max)))))))
+                      (parse-arguments (cdr expr-list) max))))))
+  nil)
 
 (defun parse-call (expr-list)
   (cond ((equal "(" (car expr-list))
          (progn
            (setf *paranthese* (1+ *paranthese*))
            (parse-call (cdr expr-list))))
+        ((equal ")" (car expr-list))
+         (progn
+           (setf *paranthese* (1- *paranthese*))
+           (setf *call* (append *call* (list ")")))
+           (dec-arg)))
         ((or (equal "mod" (car expr-list))
              (equal "%" (car expr-list)))
          (progn
