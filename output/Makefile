@@ -3,7 +3,7 @@ VERSION 	= 4.7.0
 CC      	= /usr/bin/gcc
 CFLAGS  	= -Wall -g -c -D_REENTRANT -DVERSION=\"$(VERSION)\"
 LDFLAGS 	= -pthread -lm
-SRCDIR 		= /usr/local/src/async
+SRCDIR 		= /Users/edward/Documents/Code/common-lisp/projects/next/output 
 
 OBJ		= output.o
 
