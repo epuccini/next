@@ -39,8 +39,8 @@
 (defvar *code* nil)
 (defvar *paranthese* 0)
 (defvar *arguments* 0)
-;(defvar *def-template* (load-data "../templates/code.h"))
-;(defvar *impl-template* (load-data "../templates/code.c"))
+(defvar *def-template* (load-binary-data "../templates/code.h"))
+(defvar *impl-template* (load-binary-data "../templates/code.c"))
 
 (defun split-expr (expression)
   (let* ((new-expr1 (regex-replace-all "\\(" expression ";(;"))

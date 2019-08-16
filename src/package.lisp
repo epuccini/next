@@ -7,7 +7,7 @@
 ;;; -----------------------------------------------------
 
 (defpackage :next
-    (:use "COMMON-LISP" #:flood #:argparse #:cl-ppcre)
+    (:use "COMMON-LISP" #:flood #:argparse #:cl-ppcre )
     (:export
      #:parse
      #:parse-expression
@@ -15,6 +15,7 @@
      #:parse-arguments
      #:load-data
      #:save-data
+     #:load-binary-data
      #:*call*
      #:*code*
      #:*def-template*

@@ -10,6 +10,18 @@
 
 (in-package :next)
 
+(require 'cl-binary)
+
+(defun load-binary-data (path)
+  "Load binary file from path."
+  (let ((store))
+    (cl-binary:with-open-binary-file (in path)
+      (loop for line = (cl-binary:read-u8 in)
+         while line do
+           (setf store (concatenate 'string store
+                                    (format nil "~a" (code-char line))))))
+	store))
+
 (defun load-data (path)
   "Load ascii file from path."
   (let ((store))
