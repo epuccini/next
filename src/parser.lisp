@@ -42,6 +42,7 @@
 (defvar *def-template* (load-binary-data "../templates/code.h"))
 (defvar *impl-template* (load-binary-data "../templates/code.c"))
 (defvar *is-main-defined* nil)
+(defvar *infinite-arguments* 10000)
 
 (defun is-main-defined-p ()
   *is-main-defined*)
@@ -96,6 +97,9 @@
   (setf (gethash *paranthese* *arguments*)
         (1+ (gethash *paranthese* *arguments*))))
 
+(defun zero-arg ()
+  (setf (gethash *paranthese* *arguments*) 0))
+
 (defun parse-multiline-comment (expr-list)
   (cond ((equal "|;" (car expr-list))
          (parse-expression (cdr expr-list)))
@@ -111,7 +115,7 @@
 (defun parse-cstr (expr-list)
   (cond ((equal "\"" (car expr-list))
          (setf *call* (append *call* (list "\"")))
-         (parse-arguments (cdr expr-list) 1))
+         (parse-arguments (cdr expr-list) *infinite-arguments*))
         ((stringp (car expr-list))
          (setf *call* (append *call* (list (car expr-list))))
          (parse-cstr (cdr expr-list)))))
@@ -125,6 +129,9 @@
                (setf *call* (append *call* (list ","))))
            (parse-call (cdr expr-list))))
         ((equal "\"" (car expr-list))
+         (if (and *paranthese*
+                  (not (equal "(" (car (last *call*)))))
+             (setf *call* (append *call* (list ","))))
          (setf *call* (append *call* (list "\"")))
          (parse-cstr (cdr expr-list)))
         ((equal ")" (car expr-list))
@@ -163,12 +170,19 @@
            (dec-arg)))
         ((equal "\n" (car expr-list))
          (parse-expression (cdr expr-list)))
+        ((equal "print-format" (car expr-list))
+         (progn
+           (setf *call* (append *call* (list "print_format")))
+           (setf *call* (append *call* (list "(")))
+           (zero-arg)
+           (parse-arguments (cdr expr-list) *infinite-arguments*)))
         ((equal "println" (car expr-list))
          (progn
            (if (numberp (parse-integer (cadr expr-list) :junk-allowed t))
                (setf *call* (append *call* (list "println_int")))
                (setf *call* (append *call* (list "println_str"))))
            (setf *call* (append *call* (list "(")))
+           (zero-arg)
            (parse-arguments (cdr expr-list) 1)))
         ((equal "print" (car expr-list))
          (progn
@@ -176,12 +190,14 @@
                (setf *call* (append *call* (list "println_int")))
                (setf *call* (append *call* (list "print_str"))))
            (setf *call* (append *call* (list "(")))
+           (zero-arg)
            (parse-arguments (cdr expr-list) 1)))
         ((or (equal "mod" (car expr-list))
              (equal "%" (car expr-list)))
          (progn
            (setf *call* (append *call* (list "mod")))
            (setf *call* (append *call* (list "(")))
+           (zero-arg)
            (parse-arguments (cdr expr-list) 2)))))
 
 (defun parse-expression (expr-list)

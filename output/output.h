@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdarg.h>
 
 int mod(int a, int b);
 int int_mod_int(int a, int b);
@@ -12,5 +13,5 @@ void println_long(long val);
 void println_float(float val);
 void println_double(double val);
 void println_str(const char* str);
-
+void print_format(const char* fmt, ...);
 

@@ -47,3 +47,24 @@ void println_double(double val) {
 void println_str(const char* str) {
     printf("%s \n", str);
 }
+
+void print_format(const char* fmt, ...) {
+    va_list arglist;
+    va_start(arglist, fmt);
+    const char* p;
+    
+    for(p = fmt; *p != '\0'; p++) {
+        if (*p == '%') {
+            p++;
+            if (*p == 'd')
+                printf("%d", va_arg(arglist, int));
+            if (*p == 's')
+                printf("%s", va_arg(arglist, char*));
+            if (*p == 'c')
+                printf("%c", va_arg(arglist, int));
+            continue;
+        }
+    };
+    va_end(arglist);
+    printf("\n");
+}

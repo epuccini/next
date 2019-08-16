@@ -7,4 +7,5 @@ by Edward Puccini |;
 (println "Hello World")
 (println 10)
 ;(println 10.2)
+(print-format "%s%d" "x = " 10)
 (mod 4 (mod 11 5))
