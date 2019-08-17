@@ -4,8 +4,16 @@ int mod(int a, int b) {
 	return a % b;
 }
 
-int int_mod_int(int a, int b) {
+int int32_mod_int32(int a, int b) {
     return a % b;
+}
+
+bool bool_not_bool(bool a) {
+    return !a;
+}
+
+int int32_not_int32(int a) {
+    return !a;
 }
 
 void print_char(char val) {
@@ -93,7 +101,7 @@ void print_format(const char* fmt, ...) {
     printf("\n");
 }
 
-char plus_byte(int size, ...) {
+short plus_byte(int size, ...) {
     va_list arglist;
     va_start(arglist, size);
     char result = 0;
@@ -101,7 +109,7 @@ char plus_byte(int size, ...) {
     for (int i = 0; i < size; i++) {
         result += (char)va_arg(arglist, int);
     }
-    return result;
+    return (short)result;
 }
 
 short plus_int16(int size, ...) {
