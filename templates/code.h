@@ -20,6 +20,10 @@ void println_float(float val);
 void println_double(double val);
 void println_str(const char* str);
 void print_format(const char* fmt, ...);
+char plus_byte(int size, ...);
+short plus_short(int size, ...);
 int plus_int32(int size, ...);
 long plus_int64(int size, ...);
+float plus_float(int size, ...);
+double plus_double(int size, ...);
 

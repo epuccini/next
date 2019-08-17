@@ -93,6 +93,28 @@ void print_format(const char* fmt, ...) {
     printf("\n");
 }
 
+char plus_byte(int size, ...) {
+    va_list arglist;
+    va_start(arglist, size);
+    char result = 0;
+    
+    for (int i = 0; i < size; i++) {
+        result += (char)va_arg(arglist, int);
+    }
+    return result;
+}
+
+short plus_int16(int size, ...) {
+    va_list arglist;
+    va_start(arglist, size);
+    short result = 0;
+    
+    for (int i = 0; i < size; i++) {
+        result += (short) va_arg(arglist, int);
+    }
+    return result;
+}
+
 int plus_int32(int size, ...) {
     va_list arglist;
     va_start(arglist, size);
@@ -111,6 +133,28 @@ long plus_int64(int size, ...) {
     
     for (int i = 0; i < size; i++) {
         result += va_arg(arglist, long);
+    }
+    return result;
+}
+
+float plus_float(int size, ...) {
+    va_list arglist;
+    va_start(arglist, size);
+    float result = 0;
+    
+    for (int i = 0; i < size; i++) {
+        result += (float) va_arg(arglist, double);
+    }
+    return result;
+}
+
+double plus_double(int size, ...) {
+    va_list arglist;
+    va_start(arglist, size);
+    double result = 0;
+    
+    for (int i = 0; i < size; i++) {
+        result += va_arg(arglist, double);
     }
     return result;
 }
