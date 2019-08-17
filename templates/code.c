@@ -5,14 +5,26 @@ int mod(int a, int b) {
 }
 
 int int_mod_int(int a, int b) {
-	return a % b;
+    return a % b;
 }
 
-void print_int(int val) {
+void print_char(char val) {
+    printf("%c", val);
+}
+
+void print_byte(char val) {
     printf("%d", val);
 }
 
-void print_long(long val) {
+void print_int16(short val) {
+    printf("%d", val);
+}
+
+void print_int32(int val) {
+    printf("%d", val);
+}
+
+void print_int64(long val) {
     printf("%ld", val);
 }
 
@@ -28,11 +40,23 @@ void print_str(const char* str) {
     printf("%s", str);
 }
 
-void println_int(int val) {
+void println_byte(char val) {
+    printf("%d\n", val);
+}
+
+void println_char(char val) {
+    printf("%c\n", val);
+}
+
+void println_int16(short val) {
+    printf("%d\n", val);
+}
+
+void println_int32(int val) {
     printf("%d \n", val);
 }
 
-void println_long(long val) {
+void println_int64(long val) {
     printf("%ld \n", val);
 }
 
@@ -67,4 +91,26 @@ void print_format(const char* fmt, ...) {
     };
     va_end(arglist);
     printf("\n");
+}
+
+int plus_int32(int size, ...) {
+    va_list arglist;
+    va_start(arglist, size);
+    int result = 0;
+    
+    for (int i = 0; i < size; i++) {
+        result += va_arg(arglist, int);
+    }
+    return result;
+}
+
+long plus_int64(int size, ...) {
+    va_list arglist;
+    va_start(arglist, size);
+    long result = 0;
+    
+    for (int i = 0; i < size; i++) {
+        result += va_arg(arglist, long);
+    }
+    return result;
 }

@@ -39,10 +39,14 @@
 (defvar *code* nil)
 (defvar *block* 0)
 (defvar *arguments* 0)
-(defvar *def-template* (load-binary-data "../templates/code.h"))
-(defvar *impl-template* (load-binary-data "../templates/code.c"))
+(defvar *def-template* nil)
+(defvar *impl-template* nil)
 (defvar *is-main-defined* nil)
 (defvar *infinite-arguments* 10000)
+
+(defun load-templates ()
+  (setf *def-template* (load-binary-data "../templates/code.h"))
+  (setf *impl-template* (load-binary-data "../templates/code.c")))
 
 (defun is-main-defined-p ()
   *is-main-defined*)
@@ -188,7 +192,7 @@
         ((equal "println" (car expr-list))
          (progn
            (if (numberp (parse-integer (cadr expr-list) :junk-allowed t))
-               (setf *call* (append *call* (list "println_int")))
+               (setf *call* (append *call* (list "println_int32")))
                (setf *call* (append *call* (list "println_str"))))
            (setf *call* (append *call* (list "(")))
            (zero-arg)
@@ -196,7 +200,7 @@
         ((equal "print" (car expr-list))
          (progn
            (if (numberp (parse-integer (cadr expr-list) :junk-allowed t))
-               (setf *call* (append *call* (list "println_int")))
+               (setf *call* (append *call* (list "println_int32")))
                (setf *call* (append *call* (list "print_str"))))
            (setf *call* (append *call* (list "(")))
            (zero-arg)
@@ -245,6 +249,7 @@
 
 
 (defun compile-next (infile outfile)
+  (load-templates)
   (let* ((infile-data (load-binary-data infile))
          (code (parse infile-data))
          (outfile-data (concatenate 'string *impl-template* code))
