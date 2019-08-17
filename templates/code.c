@@ -28,11 +28,11 @@ void print_int64(long val) {
     printf("%ld", val);
 }
 
-void print_float(float val) {
+void print_float32(float val) {
     printf("%f", val);
 }
 
-void print_double(double val) {
+void print_float64(double val) {
     printf("%lf", val);
 }
 
@@ -60,11 +60,11 @@ void println_int64(long val) {
     printf("%ld \n", val);
 }
 
-void println_float(float val) {
+void println_float32(float val) {
     printf("%f \n", val);
 }
 
-void println_double(double val) {
+void println_float64(double val) {
     printf("%lf \n", val);
 }
 
@@ -137,7 +137,7 @@ long plus_int64(int size, ...) {
     return result;
 }
 
-float plus_float(int size, ...) {
+float plus_float32(int size, ...) {
     va_list arglist;
     va_start(arglist, size);
     float result = 0;
@@ -148,7 +148,7 @@ float plus_float(int size, ...) {
     return result;
 }
 
-double plus_double(int size, ...) {
+double plus_float64(int size, ...) {
     va_list arglist;
     va_start(arglist, size);
     double result = 0;
