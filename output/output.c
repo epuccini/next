@@ -169,6 +169,7 @@ double plus_float64(int size, ...) {
 int main () {
     println_str("HelloWorld");
 println_int32(10);
+println_float64(10.2f);
 print_format("%s%d","x=",10);
 mod(4,mod(11,5));
 

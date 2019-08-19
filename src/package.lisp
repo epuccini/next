@@ -7,7 +7,7 @@
 ;;; -----------------------------------------------------
 
 (defpackage :next
-    (:use "COMMON-LISP" #:flood #:cl-ppcre)
+    (:use "COMMON-LISP" #:flood #:cl-ppcre #:parse-float)
     (:export
      #:parse
      #:load-data
