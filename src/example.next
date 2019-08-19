@@ -8,4 +8,6 @@ by Edward Puccini |;
 (println 10)
 (println 10.2d0)
 (print-format "%s%d" "x = " 10)
-(mod 4 (mod 11 5))
+(let [result:int32 (mod 9 (mod 12 5))]
+	(println result))
+(print "ENDE")
