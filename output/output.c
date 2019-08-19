@@ -168,11 +168,12 @@ double plus_float64(int size, ...) {
 }
 int main () {
     println_int32(10);
-	println_float64(10.2f);
-	print_format("%s%d","x=",10);
-	{
-		int result=mod(9,mod(12,5));
-		println_str(result);
-	}
-	print_str("ENDE");
+println_float64(10.2f);
+print_format("%s%d","x=",10);
+{
+int result=mod(9,mod(12,5));
+println_str(result);
+}
+print_str("ENDE");
+
 }

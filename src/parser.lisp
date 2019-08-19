@@ -102,6 +102,21 @@
       (setf *code* (format nil "~a}" *code*))) 
   *code*)
 
+(defun skip-expr-or-value (expr p)
+  (cond  ((equal (car expr) "(")
+          (setq p (1+ p))
+          (skip-expr-or-value (cdr expr) p))
+         ((equal (car expr) ")")
+         (progn
+           (setq p (1- p))
+           (if (= p 0)
+               (return-from skip-expr-or-value (cdr expr))
+               (skip-expr-or-value (cdr expr) p))))
+         ((and (not (equal (car expr) "(")) (not (equal (car expr) ")")))
+          (if (> p 0)
+              (skip-expr-or-value (cdr expr) p)
+              (return-from skip-expr-or-value (cdr expr))))))
+
 (defun skip-expression (expr p)
   (cond  ((equal (car expr) "(")
           (setq p (1+ p))
@@ -114,7 +129,6 @@
                (skip-expression (cdr expr) p))))
         ((or (equal (car expr) "(") (not (equal (car expr) ")")))
          (skip-expression (cdr expr) p))))
-     
 
 (defun inc-block ()
   (setf *block* (1+ *block*)))
