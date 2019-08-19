@@ -172,7 +172,7 @@ println_float64(10.2f);
 print_format("%s%d","x=",10);
 {
 int result=mod(9,mod(12,5));
-println_str(result);
+println_int32(result);
 }
 print_str("ENDE");
 
