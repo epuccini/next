@@ -44,7 +44,18 @@
 
 (defun build ()
   "Save executable with necessary options."
+  #+windows
   (save-lisp-and-die "next.exe"
+                     :executable t
+                     :toplevel 'main
+                     :save-runtime-options t)
+  #+linux
+  (save-lisp-and-die "next"
+                     :executable t
+                     :toplevel 'main
+                     :save-runtime-options t)
+  #+darwin
+  (save-lisp-and-die "next"
                      :executable t
                      :toplevel 'main
                      :save-runtime-options t))
