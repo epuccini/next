@@ -115,6 +115,21 @@
 (defun zero-arg ()
   (setf (gethash *block* *arguments*) 0))
 
+(defun type-of-number-string (numstr)
+  (cond ((and (typep (parse-integer numstr :junk-allowed t) 'integer)
+              (not (find #\. numstr)))
+         'integer)
+        ((typep (parse-float numstr
+                             :junk-allowed t
+                             :type 'double-float) 'double-float)
+         'double-float)
+        ((typep (parse-float numstr
+                             :junk-allowed t
+                             :type 'single-float) 'float)
+         'float)
+        ((typep numstr 'string)
+         'string)))
+        
 (defun parse-multiline-comment (expr-list)
   (cond ((equal "|;" (car expr-list))
          (parse-expression (cdr expr-list)))
@@ -194,37 +209,27 @@
            (zero-arg)
            (parse-arguments (cdr expr-list) *infinite-arguments*)))
         ((equal "println" (car expr-list))
-         (progn
-           (cond ((and (typep (parse-integer (cadr expr-list) :junk-allowed t) 'integer)
-                       (not (find #\. (cadr expr-list)))) 
+         (let ((tp (type-of-number-string (cadr expr-list))))
+           (cond ((equal tp 'integer)
                   (setf *call* (append *call* (list "println_int32"))))
-                 ((typep (parse-float (cadr expr-list)
-                                      :junk-allowed t
-                                      :type 'double-float) 'double-float)
+                 ((equal tp 'double-float)
                   (setf *call* (append *call* (list "println_float64"))))
-                 ((typep (parse-float (cadr expr-list)
-                                      :junk-allowed t
-                                      :type 'single-float) 'float)
+                 ((equal tp 'float)
                   (setf *call* (append *call* (list "println_float32"))))
-                 ((stringp (cadr expr-list))
+                 ((equal tp 'string)
                   (setf *call* (append *call* (list "println_str")))))
            (setf *call* (append *call* (list "(")))
            (zero-arg)
            (parse-arguments (cdr expr-list) 1)))
         ((equal "print" (car expr-list))
-         (progn
-           (cond ((and (typep (parse-integer (cadr expr-list) :junk-allowed t) 'integer)
-                       (not (find #\. (cadr expr-list))))
+         (let ((tp (type-of-number-string (cadr expr-list))))
+           (cond ((equal tp 'integer)
                   (setf *call* (append *call* (list "println_int32"))))
-                 ((typep (parse-float (cadr expr-list)
-                                      :junk-allowed t
-                                      :type 'double-float) 'double-float)
+                 ((equal tp 'double-float)
                   (setf *call* (append *call* (list "print_float64"))))
-                 ((typep (parse-float (cadr expr-list)
-                                      :junk-allowed t
-                                      :type 'single-float) 'float)
+                 ((equal tp 'float)
                   (setf *call* (append *call* (list "print_float32"))))
-                 ((stringp (cadr expr-list))
+                 ((equal tp 'string)
                   (setf *call* (append *call* (list "print_str")))))
            (setf *call* (append *call* (list "(")))
            (zero-arg)
