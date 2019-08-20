@@ -167,7 +167,8 @@ double plus_float64(int size, ...) {
     return result;
 }
 int main () {
-    println_int32(10);
+    println_str("HelloWorld");
+println_int32(10);
 println_float64(10.2f);
 print_format("%s%d","x=",10);
 {
@@ -175,8 +176,10 @@ int result=mod(9,mod(12,5);
 float value=2.0;
 println_int32(result);
 print_str("LET1");
-print_str("LET2");
 }
+println_int32(result);
+print_str("LET1");
+print_str("LET2");
 print_str("ENDE");
 
 }
