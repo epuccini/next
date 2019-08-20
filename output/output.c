@@ -176,9 +176,21 @@ int result=mod(9,mod(12,5));
 float value=2.0;
 char* str="INIT";
 println_int32(result);
-print_str("LET1");
-print_str("LET2");
 }
-print_str("ENDE");
+{
+int result=mod(9,mod(12,5));
+println_int32(result);
+println_str("LET1");
+println_str("LET2");
+}
+{
+int result=mod(9,mod(12,5));
+float value=2.0;
+char* str="INIT";
+println_int32(result);
+println_str("LET1");
+println_str("LET2");
+}
+println_str("ENDE");
 
 }
