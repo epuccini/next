@@ -8,6 +8,12 @@ by Edward Puccini |;
 (println 10)
 (println 10.2d0)
 (print-format "%s%d" "x = " 10)
-(let [result:int32 (mod 9 (mod 12 5))]
+
+(let [test1:int64 0
+	  test2:int64 0]
+	  (print "TEST"))
+	  
+(let [result:int32 (mod 9 (mod 12 5))
+	  value:float32 2.0]
 	(println result))
 (print "ENDE")
