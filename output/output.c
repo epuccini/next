@@ -175,7 +175,6 @@ print_format("%s%d","x=",10);
 int result=mod(9,mod(12,5);
 float value=2.0;
 char* str="INIT";
-}
 print_str("LET1");
 print_str("LET2");
 print_str("ENDE");
