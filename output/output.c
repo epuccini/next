@@ -172,12 +172,12 @@ println_int32(10);
 println_float64(10.2f);
 print_format("%s%d","x=",10);
 {
-int result=mod(9,mod(12,5);
+int result=mod(9,mod(12,5));
 float value=2.0;
 char* str="INIT";
 println_int32(result);
 }
-print_str("LET1");
-print_str("LET2");
-print_str("ENDE")
+print_str("LET1")print_str("LET2"));
+print_str("ENDE");
+
 }
