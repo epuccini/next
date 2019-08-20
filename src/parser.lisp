@@ -213,6 +213,10 @@
         ((> (length expr-list) 0)
          (format t "parse-inner-block: PARSE INNER ~a Block: ~a~%" (cdr expr-list) *block*)
          (setf expr-list (parse-inner-block (cdr expr-list)))))
+  (if (equal "(" (car expr-list) )
+      (setf expr-list (parse-inner-block expr-list)))
+  (if (equal (format nil "~a" #\Tab) (car expr-list))
+      (setf expr-list (parse-inner-block (cdr expr-list))))
   expr-list)
   
 (defun parse-variable (expr-list)
