@@ -41,6 +41,7 @@
 (defvar *code* nil)
 (defvar *paranteses* 0)
 (defvar *variables* nil)
+(defvar *functions* nil)
 (defvar *arguments* 0)
 (defvar *def-template* nil)
 (defvar *impl-template* nil)
@@ -71,16 +72,24 @@
 
 (defun error-parameter-max (cnt max)
   (format t "Error too many parameter to function (~a). Only ~a parameter expected!~%" cnt max)
-  (print-stack))
+  (print-stack)
+  (sb-ext:quit))
 
 
 (defun error-no-type-def ()
   (format t "Error no variable and type defined!~%")
-  (print-stack))
+  (print-stack)
+  (sb-ext:quit))
+
+(defun error-function-not-defined ()
+  (format t "Error function not defined!~%")
+  (print-stack)
+  (sb-ext:quit))
 
 (defun error-missing-expression ()
   (format t "Error missing expression!~%")
-  (print-stack))
+  (print-stack)
+  (sb-ext:quit))
 
 (defun split-expr (expression)
   (let* ((new-expr1 (regex-replace-all "\\(" expression "°(°"))
@@ -453,7 +462,9 @@
            (setf *call* (append *call* (list "mod")))
            (setf *call* (append *call* (list "(")))
            (zero-arg)
-           (setf expr-list (parse-arguments (cdr expr-list) 2)))))
+           (setf expr-list (parse-arguments (cdr expr-list) 2))))
+        ((stringp (car expr-list))
+         (error-function-not-defined)))
    expr-list)
 
 
