@@ -74,8 +74,12 @@
   (print-stack))
 
 
-(defun error-not-type-def ()
-  (format t "Error no type for variable defined!~%")
+(defun error-no-type-def ()
+  (format t "Error no variable and type defined!~%")
+  (print-stack))
+
+(defun error-missing-expression ()
+  (format t "Error missing expression!~%")
   (print-stack))
 
 (defun split-expr (expression)
@@ -250,7 +254,11 @@
            (setf *call* (append *call* (list (car def))))
            (setf *call* (append *call* (list "=")))
            (format t "parse-variable: OPEN ARG~%")
-           (setf expr-list (parse-expression (cdr expr-list))))))
+           (if (equal (cadr expr-list) "]")
+               (error-missing-expression))
+           (setf expr-list (parse-expression (cdr expr-list)))))
+        (t
+         (error-no-type-def)))
   expr-list)
           
 (defun parse-parameter-vector (expr-list)
