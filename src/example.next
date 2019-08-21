@@ -29,6 +29,7 @@ by Edward Puccini |;
 
 (defn test:int32 [op1:int32 op2:float32]
 	(println op1)
-	(println op2))
+	(println op2)
+	(return 111))
 	
-(test 2 3.3)
+(println (test 2 3.3))
