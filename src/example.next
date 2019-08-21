@@ -27,3 +27,8 @@ by Edward Puccini |;
 	(println str))
 (println "ENDE")
 
+(defn test:int32 [op1:int32 op2:float32]
+	(println op1)
+	(println op2))
+	
+(test 2,3.3)

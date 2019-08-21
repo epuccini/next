@@ -192,5 +192,11 @@ println_int32(result);
 println_str(str);
 }
 println_str("ENDE");
+int test(int op1,float op2)
+{
+println_int32(op1);
+println_float32(op2);
+}
+test(2.1,3.3);
 
 }
