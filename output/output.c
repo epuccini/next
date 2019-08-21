@@ -197,6 +197,6 @@ int test(int op1,float op2)
 println_int32(op1);
 println_float32(op2);
 }
-test(2.1,3.3);
+test(2,3.3);
 
 }
