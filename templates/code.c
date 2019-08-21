@@ -166,3 +166,5 @@ double plus_float64(int size, ...) {
     }
     return result;
 }
+
+$(IMPLEMENTATION)
