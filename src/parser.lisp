@@ -92,7 +92,9 @@
          (new-expr6 (regex-replace-all "\\]" new-expr5 "°]°"))
          (new-expr7 (regex-replace-all (format nil "~a" #\newline) new-expr6
                                        (format nil "°\n°")))
-         (expr-list (split " |°" new-expr7)))
+         (new-expr8 (regex-replace-all (format nil "~a" #\tab) new-expr7
+                                       (format nil " ")))
+         (expr-list (split " |°" new-expr8)))
     (remove-if #'(lambda(x) (= (length x) 0)) expr-list)))
 
 (defun emit-code-call (call)
@@ -256,14 +258,13 @@
            (format t "parse-variable: OPEN ARG~%")
            (if (equal (cadr expr-list) "]")
                (error-missing-expression))
-           (setf expr-list (parse-expression (cdr expr-list)))))
-        (t
-         (error-no-type-def)))
+           (setf expr-list (parse-expression (cdr expr-list))))))
   expr-list)
           
 (defun parse-parameter-vector (expr-list)
   (cond ((equal "[" (car expr-list))
          (format t "parse-parameter-vector: OPEN VEC~%")
+         (format t "parse-parameter-vector: FIRST VAR ~a~%" expr-list)
          (setf expr-list (parse-variable (cdr expr-list)))
          (setf expr-list (parse-parameter-vector expr-list)))
         ((equal "]" (car expr-list))
@@ -281,10 +282,10 @@
          (format t "parse-parameter-vector: ) Block: ~a~%" *paranteses*)
          (setf expr-list (cdr expr-list)))
         ((equal "\n" (car expr-list))
-         (format t "parse-parameter-vector: RET ~%")
+         (format t "parse-parameter-vector: RET ~a~%" (cdr expr-list))
          (setf expr-list (parse-parameter-vector (cdr expr-list))))
         ((stringp (car expr-list))
-         (setf expr-list (parse-variable (cdr expr-list)))
+         (setf expr-list (parse-variable expr-list))
          (format t "parse-parameter-vector: NEXT VAR ~a~%" expr-list)
          (setf expr-list (parse-parameter-vector expr-list))))
   expr-list)
