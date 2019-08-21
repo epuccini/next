@@ -96,6 +96,11 @@
   (print-stack)
   (sb-ext:quit))
 
+(defun error-syntax-error ()
+  (format t "Error syntax error!~%")
+  (print-stack)
+  (sb-ext:quit))
+
 (defun split-expr (expression)
   (let* ((new-expr1 (regex-replace-all "\\(" expression "°(°"))
          (new-expr2 (regex-replace-all "\\)" new-expr1 "°)°"))
@@ -108,7 +113,8 @@
                                        (format nil "°\n°")))
          (new-expr8 (regex-replace-all (format nil "~a" #\tab) new-expr7
                                        (format nil " ")))
-         (expr-list (split " |°" new-expr8)))
+         (new-expr9 (regex-replace-all "\\," new-expr8 "°,°"))
+         (expr-list (split " |°" new-expr9)))
     (remove-if #'(lambda(x) (= (length x) 0)) expr-list)))
 
 (defun emit-code-call (call)
@@ -206,7 +212,6 @@
         ((typep numstr 'string)
          'string)))
 
-  
 (defun parse-argument (expr-list)
   (cond ((find #\: (car expr-list))
          (let ((def (split ":" (car expr-list))))
@@ -470,6 +475,8 @@
                (setf *call* (append *call* (list (format nil ";~%")))))
            (dec-arg)
            (setf expr-list (parse-call (cdr expr-list)))))
+        ((equal "," (car expr-list))
+         (error-syntax-error))
         ((numberp (parse-integer (car expr-list) :junk-allowed t))
          (progn
            (inc-arg)
@@ -516,6 +523,8 @@
                (setf *call* (append *call* (list (format nil ");~%")))))
            (dec-arg)
            (return-from parse-call (cdr expr-list))))
+         ((equal "," (car expr-list))
+          (error-syntax-error))
         ((equal "\n" (car expr-list))
          (dbg "parse-call: RET")
          (setf expr-list (parse-call (cdr expr-list))))
@@ -615,6 +624,8 @@
          (if (= (- *paranteses* *block*) 0)
              (setf *call* (append *call* (list (format t ";~%")))))
          (setf expr-list (cdr expr-list)))
+        ((equal "," (car expr-list))
+         (error-syntax-error))        
         ((equal (format nil "~a" #\Tab) (car expr-list))
          (setf expr-list (cdr expr-list)))
         ((numberp (parse-integer (car expr-list) :junk-allowed t))
