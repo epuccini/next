@@ -359,7 +359,6 @@
                             (equal x (get-variable-name (car expr-list))))
                         (hash-table-keys *variables*))
          (progn
-           (dbg "HASH " (hash-table-keys *variables*))
            (inc-arg)
            (if (and (gethash *paranteses* *arguments*)
                     (not (equal "(" (car (last *call*)))))
