@@ -37,11 +37,13 @@
     (strs -> () (str) (strs))
     (letter -> a b c d e f g h i j k l m n o p q r s t u v w x y z)))
 
-(defvar *call* '("    "))
+(defvar *code_list* '(""))
+(defvar *definition_list* '(""))
+(defvar *implementation_list* '(""))
 (defvar *code* nil)
 (defvar *definitition* nil)
 (defvar *implementation* nil)
-(defvar *target* 'call)
+(defvar *target* 'code)
 (defvar *paranteses* 0)
 (defvar *variables* nil)
 (defvar *functions* nil)
@@ -121,15 +123,18 @@
     (remove-if #'(lambda(x) (= (length x) 0)) expr-list)))
 
 (defun emit-code-call ()
-  (if *implementation*
-      (format t "~%~a~{~a~}~%" (car *implementation*) (cdr *implementation*)))
-  (if *call*
-      (format t "~%~a~{~a~}~%" (car *call*) (cdr *call*)))
+  (if *implementation_list*
+      (format t "~%~{~a~}~%" *implementation_list*))
+  (if *code_list*
+      (format t "~%~{~a~}~%" *code_list*))
   (if (not (is-main-defined-p))
       (setf *code* (format nil "int main () {"))) 
-  (if *call*
+  (if *implementation_list*
+      (setf *implementation*
+            (format nil "~%~{~a~}~%" *implementation_list*)))
+  (if *code_list*
       (setf *code*
-            (format nil "~a~%~a~{~a~}~%" *code* (car *call*) (cdr *call*))))
+            (format nil "~a~%~{~a~}~%" *code* *code_list*)))
   (if (not (is-main-defined-p))
       (setf *code* (format nil "~a}" *code*))))
 
@@ -202,20 +207,20 @@
   (setf (gethash *paranteses* *arguments*) 0))
 
 (defun add-code (expression)
-  (cond ((equal *target* 'call)
-         (setf *call* (append *call* (list expression))))
+  (cond ((equal *target* 'code)
+         (setf *code_list* (append *code_list* (list expression))))
         ((equal *target* 'implementation)
-         (setf *implementation* (append *implementation* (list expression))))
+         (setf *implementation_list* (append *implementation_list* (list expression))))
         ((equal *target* 'definition)
-         (setf *definitition* (append *definitition* (list expression))))))
+         (setf *definition_list* (append *definition_list* (list expression))))))
 
 (defun get-last-code ()
-  (cond ((equal *target* 'call)
-         (car (last *call*)))
+  (cond ((equal *target* 'code)
+         (car (last *code_list*)))
         ((equal *target* 'implementation)
-         (car (last  *implementation*)))
+         (car (last  *implementation_list*)))
         ((equal *target* 'definition)
-         (car (last *definitition*)))))
+         (car (last *definition_list*)))))
 
 (defun type-of-number-string (numstr)
   (cond ((and (typep (parse-integer numstr :junk-allowed t) 'integer)
@@ -360,7 +365,7 @@
            (setf expr-list (parse-argument-vector expr-list)))))
   (add-code (format nil "}~%"))
   (dec-block)
-           (setf *target* 'call)
+           (setf *target* 'code)
   expr-list)
 
 (defun parse-inner-block (expr-list)
@@ -585,9 +590,6 @@
                   (setf tp function-type))
                  (number-type
                   (setf tp number-type)))
-           (format t "parse-arguments: println variable-type ~a~%" variable-type)
-           (format t "parse-arguments: println function-type ~a~%" function-type)
-           (format t "parse-arguments: println number-type ~a~%" number-type)
            (cond ((equal tp 'integer)
                   (add-code "println_int32"))
                  ((equal tp 'bigint)
@@ -615,9 +617,6 @@
                   (setf tp function-type))
                  (number-type
                   (setf tp number-type)))
-           (format t "parse-arguments: print variable-type ~a~%" variable-type)
-           (format t "parse-arguments: print function-type ~a~%" function-type)
-           (format t "parse-arguments: print number-type ~a~%" number-type)
            (cond ((equal tp 'integer)
                   (add-code "print_int32"))
                  ((equal tp 'bigint)
@@ -710,7 +709,9 @@
 (defun parse (expression)
   "Parse expression."
   (let ((expr-list (preprocess expression)))
-    (setf *call* '("    "))
+    (setf *code_list* '(""))
+    (setf *implementation_list* '(""))
+    (setf *definition_list* '(""))
     (setf *paranteses* 0)
     (setf  *block* 0)
     (setf *arguments* (make-hash-table))
@@ -721,7 +722,7 @@
     (loop while (and (find "(" expr-list :test #'equal)
                      (> (length expr-list) 0)) do
            (setf expr-list (parse-expression expr-list)))
-    (setf *code* (emit-code-call))
+    (emit-code-call)
     *code*))
 
 (defun repl ()
@@ -755,3 +756,4 @@
     (save-binary-data (concatenate 'string
                                    outfilepath
                                    outfilename ".c") outfile-data)))
+  

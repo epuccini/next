@@ -167,6 +167,7 @@ double plus_float64(int size, ...) {
     return result;
 }
 
+
 int test_0(int op1_1,float op2_1)
 {
 println_int32(op1_1);
@@ -174,8 +175,9 @@ println_float32(op2_1);
 return(111);
 }
 
+
 int main () {
-    println_str("Hello,World");
+println_str("Hello,World");
 println_int32(10);
 println_float64(10.2f);
 print_format("%s%d","x=",10);
