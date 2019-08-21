@@ -4,7 +4,7 @@ by Edward Puccini |;
 
 ; single line comment
 
-(println "Hello World")
+(println "Hello, World")
 (println 10)
 (println 10.2d0)
 (print-format "%s%d" "x = " 10)

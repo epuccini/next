@@ -167,36 +167,36 @@ double plus_float64(int size, ...) {
     return result;
 }
 int main () {
-    println_str("HelloWorld");
+    println_str("Hello,World");
 println_int32(10);
 println_float64(10.2f);
 print_format("%s%d","x=",10);
 {
-int result=mod(9,mod(12,5));
-float value=2.0;
-char* str="INIT";
-println_int32(result);
+int result_1=mod(9,mod(12,5));
+float value_1=2.0;
+char* str_1="INIT";
+println_int32(result_1);
 }
 {
-int result=mod(9,mod(12,5));
-println_int32(result);
+int result_1=mod(9,mod(12,5));
+println_int32(result_1);
 println_str("LET1");
 println_str("LET2");
 }
 {
-int result=mod(9,mod(12,5));
-float value=2.0;
-char* str="INIT";
-println_float32(value);
-println_int32(result);
-println_str(str);
+int result_1=mod(9,mod(12,5));
+float value_1=2.0;
+char* str_1="INIT";
+println_float32(value_1);
+println_int32(result_1);
+println_str(str_1);
 }
 println_str("ENDE");
-int test(int op1,float op2)
+int test_0(int op1_1,float op2_1)
 {
-println_int32(op1);
-println_float32(op2);
+println_int32(op1_1);
+println_float32(op2_1);
 }
-test(2,3.3);
+test_0(2,3.3);
 
 }
