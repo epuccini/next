@@ -59,3 +59,9 @@
                      :executable t
                      :toplevel 'main
                      :save-runtime-options t))
+
+(defun release ()
+  (let ((last-mode (flood:get-log-level)))
+    (flood:set-log-level :prd)
+    (build)
+    (flood:set-log-level last-mode)))

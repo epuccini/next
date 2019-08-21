@@ -1,7 +1,7 @@
 APPLICATION 	= output
 VERSION 	= 4.7.0
 CC      	= /usr/bin/gcc
-CFLAGS  	= -Wall -g -c -D_REENTRANT -DVERSION=\"$(VERSION)\"
+CFLAGS  	= -Wall -g -c -D_REENTRANT -DVERSION=\"$(VERSION)\" -fnested-functions
 LDFLAGS 	= -pthread -lm
 SRCDIR 		= /Users/edward/Documents/Code/common-lisp/projects/next/output 
 
