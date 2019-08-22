@@ -40,9 +40,6 @@
 (defvar *code_list* '(""))
 (defvar *definition_list* '(""))
 (defvar *implementation_list* '(""))
-(defvar *code* nil)
-(defvar *definitition* nil)
-(defvar *implementation* nil)
 (defvar *target* 'code)
 (defvar *paranteses* 0)
 (defvar *variables* nil)
@@ -123,20 +120,24 @@
     (remove-if #'(lambda(x) (= (length x) 0)) expr-list)))
 
 (defun emit-code-call ()
-  (if *implementation_list*
-      (format t "~%~{~a~}~%" *implementation_list*))
-  (if *code_list*
-      (format t "~%~{~a~}~%" *code_list*))
-  (if (not (is-main-defined-p))
-      (setf *code* (format nil "int main () {"))) 
-  (if *implementation_list*
-      (setf *implementation*
-            (format nil "~%~{~a~}~%" *implementation_list*)))
-  (if *code_list*
-      (setf *code*
-            (format nil "~a~%~{~a~}~%" *code* *code_list*)))
-  (if (not (is-main-defined-p))
-      (setf *code* (format nil "~a}" *code*))))
+  (let ((code '(""))
+        (definition '(""))
+        (implementation '("")))
+    (if *implementation_list*
+        (format t "~%~{~a~}~%" *implementation_list*))
+    (if *code_list*
+        (format t "~%~{~a~}~%" *code_list*))
+    (if (not (is-main-defined-p))
+        (setf code (format nil "int main () {"))) 
+    (if *implementation_list*
+        (setf implementation
+              (format nil "~%~{~a~}~%" *implementation_list*)))
+    (if *code_list*
+        (setf code
+              (format nil "~a~%~{~a~}~%" code *code_list*)))
+    (if (not (is-main-defined-p))
+        (setf code (format nil "~a}" code)))
+    (values code definition implementation)))
 
 (defun skip-expr-or-value (expr p)
   (cond  ((equal (car expr) "(")
@@ -721,9 +722,8 @@
     (setf expr-list (parse-expression expr-list))
     (loop while (and (find "(" expr-list :test #'equal)
                      (> (length expr-list) 0)) do
-           (setf expr-list (parse-expression expr-list)))
-    (emit-code-call)
-    *code*))
+         (setf expr-list (parse-expression expr-list))))
+  (emit-code-call))
 
 (defun repl ()
   (format t "~%>")
@@ -735,25 +735,25 @@
 (defun evaluate (expression)
   (parse expression))
 
-
 (defun compile-next (infile outfile)
-  (load-templates)
-  (let* ((infile-data (load-binary-data infile))
-         (code (parse infile-data))
-         (outfile-data (concatenate 'string *impl-template* code))
-         (outfilename (pathname-name outfile))
-         (outfilepath (directory-namestring outfile)))
-    (setf outfile-data (regex-replace-all "\\$\\(OUTPUT_H\\)"
-                                          outfile-data
-                                          (concatenate 'string
-                                                       outfilename ".h")))
-    (setf outfile-data (regex-replace-all "\\$\\(IMPLEMENTATION\\)"
-                                          outfile-data
-                                          *implementation*))
-    (save-binary-data (concatenate 'string
-                                   outfilepath
-                                   outfilename ".h") *def-template*)
-    (save-binary-data (concatenate 'string
-                                   outfilepath
-                                   outfilename ".c") outfile-data)))
-  
+  (let ((infile-data (load-binary-data infile)))
+    (load-templates)
+    (multiple-value-bind (code definition implementation) (parse infile-data)
+      (declare (ignore definition))
+      (let* ((outfile-data (concatenate 'string *impl-template* code))
+             (outfilename (pathname-name outfile))
+             (outfilepath (directory-namestring outfile)))
+        (setf outfile-data (regex-replace-all "\\$\\(OUTPUT_H\\)"
+                                                 outfile-data
+                                                 (concatenate 'string
+                                                              outfilename ".h")))
+        (setf outfile-data (regex-replace-all "\\$\\(IMPLEMENTATION\\)"
+                                              outfile-data
+                                              implementation))
+        (save-binary-data (concatenate 'string
+                                          outfilepath
+                                          outfilename ".h") *def-template*)
+        (save-binary-data (concatenate 'string
+                                       outfilepath
+                                       outfilename ".c") outfile-data)))))
+
