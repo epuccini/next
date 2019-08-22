@@ -171,7 +171,9 @@ double plus_float64(int size, ...) {
 int test_1(int op1_1,float op2_1)
 {
 return(mod(4,5));
-println_int32(op1_1)println_float32(op2_1)return(111));
+println_int32(op1_1);
+println_float32(op2_1);
+return(111);
 }
 int main()
 {
@@ -180,9 +182,7 @@ int result_2=mod(9,mod(12,5));
 float value_2=2.0;
 char* str_2="INIT";
 println_int32(result_2);
-println_str("(test23.3)");
-return(0);
-}
+println_str("(test23.3)")return(0)}
 }
 
 
