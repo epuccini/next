@@ -5,6 +5,7 @@ by Edward Puccini |;
 ; single line comment
 
 (defn test:int32 [op1:int32 op2:float32]
+	(return (mod 4 5))
 	(println op1)
 	(println op2)
 	(return 111))
@@ -14,6 +15,7 @@ by Edward Puccini |;
 		  value:float32 2.0
 		  str:string "INIT"]
 		(println result))
-	(println "(test 2 3.3)"))
+	(println "(test 2 3.3)")
+	(return 0))
 	
 	
