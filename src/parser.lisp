@@ -388,7 +388,7 @@
         (dbg "parse-inner-block: PARSE NEXT CALL " expr-list)
         (inc-arg)
         (inc-parens)
-        (setf expr-list (parse-call (cdr expr-list)))))
+        (setf expr-list (parse-call expr-list))))
   (if (not (equal ")" (car expr-list)))
       (progn
         (dbg "parse-inner-block. NEXT EXIT" expr-list)
