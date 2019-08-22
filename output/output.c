@@ -174,34 +174,16 @@ println_int32(op1_1);
 println_float32(op2_1);
 return(111);
 }
+int main()
+{
+{
+int result_2=mod(9,mod(12,5));
+float value_2=2.0;
+char* str_2="INIT";
+println_int32(result_2);
+println_str("(test23.3)");
+}
+}
 
 
-int main () {
-println_str("Hello,World");
-println_int32(10);
-println_float64(10.2f);
-print_format("%s%d","x=",10);
-{
-int result_1=mod(9,mod(12,5));
-float value_1=2.0;
-char* str_1="INIT";
-println_int32(result_1);
-}
-{
-int result_1=mod(9,mod(12,5));
-println_int32(result_1);
-println_str("LET1");
-println_str("LET2");
-}
-{
-int result_1=mod(9,mod(12,5));
-float value_1=2.0;
-char* str_1="INIT";
-println_float32(value_1);
-println_int32(result_1);
-println_str(str_1);
-}
-println_str("ENDE");
-println_int32(test_0(2,3.3));
 
-}
