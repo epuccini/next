@@ -392,6 +392,8 @@
       (progn
         (dbg "parse-inner-block: PARSE NEXT CALL " expr-list)
         (setf expr-list (parse-call expr-list))))
+  (if (equal "\n" (car expr-list))
+      (setf expr-list (parse-inner-block (cdr expr-list))))
   (if (not (equal ")" (car expr-list)))
       (progn
         (dbg "parse-inner-block. NEXT EXIT" expr-list)
@@ -512,8 +514,14 @@
          (progn
            (dec-arg)
            (dec-parens)
-           (if (= *paranteses* *block*)
-               (add-code (format nil ");~%")))
+           (dbg "parse-arguments: BLock " *block* " Parens " *paranteses*)
+           (if (> (- *paranteses* *block*) 0)
+                (add-code ")"))
+           (if (<= *paranteses* *block*)
+               (progn
+                 (add-code (format nil ");~%"))))
+           (if (<= (- *paranteses* *block*) 0)
+                 (return-from parse-arguments (cdr expr-list)))
            (dbg "parse-arguments: ARG CLOSE ) block " *block* " Parens " *paranteses*)
            (setf expr-list (parse-call (cdr expr-list)))))
         ((equal "," (car expr-list))
@@ -557,14 +565,7 @@
            (setf expr-list (parse-call (cdr expr-list)))))
         ((equal ")" (car expr-list))
          (progn
-           (dec-parens)
-           (dbg "parse-call: CALL INNER CLOSE block " *block* " Parens " *paranteses*)
-           (add-code ")")
-           (if (= *paranteses* *block*)
-               (progn
-                 (dbg "parse-call: CALL OUTER CLOSE ) block " *block* " Parens " *paranteses*)
-                 (add-code (format nil ");~%"))))
-           (dec-arg)
+           (setf expr-list (parse-arguments expr-list *infinite-arguments*))
            (return-from parse-call (cdr expr-list))))
         ((equal "," (car expr-list))
          (error-syntax-error))

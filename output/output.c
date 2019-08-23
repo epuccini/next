@@ -170,22 +170,29 @@ double plus_float64(int size, ...) {
 
 int test_1(int op1_1,float op2_1)
 {
-return(mod(4,5));
 println_int32(op1_1);
 println_float32(op2_1);
 return(111);
-)}
+}
 int main()
 {
 {
-int result_2=mod(9,mod(12,5));
-float value_2=2.0;
-char* str_2="INIT";
-println_int32(result_2);
-)println_str("(test23.3)"return(0)}
+float arg1_2=0.0;
+float arg2_2=0.0;
+print_float32(arg1_2);
+print_float32(arg2_2);
+print_str("ENDE");
+}
 }
 
 
 mod(9,5);
 mod(9,mod(12,10));
-mod(9,mod(12,mod(4,9)
+mod(9,mod(12,mod(4,9)));
+mod(9,mod(12,mod(9,mod(4,3))));
+{
+char* arg_1="";
+int block_1=0;
+print_str("HELLO");
+}
+
