@@ -524,14 +524,19 @@
            (dec-parens)
            (dbg "parse-arguments: BLock " *block* " Parens " *paranteses*)
            (if (> (- *paranteses* *block*) 0)
-                (add-code ")"))
+               (progn
+                 (loop for x from 0 to (- *paranteses* *block*) do
+                      (add-code ")"))
+                 (add-code (format nil ";~%"))
+                 (return-from parse-arguments (cdr expr-list))))
            (if (<= *paranteses* *block*)
                (progn
-                 (add-code (format nil ");~%"))))
-           (if (<= (- *paranteses* *block*) 0)
-                 (return-from parse-arguments (cdr expr-list)))
+                 (add-code (format nil ");~%"))
+                 (dbg "parse-arguments: ADD CODE ); " (cdr expr-list))
+                 (return-from parse-arguments (cdr expr-list))))
            (dbg "parse-arguments: ARG CLOSE ) block " *block* " Parens " *paranteses*)
-           (setf expr-list (parse-call (cdr expr-list)))))
+           (setf expr-list (parse-call (cdr expr-list)))
+           (dbg "parse-arguments:  END CALL " expr-list)))
         ((equal "," (car expr-list))
          (error-syntax-error))
         ((numberp (parse-integer (car expr-list) :junk-allowed t))
@@ -685,6 +690,7 @@
 (defvar *switch* nil)
 
 (defun parse-expression (expr-list)
+  (dbg "parse-expression: START with " expr-list)
   (cond ((equal "(" (car expr-list))
          (progn
            (inc-arg)
