@@ -13,7 +13,7 @@ by Edward Puccini |;
      block:int32 0]
     (print "HELLO"))
 
-(defn test:int32 [op1:int32 op2:float32]
+(defn test:int32 [op1:float32 op2:float32]
 	(println op1)
 	(println op2)
 	(return 111))
