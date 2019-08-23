@@ -442,7 +442,9 @@
            (dbg "parse-variable: OPEN ARG")
            (if (equal (cadr expr-list) "]")
                (error-missing-expression))
-           (setf expr-list (parse-expression (cdr expr-list))))))
+           (setf expr-list (parse-expression (cdr expr-list)))))
+        ((not (find #\: (car expr-list)))
+         (error-syntax-error)))
   expr-list)
           
 (defun parse-parameter-vector (expr-list)
@@ -680,6 +682,7 @@
          (error-function-not-defined)))
    expr-list)
 
+(defvar *switch* nil)
 
 (defun parse-expression (expr-list)
   (cond ((equal "(" (car expr-list))
@@ -718,7 +721,11 @@
          (dbg "parse-expression: parse singleiline comment")
          (setf expr-list (parse-single-line-comment (cdr expr-list))))
         ((> (length (cdr expr-list)) 0)
-         ;(return-from parse-expression (cdr expr-list))
+         (if (not *switch*)
+             (progn
+               (setf *switch* t)
+               (return-from parse-expression (cdr expr-list))))
+         (setf *switch* nil)
          (dbg "parse-expression: NEXT " (cdr expr-list))
          (setf expr-list (parse-expression (cdr expr-list)))))
   expr-list)

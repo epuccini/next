@@ -10,6 +10,10 @@
     (:use "COMMON-LISP" #:flood #:cl-ppcre #:parse-float #:alexandria)
     (:export
      #:parse
+     #:parse-expression
+     #:parse-function
+     #:parse-variable
+     #:parse-call
      #:load-data
      #:save-data
      #:load-binary-data
