@@ -3,13 +3,15 @@ Next example file
 by Edward Puccini |;
 
 ; single line comment
-
+(mod 9 5)
+(mod 9 (mod 12 10))
+(mod 9 (mod 12 (mod 4 9)))
 (defn test:int32 [op1:int32 op2:float32]
 	(return (mod 4 5))
 	(println op1)
 	(println op2)
 	(return 111))
-	
+
 (defn main:int32 []
 	(let [result:int32 (mod 9 (mod 12 5))
 		  value:float32 2.0
