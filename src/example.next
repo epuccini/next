@@ -18,8 +18,8 @@ by Edward Puccini |;
 	(println op2)
 	(return 111))
 
-(defn main:int32 []
-  (let [arg1:float32 = 0.0 arg2:float32 0.0]
+(defn main:int32 [arg:string]
+  (let [arg1:float32 0.0 arg2:float32 0.0]
    (print arg1)
    (print arg2)
    (print "ENDE")))

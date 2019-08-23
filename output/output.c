@@ -174,7 +174,7 @@ println_float32(op1_1);
 println_float32(op2_1);
 return(111);
 }
-int main()
+int main(char* arg_1)
 {
 {
 float arg1_2=0.0;
