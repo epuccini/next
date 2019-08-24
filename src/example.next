@@ -22,4 +22,5 @@ by Edward Puccini |;
   (let [arg1:float32 0.0 arg2:float32 0.0]
    (print arg1)
    (print arg2)
-   (print "ENDE")))
+   (print "ENDE"))
+  (print arg))
