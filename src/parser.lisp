@@ -161,7 +161,7 @@
   (setq *block* (+ 1 *block*)))
 
 (defun dec-block ()
-  (setq *block* (- 1 *block*)))
+  (setq *block* (- *block* 1)))
 
 (defun zero-parens ()
   (setq *paranteses* 0))
@@ -365,6 +365,7 @@
           
 
 (defun parse-block (expr-list)
+  (dbg "parse-block " (car expr-list))
   (if (equal "(" (car expr-list))
       (progn
         (setf expr-list (parse-expression expr-list))
@@ -407,7 +408,7 @@
       (progn
         (dbg "parse-let-vector: next variable")  
         (setf expr-list (parse-let-vector expr-list))))
-  (dbg "parse-let-vector: exit")
+  (dbg "parse-let-vector: exit" (car expr-list))
   expr-list)
 
 (defun parse-open-square-bracket (expr-list)
@@ -433,6 +434,8 @@
   (setf expr-list (parse-block expr-list))
   (dec-block)
   (add-code (format nil "}~%"))
+  (dbg "parse-let BLOCK END  block " *block* " parens " *paranteses*)
+  (setf expr-list (cdr expr-list))
   expr-list)
 
 (defun parse-def-function (expr-list)
@@ -450,6 +453,8 @@
   (setf expr-list (parse-block expr-list))
   (add-code (format nil "}~%"))
   (dec-block)
+  (dbg "parse-def-function BLOCK END block " *block* " parens " *paranteses*)
+  (setf expr-list (cdr expr-list))
   expr-list)
 
   (defun parse-multiline-comment (expr-list)

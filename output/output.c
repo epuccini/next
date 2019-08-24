@@ -170,19 +170,20 @@ double plus_float64(int size, ...) {
 
 int test_1(float op1_1,float op2_1)
 {
-println_float32(op1_1);
-println_float32(op2_1);
-return(111);
+println_float32(op1_1));
+println_float32(op2_1));
+return(111));
 }
-int main(char* arg_1)
+int main(char* argv_1)
 {
 {
-float arg1_2=0.0;
-float arg2_2=0.0;
-print_float32(arg1_2);
-print_float32(arg2_2);
-print_str("ENDE");
+float float1_2=0.0;
+float float2_2=0.0;
+print_float32(float1_2)));
+print_float32(float2_2)));
+print_str("ENDE")));
 }
+print_str(argv_1))));
 }
 
 
@@ -195,4 +196,4 @@ char* arg_1="";
 int block_1=0;
 print_str("HELLO");
 }
-print_str(
+
