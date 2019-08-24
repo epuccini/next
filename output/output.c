@@ -188,4 +188,13 @@ println_str(argv_0);
 }
 
 
+mod(9,5);
+mod(9,mod(12,10));
+mod(9,mod(12,mod(4,9)));
+mod(9,mod(12,mod(9,mod(4,3))));
+{
+char* arg_1="";
+int block_1=0;
+print_str("HELLO");
+}
 
