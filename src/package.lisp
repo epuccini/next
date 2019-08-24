@@ -14,10 +14,13 @@
      #:parse-function
      #:parse-variable
      #:parse-call
+     #:get-iter-variable-name
      #:load-data
      #:save-data
      #:load-binary-data
      #:repl
+     #:*block*
+     #:*variables*
      #:evaluate
      #:compile-next
      #:*call*

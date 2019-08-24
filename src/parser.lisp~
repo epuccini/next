@@ -166,7 +166,10 @@
   (setq *block* (+ 1 *block*)))
 
 (defun dec-block ()
-  (setq *block* (- *block* 1)))
+  (setq *block* (- *block* 1))
+  ;; delete current block variables
+  (mapcar #'(lambda (var) (setf (gethash (get-variable-name var) *variables*) nil) var)
+          (hash-table-keys *variables*)))
 
 (defun zero-parens ()
   (setq *paranteses* 0))
@@ -374,7 +377,6 @@
     (if (>= cnt 0)
         (progn
           (setf hash (format nil "~a_~a" name cnt))
-          (dbg "HASH " hash)
           (if (remove-if-not #'(lambda (x) (equal x hash))
                              (hash-table-keys *variables*))
               (progn
@@ -384,7 +386,6 @@
                 (dbg "CNT " cnt)
                 (setf cnt (- cnt 1))
                 (get-iter-variable-name-x name cnt))))))
-  (dbg "ENDE")
   (format nil "~a_~a" name 0))
 
 (defun get-iter-variable-name (name)
