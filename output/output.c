@@ -168,22 +168,23 @@ double plus_float64(int size, ...) {
 }
 
 
-int test_1(float op1_1,float op2_1)
+int test_1(float op1_0,float op2_0)
 {
-println_float32(op1_1);
-println_float32(op2_1);
+println_str(op1_0);
+println_str(op2_0);
 return(111);
 }
-int main(int argv_1)
+int main(int argv_0)
 {
 {
 float float1_2=0.0;
 float float2_2=0.0;
-print_float32(float1_2);
-print_float32(float2_2);
-print_str("ENDE");
+println_str(argv_0);
+println_float32(float1_2);
+println_float32(float2_2);
+println_str("ENDE");
 }
-print_int32(argv_1);
+println_str(argv_0);
 }
 
 
