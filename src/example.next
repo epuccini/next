@@ -18,7 +18,7 @@ by Edward Puccini |;
 	(println op2)
 	(return 111))
 
-(defn main:int32 [argv:string]
+(defn main:int32 [argv:int32]
   (let [float1:float32 0.0 float2:float32 0.0]
    (print float1)
    (print float2)

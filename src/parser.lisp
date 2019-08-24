@@ -364,27 +364,27 @@
   expr-list)
           
 
-(defun parse-inner-block (expr-list)
+(defun iterate-inner-block (expr-list)
   (dbg "parse-block " (car expr-list))
   (if (equal "(" (car expr-list))
       (progn
         (setf expr-list (parse-expression expr-list))
-        (setf expr-list (parse-inner-block expr-list))))
+        (setf expr-list (iterate-inner-block expr-list))))
   (if (not expr-list)
-      (return-from parse-inner-block expr-list))
+      (return-from iterate-inner-block expr-list))
   (if (equal "\n" (car expr-list))
-      (setf expr-list (parse-inner-block (cdr expr-list))))
+      (setf expr-list (iterate-inner-block (cdr expr-list))))
   (if (equal ")" (car expr-list))
       (progn
         (dbg "parse-block: CLOSE" expr-list)
-        (return-from parse-inner-block expr-list)))
+        (return-from iterate-inner-block expr-list)))
   (if (not (equal ")" (car expr-list)))
       (progn
         (dbg "parse-block " (car expr-list))
-        (setf expr-list (parse-inner-block (cdr expr-list))))))
+        (setf expr-list (iterate-inner-block (cdr expr-list))))))
 
 (defun parse-block (expr-list)
-  (setf expr-list (parse-inner-block expr-list))
+  (setf expr-list (iterate-inner-block expr-list))
   (cdr expr-list))
   
 (defun parse-function-vector (expr-list)

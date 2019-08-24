@@ -174,7 +174,7 @@ println_float32(op1_1);
 println_float32(op2_1);
 return(111);
 }
-int main(char* argv_1)
+int main(int argv_1)
 {
 {
 float float1_2=0.0;
@@ -183,17 +183,8 @@ print_float32(float1_2);
 print_float32(float2_2);
 print_str("ENDE");
 }
-print_str(argv_1);
+print_int32(argv_1);
 }
 
 
-mod(9,5);
-mod(9,mod(12,10));
-mod(9,mod(12,mod(4,9)));
-mod(9,mod(12,mod(9,mod(4,3))));
-{
-char* arg_1="";
-int block_1=0;
-print_str("HELLO");
-}
 
