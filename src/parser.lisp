@@ -82,6 +82,11 @@
   (print-stack)
   (sb-ext:quit))
 
+(defun error-varible-not-found ()
+  (format t "Error variable not found!~%")
+  (print-stack)
+  (sb-ext:quit))
+
 (defun preprocess (expression)
   (let* ((new-expr1 (regex-replace-all "\\(" expression "°(°"))
          (new-expr2 (regex-replace-all "\\)" new-expr1 "°)°"))
@@ -362,7 +367,28 @@
         ((not (find #\: (car expr-list)))
          (error-syntax-error)))
   expr-list)
-          
+
+(defun get-iter-variable-name-x (name cnt)
+  (let ((hash  ""))
+    (dbg "get-iter-variable-x " cnt)
+    (if (>= cnt 0)
+        (progn
+          (setf hash (format nil "~a_~a" name cnt))
+          (dbg "HASH " hash)
+          (if (remove-if-not #'(lambda (x) (equal x hash))
+                             (hash-table-keys *variables*))
+              (progn
+                (dbg "FOUND " hash)
+                (return-from get-iter-variable-name-x hash))
+              (progn
+                (dbg "CNT " cnt)
+                (setf cnt (- cnt 1))
+                (get-iter-variable-name-x name cnt))))))
+  nil)
+
+(defun get-iter-variable-name (name)
+  (dbg "get-iter-variable-name " *block*)
+  (get-iter-variable-name-x name *block*))
 
 (defun iterate-inner-block (expr-list)
   (dbg "parse-block " (car expr-list))
@@ -537,10 +563,9 @@
              (add-code (car expr-list))
              (setf expr-list (parse-arguments (cdr expr-list) max)))))
         ((remove-if-not #'(lambda (x)
-                            (equal x (get-variable-name (car expr-list))))
-                        (hash-table-keys *variables*))
+                             (equal x (get-variable-name (car expr-list))))
+                         (hash-table-keys *variables*))
          (progn
-           (dbg "parse-arguments: VARIABLE " (cdr expr-list))
            (inc-arg)
            (if (and (gethash *paranteses* *arguments*)
                     (not (equal "(" (get-last-code))))
@@ -549,7 +574,7 @@
                (error-parameter-max (gethash *paranteses* *arguments*)
                                     max))
            (dbg "parse-arguments: VARIABLE " (get-variable-name (car expr-list)))
-           (add-code (get-variable-name (car expr-list)))
+           (add-code (get-iter-variable-name (car expr-list)))
            (setf expr-list (parse-arguments (cdr expr-list) max)))))
   expr-list)
 
