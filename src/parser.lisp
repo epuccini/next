@@ -87,6 +87,16 @@
   (print-stack)
   (sb-ext:quit))
 
+(defun error-function-vector-malformed ()
+  (format t "Error function vector malformed!~%")
+  (print-stack)
+  (sb-ext:quit))
+
+(defun error-let-vector-malformed ()
+  (format t "Error let vector malformed!~%")
+  (print-stack)
+  (sb-ext:quit))
+
 (defun preprocess (expression)
   (let* ((new-expr1 (regex-replace-all "\\(" expression "°(°"))
          (new-expr2 (regex-replace-all "\\)" new-expr1 "°)°"))
@@ -421,7 +431,7 @@
   (if (equal "\n" (car expr-list))
       (setf expr-list (parse-function-vector (cdr expr-list))))
   (if (and (not (find #\: (cadr expr-list))) (not (equal "]" (cadr expr-list))))
-      (error-syntax-error))
+      (error-function-vector-malformed))
   (if (not (equal "]" (car expr-list)))
       (progn
         (dbg "parse-function-vector: next variable")  
