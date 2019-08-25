@@ -82,8 +82,8 @@
   (print-stack)
   (sb-ext:quit))
 
-(defun error-varible-not-found ()
-  (format t "Error variable not found!~%")
+(defun error-variable-not-defined ()
+  (format t "Error variable not defined!~%")
   (print-stack)
   (sb-ext:quit))
 
@@ -420,6 +420,8 @@
       (return-from parse-function-vector expr-list))
   (if (equal "\n" (car expr-list))
       (setf expr-list (parse-function-vector (cdr expr-list))))
+  (if (and (not (find #\: (cadr expr-list))) (not (equal "]" (cadr expr-list))))
+      (error-syntax-error))
   (if (not (equal "]" (car expr-list)))
       (progn
         (dbg "parse-function-vector: next variable")  
@@ -575,7 +577,10 @@
                                     max))
            (dbg "parse-arguments: VARIABLE " (get-iter-variable-name (car expr-list)))
            (add-code (get-iter-variable-name (car expr-list)))
-           (setf expr-list (parse-arguments (cdr expr-list) max)))))
+           (setf expr-list (parse-arguments (cdr expr-list) max))))
+        ((stringp (car expr-list))
+         (dbg "parse-call: VARIABLE not defined: " (car expr-list))
+         (error-variable-not-defined)))
   expr-list)
 
 (defun parse-call (expr-list)

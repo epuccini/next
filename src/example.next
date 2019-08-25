@@ -4,24 +4,17 @@ by Edward Puccini |;
 
 ; single line comment
 
-(mod 9 5)
-(mod 9 (mod 12 10))
-(mod 9 (mod 12 (mod 4 9)))
-(mod 9 (mod 12 (mod 9 (mod 4 3))))
 
-(let [arg:string ""
-     block:int32 0]
-    (print "HELLO"))
 
 (defn test:int32 [op1:float32 op2:float32]
 	(println op1)
 	(println op2)
 	(return 111))
 
-(defn main:int32 [argv:int32]
+(defn main:int32 [argc:int32]
   (let [float1:float32 0.0 float2:float32 0.0]
-    (println argv)
+    (println argc)
    (println float1)
    (println float2)
    (println "ENDE"))
-  (println argv))
+  (println argc))
