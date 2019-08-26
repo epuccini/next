@@ -19,15 +19,16 @@
 (defvar *functions* nil)
 (defvar *arguments* 0)
 (defvar *block* 0)
+(defvar *generics-template* nil)
 (defvar *def-template* nil)
 (defvar *impl-template* nil)
 (defvar *is-main-defined* nil)
 (defvar *infinite-arguments* 10000)
 
-
 (defun load-templates ()
   (setf *def-template* (load-binary-data "../templates/code.h"))
-  (setf *impl-template* (load-binary-data "../templates/code.c")))
+  (setf *impl-template* (load-binary-data "../templates/code.c"))
+  (setf *generics-template* (load-binary-data "../templates/generics.h")))
 
 (defun is-main-defined-p ()
   *is-main-defined*)
@@ -38,7 +39,7 @@
     (let* ((msg-lst (remove-if #'null
                                (swank-backend:call-with-debugging-environment
                                 (lambda () (swank:backtrace 0 5)))))
-           (stack-msg 
+           (stack-msg
             (progn
               (mapcar (lambda (msg)
                         (setf trace (concatenate 'string trace 
@@ -590,7 +591,7 @@
           (progn
             (if (not (gethash (format nil "~a" parens) count))
                 (setf (gethash (format nil "~a" parens) count) 0))
-            (if (equal "(" element)
+            (if (or (equal "(" element) (equal "[" element))
                 (progn
                   (setf (gethash (format nil "~a" parens) count)
                         (1+ (gethash (format nil "~a" parens) count)))
@@ -601,7 +602,7 @@
                 (progn
                   (setf (gethash (format nil "~a" parens) count)
                         (1+ (gethash (format nil "~a" parens) count)))))
-            (if (equal ")" element)
+            (if (or (equal ")" element) (equal "]" element))
                 (progn
                   (setf parens (1- parens))))
             (if (not (gethash (format nil "~a" parens) count))
