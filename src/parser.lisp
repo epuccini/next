@@ -580,44 +580,32 @@
          (add-code (car expr-list))
          (setf expr-list (parse-cstr (cdr expr-list)))))
   expr-list)
-
-(defvar *count-parens* 0)
-
-(defun count-elements-x (element count)
-  (flood:dbg "count-elements-x: ELEMENT " element)
-  (if (not (gethash (format nil "~a" *count-parens*) count))
-          (setf (gethash (format nil "~a" *count-parens*) count) 0))
-  (if (equal "(" element)
-      (progn
-        (setf (gethash (format nil "~a" *count-parens*) count)
-              (1+ (gethash (format nil "~a" *count-parens*) count)))
-        (flood:dbg "(")
-        (flood:dbg "hash " (gethash (format nil "~a" *count-parens*) count))
-        (setf *count-parens* (1+ *count-parens*))))
-  (if (and (stringp element)
-           (not (equal "(" element))
-           (not (equal ")" element)))
-      (progn
-        (setf (gethash (format nil "~a" *count-parens*) count)
-              (1+ (gethash (format nil "~a" *count-parens*) count)))
-        (flood:dbg "TOKEN")
-        (flood:dbg "hash " (gethash (format nil "~a" *count-parens*) count))
-        (flood:dbg "*count-parens* " *count-parens*)))
-  (if (equal ")" element)
-      (progn
-        (flood:dbg ")")
-        (flood:dbg "hash " (gethash (format nil "~a" *count-parens*) count))
-        (setf *count-parens* (1- *count-parens*))))
-  (if (not (gethash (format nil "~a" *count-parens*) count))
-      (setf (gethash (format nil "~a" *count-parens*) count) 0))
-  count)
-      
+    
 (defun count-elements (expr-list)
-  (let ((count (make-hash-table :test 'equal)))
-    (setf *count-parens* 1)
+  (let ((count (make-hash-table :test 'equal))
+        (parens 0))
+    (setf parens 1)
     (dolist (element expr-list)
-      (if (not (= *count-parens* 0))
-          (setf count (count-elements-x element count))))
+      (if (not (= parens 0))
+          (progn
+            (if (not (gethash (format nil "~a" parens) count))
+                (setf (gethash (format nil "~a" parens) count) 0))
+            (if (equal "(" element)
+                (progn
+                  (setf (gethash (format nil "~a" parens) count)
+                        (1+ (gethash (format nil "~a" parens) count)))
+                  (setf parens (1+ parens))))
+            (if (and (stringp element)
+                     (not (equal "(" element))
+                     (not (equal ")" element)))
+                (progn
+                  (setf (gethash (format nil "~a" parens) count)
+                        (1+ (gethash (format nil "~a" parens) count)))))
+            (if (equal ")" element)
+                (progn
+                  (setf parens (1- parens))))
+            (if (not (gethash (format nil "~a" parens) count))
+                (setf (gethash (format nil "~a" parens) count) 0)))))
     (gethash "1" count)))
 
 (defun parse-arguments (expr-list max)
