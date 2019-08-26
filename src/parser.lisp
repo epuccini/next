@@ -19,9 +19,9 @@
 (defvar *functions* nil)
 (defvar *arguments* 0)
 (defvar *block* 0)
-(defvar *generics-template* nil)
-(defvar *def-template* nil)
-(defvar *impl-template* nil)
+(defvar *generics-template* "")
+(defvar *def-template* "")
+(defvar *impl-template* "")
 (defvar *is-main-defined* nil)
 (defvar *infinite-arguments* 10000)
 
@@ -130,9 +130,9 @@
     (remove-if #'(lambda(x) (= (length x) 0)) expr-list)))
 
 (defun emit-code-call ()
-  (let ((code '(""))
-        (definition '(""))
-        (implementation '("")))
+  (let ((code "")
+        (definition "")
+        (implementation ""))
     (if *implementation_list*
         (format t "~%~{~a~}~%" *implementation_list*))
     (if *code_list*
@@ -922,10 +922,11 @@
   (let ((infile-data (load-binary-data infile)))
     (load-templates)
     (multiple-value-bind (code definition implementation) (parse infile-data)
-      (declare (ignore definition))
       (let* ((outfile-data (concatenate 'string *impl-template* code))
              (outfilename (pathname-name outfile))
-             (outfilepath (directory-namestring outfile)))
+             (outfilepath (directory-namestring outfile))
+             (definition-data (concatenate 'string *def-template*
+                                           (format nil "~a" definition))))
         (setf outfile-data (regex-replace-all "\\$\\(OUTPUT_H\\)"
                                                  outfile-data
                                                  (concatenate 'string
@@ -935,7 +936,7 @@
                                               implementation))
         (save-binary-data (concatenate 'string
                                           outfilepath
-                                          outfilename ".h") *def-template*)
+                                          outfilename ".h") definition-data)
         (save-binary-data (concatenate 'string
                                        outfilepath
                                        outfilename ".c") outfile-data)))))
