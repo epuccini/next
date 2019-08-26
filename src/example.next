@@ -17,7 +17,7 @@ by Edward Puccini |;
   (let [float1:float32 0.0 float2:float32 0.0]
     (println argc)
     (set float1 666.0)
-    (set argc (+ 100 999))
+    (set argc (+ 100 1000 500))
     (set argc (+ 100 (+ 1000 999)))
     (println float1)
     (println float2)

@@ -581,6 +581,45 @@
          (setf expr-list (parse-cstr (cdr expr-list)))))
   expr-list)
 
+(defvar *count-parens* 0)
+
+(defun count-elements-x (element count)
+  (flood:dbg "count-elements-x: ELEMENT " element)
+  (if (not (gethash (format nil "~a" *count-parens*) count))
+          (setf (gethash (format nil "~a" *count-parens*) count) 0))
+  (if (equal "(" element)
+      (progn
+        (setf (gethash (format nil "~a" *count-parens*) count)
+              (1+ (gethash (format nil "~a" *count-parens*) count)))
+        (flood:dbg "(")
+        (flood:dbg "hash " (gethash (format nil "~a" *count-parens*) count))
+        (setf *count-parens* (1+ *count-parens*))))
+  (if (and (stringp element)
+           (not (equal "(" element))
+           (not (equal ")" element)))
+      (progn
+        (setf (gethash (format nil "~a" *count-parens*) count)
+              (1+ (gethash (format nil "~a" *count-parens*) count)))
+        (flood:dbg "TOKEN")
+        (flood:dbg "hash " (gethash (format nil "~a" *count-parens*) count))
+        (flood:dbg "*count-parens* " *count-parens*)))
+  (if (equal ")" element)
+      (progn
+        (flood:dbg ")")
+        (flood:dbg "hash " (gethash (format nil "~a" *count-parens*) count))
+        (setf *count-parens* (1- *count-parens*))))
+  (if (not (gethash (format nil "~a" *count-parens*) count))
+      (setf (gethash (format nil "~a" *count-parens*) count) 0))
+  count)
+      
+(defun count-elements (expr-list)
+  (let ((count (make-hash-table :test 'equal)))
+    (setf *count-parens* 1)
+    (dolist (element expr-list)
+      (if (not (= *count-parens* 0))
+          (setf count (count-elements-x element count))))
+    (gethash "1" count)))
+
 (defun parse-arguments (expr-list max)
   (cond ((equal "(" (car expr-list))
          (progn
@@ -694,9 +733,11 @@
                  ((equal tp 'single-float)
                   (add-code "add_float32")))
            (add-code "(")
+           (add-code (format nil "~a" (1- (count-elements expr-list))))
+           (inc-arg)
            (zero-arg)
            (dbg "parse-call: println Next arg " (cdr expr-list))
-           (setf expr-list (parse-arguments (cdr expr-list) *infinite-arguments*))))
+           (setf expr-list (parse-arguments (cdr expr-list) (1- (count-elements expr-list))))))
         ((equal "print-format" (car expr-list))
          (progn
            (add-code "print_format")
