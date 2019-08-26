@@ -101,7 +101,7 @@ void print_format(const char* fmt, ...) {
     printf("\n");
 }
 
-short plus_byte(int size, ...) {
+short add_byte(int size, ...) {
     va_list arglist;
     va_start(arglist, size);
     char result = 0;
@@ -112,7 +112,7 @@ short plus_byte(int size, ...) {
     return (short)result;
 }
 
-short plus_int16(int size, ...) {
+short add_int16(int size, ...) {
     va_list arglist;
     va_start(arglist, size);
     short result = 0;
@@ -123,7 +123,7 @@ short plus_int16(int size, ...) {
     return result;
 }
 
-int plus_int32(int size, ...) {
+int add_int32(int size, ...) {
     va_list arglist;
     va_start(arglist, size);
     int result = 0;
@@ -134,7 +134,7 @@ int plus_int32(int size, ...) {
     return result;
 }
 
-long plus_int64(int size, ...) {
+long add_int64(int size, ...) {
     va_list arglist;
     va_start(arglist, size);
     long result = 0;
@@ -145,7 +145,7 @@ long plus_int64(int size, ...) {
     return result;
 }
 
-float plus_float32(int size, ...) {
+float add_float32(int size, ...) {
     va_list arglist;
     va_start(arglist, size);
     float result = 0;
@@ -156,7 +156,7 @@ float plus_float32(int size, ...) {
     return result;
 }
 
-double plus_float64(int size, ...) {
+double add_float64(int size, ...) {
     va_list arglist;
     va_start(arglist, size);
     double result = 0;

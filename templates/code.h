@@ -23,10 +23,10 @@ void println_float32(float val);
 void println_float64(double val);
 void println_str(const char* str);
 void print_format(const char* fmt, ...);
-short plus_byte(int size, ...);
-short plus_short(int size, ...);
-int plus_int32(int size, ...);
-long plus_int64(int size, ...);
-float plus_float32(int size, ...);
-double plus_float64(int size, ...);
+short add_byte(int size, ...);
+short add_short(int size, ...);
+int add_int32(int size, ...);
+long add_int64(int size, ...);
+float add_float32(int size, ...);
+double add_float64(int size, ...);
 
