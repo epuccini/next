@@ -1,0 +1,58 @@
+parse-expression: parse multiline comment
+parse-multiline-comment: COMMENT Muiltiline
+parse-multiline-comment: COMMENT comment
+parse-multiline-comment: COMMENT n
+parse-multiline-comment: COMMENT n
+parse-multiline-comment: COMMENT Next
+parse-multiline-comment: COMMENT example
+parse-multiline-comment: COMMENT file
+parse-multiline-comment: COMMENT n
+parse-multiline-comment: COMMENT n
+parse-multiline-comment: COMMENT by
+parse-multiline-comment: COMMENT Edward
+parse-multiline-comment: COMMENT Puccini
+parse-multiline-comment: OPEN
+parse-expression: parse singleiline comment
+parse-singleline-comment: COMMENT single
+parse-singleline-comment: COMMENT line
+parse-singleline-comment: COMMENT comment
+parse-expression: OPEN EXPR ( Block: 1
+parse-call: LET
+parse-parameter-vector: OPEN VEC
+parse-variable: DEFINE result:int32
+parse-variable: OPEN ARG
+parse-expression: OPEN EXPR ( Block: 2
+parse-arguments: OPEN ARG ( Block: 3
+parse-arguments: ARG CLOSE ) Block 2
+parse-call: CALL CLOSE ) Block: 1
+parse-parameter-vector: RET 
+parse-parameter-vector: RET 
+parse-parameter-vector: NEXT VAR (2.0 n n 	 str:string " INIT " ] n n 	 (
+                                  println result ) ) n n)
+parse-parameter-vector: NEXT VAR (n n 	 str:string " INIT " ] n n 	 ( println
+                                  result ) ) n n)
+parse-parameter-vector: RET 
+parse-parameter-vector: RET 
+parse-variable: DEFINE str:string
+parse-variable: OPEN ARG
+parse-expression: STRING Block: 1
+parse-expression: STRING END (] n n 	 ( println result ) ) n n)
+parse-parameter-vector: NEXT VAR (] n n 	 ( println result ) ) n n)
+parse-parameter-vector: CLOSE VEC
+parse-parameter-vector: OPEN INNER
+
+"parse-inner-block: RET INNER" n
+
+"parse-inner-block: RET INNER" 	
+parse-inner-block: PARSE INNER (( println result ) ) n n) Block: 1
+parse-inner-block: OPEN INNER Block: 2
+parse-arguments: VARIABLE result
+parse-arguments: ARG CLOSE ) Block 1
+parse-call: CALL CLOSE ) Block: 0
+
+    {
+int result=mod(9,mod(12,5));
+char* str="INIT";
+println_int32(result);
+}
+
