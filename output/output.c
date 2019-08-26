@@ -176,13 +176,13 @@ return(111);
 }
 int main(int argc_1)
 {
-print_int32(test_1(5.5,6.6));
 {
 float float1_2=0.0;
 float float2_2=0.0;
 println_int32(argc_1);
 float1_2=666.0;
-argc_1=999;
+argc_1=add_int32(100,999);
+argc_1=add_int32(100,999);
 println_float32(float1_2);
 println_float32(float2_2);
 println_int32(argc_1);
