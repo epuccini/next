@@ -413,6 +413,10 @@
   (if (equal ")" (car expr-list))
       (progn
         (dbg "parse-block: CLOSE" expr-list)
+        (if (and (equal (car expr-list) ")") (= (1- *paranteses*) *block*))
+            (progn
+              (setf expr-list (cdr expr-list))
+              (dec-parens)))
         (return-from iterate-inner-block expr-list)))
   (if (not (equal ")" (car expr-list)))
       (progn

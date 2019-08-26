@@ -176,6 +176,7 @@ return(111);
 }
 int main(int argc_0)
 {
+print_int32(test_1(5.5,6.6));
 {
 float float1_0=0.0;
 float float2_0=0.0;
