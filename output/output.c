@@ -183,6 +183,11 @@ println_int32(argc_1);
 float1_2=(666.0);
 argc_1=(add_int32(3,100,1000,500));
 argc_1=(add_int32(2,100,add_int32(2,1000,999)));
+int cnt_3=0;
+for(cnt_3=0;cnt_3<100;
+cnt_3++){
+println_int32(cnt_3);
+}
 println_float32(float1_2);
 println_float32(float2_2);
 println_int32(argc_1);
