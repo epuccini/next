@@ -101,10 +101,42 @@ void print_format(const char* fmt, ...) {
     printf("\n");
 }
 
+bool elt_bool(bool* ptr, int idx) {
+    return (bool)ptr[idx];
+}
+
+char elt_byte(char* ptr, int idx) {
+    return (char)ptr[idx];
+}
+
+short elt_int16(short* ptr, int idx) {
+    return (short)ptr[idx];
+}
+
+int elt_int32(int* ptr, int idx) {
+    return (int)ptr[idx];
+}
+
+long elt_int64(long* ptr, short idx) {
+    return (long)ptr[idx];
+}
+
+float elt_float32(float* ptr, short idx) {
+    return (float)ptr[idx];
+}
+
+double elt_float64(double* ptr, int idx) {
+    return (double)ptr[idx];
+}
+
+char* elt_string(char** ptr, int idx) {
+    return (char*)ptr[idx];
+}
+
 short add_byte(int size, ...) {
     va_list arglist;
     va_start(arglist, size);
-    char result = 0;
+    short result = 0;
     
     for (int i = 0; i < size; i++) {
         result += (char)va_arg(arglist, int);

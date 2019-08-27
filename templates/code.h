@@ -29,4 +29,11 @@ int add_int32(int size, ...);
 long add_int64(int size, ...);
 float add_float32(int size, ...);
 double add_float64(int size, ...);
-
+bool elt_bool(bool* ptr, int idx);
+char elt_byte(char* ptr, int idx);
+short elt_int16(short* ptr, int idx);
+int elt_int32(int* ptr, int idx);
+long elt_int64(long* ptr, short idx);
+float elt_float32(float* ptr, short idx);
+double elt_float64(double* ptr, int idx);
+char* elt_string(char** ptr, int idx);

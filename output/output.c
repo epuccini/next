@@ -101,10 +101,42 @@ void print_format(const char* fmt, ...) {
     printf("\n");
 }
 
+bool elt_bool(bool* ptr, int idx) {
+    return (bool)ptr[idx];
+}
+
+char elt_byte(char* ptr, int idx) {
+    return (char)ptr[idx];
+}
+
+short elt_int16(short* ptr, int idx) {
+    return (short)ptr[idx];
+}
+
+int elt_int32(int* ptr, int idx) {
+    return (int)ptr[idx];
+}
+
+long elt_int64(long* ptr, short idx) {
+    return (long)ptr[idx];
+}
+
+float elt_float32(float* ptr, short idx) {
+    return (float)ptr[idx];
+}
+
+double elt_float64(double* ptr, int idx) {
+    return (double)ptr[idx];
+}
+
+char* elt_string(char** ptr, int idx) {
+    return (char*)ptr[idx];
+}
+
 short add_byte(int size, ...) {
     va_list arglist;
     va_start(arglist, size);
-    char result = 0;
+    short result = 0;
     
     for (int i = 0; i < size; i++) {
         result += (char)va_arg(arglist, int);
@@ -174,19 +206,21 @@ println_float32(op1_1);
 println_float32(op2_1);
 return(111);
 }
-int main(int argc_1)
+int do_1(int argc_1)
 {
 {
 float float1_2=0.0;
 float float2_2=0.0;
 int array_2[]={1, 2, 3, 4, 5, 6};
-println_int32(argc_1);
 float1_2=(666.0);
 argc_1=(add_int32(3,100,1000,500));
 argc_1=(add_int32(2,100,add_int32(2,1000,999)));
 int cnt_3=0;
 for(cnt_3=0;cnt_3<5;cnt_3++)
 {
+print_str("ELT:");
+print_format("%d",elt_int32(array_2,cnt_3));
+print_str("CNT:");
 println_int32(cnt_3);
 }
 println_float32(float1_2);
@@ -195,9 +229,15 @@ println_int32(argc_1);
 println_str("ENDE");
 }
 println_int32(argc_1);
+return(2);
+}
+int main()
+{
+return(do_1(777));
 }
 
 
+;
 ;
 ;
 

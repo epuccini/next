@@ -15,20 +15,27 @@ by Edward Puccini |;
 	(println op2)
 	(return 111))
 
-(defn main:int32 [argc:int32]
+(defn do:int32 [argc:int32]
   (let [float1:float32 0.0
         float2:float32 0.0
         array:int32# [1 2 3 4 5 6]]
-    (println argc)
     (set float1 666.0)
     (set argc (+ 100 1000 500))
     (set argc (+ 100 (+ 1000 999)))
     (for [cnt:int32 0 < 5]
-         (elt array cnt)
-        ;(print-format "%d" (elt array cnt))
+        ;(elt array cnt)
+        ;(elt array (mod 11 5))
+        ;(set (elt array cnt) 1000)
+        (print "ELT: ")
+        (print-format "%d" (elt array cnt))
+        (print "CNT: ")
         (println cnt))
     (println float1)
     (println float2)
     (println argc)
     (println "ENDE"))
-  (println argc))
+  (println argc)
+  (return 2))
+
+(defn main:int32 []
+      (return (do 777)))
