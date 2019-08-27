@@ -25,7 +25,7 @@ by Edward Puccini |;
     (for [cnt:int32 0 < 5]
         ;(elt array cnt)
         ;(elt array (mod 11 5))
-       (set (elt array cnt) 1000)
+        (^ (# array cnt) 1000)
         (print "ELT: ")
         (print-format "%d" (elt array cnt))
         (print "CNT: ")
