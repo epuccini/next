@@ -661,7 +661,37 @@
          (add-code (car expr-list))
          (setf expr-list (parse-cstr (cdr expr-list)))))
   expr-list)
-    
+
+(defun parse-element (expr-list)
+  (dbg "parse-element " (car expr-list))
+  (cond ((numberp (parse-integer (car expr-list) :junk-allowed t))
+         (add-code (car expr-list))
+         (if (not (equal "]" (cadr expr-list)))
+             (add-code ", ")))
+        ;((equal "(" (car expr-list))
+         ;(setf expr-list (parse-expression expr-list)))
+        ((stringp (car expr-list))
+         (add-code (car expr-list))
+         (if (not (equal "]" (cadr expr-list)))
+             (add-code ", "))))
+  (cdr expr-list))
+             
+(defun parse-vector (expr-list)
+  (dbg "parse-vector " (car expr-list))
+  (cond ((equal "[" (car expr-list))
+         (progn
+           (setf expr-list (cdr expr-list))
+           (setf expr-list (parse-vector expr-list))))
+        ((equal "]" (car expr-list))
+         (progn
+           (setf expr-list (cdr expr-list))
+           (return-from parse-vector expr-list)))
+        ((stringp (car expr-list))
+         (progn
+           (setf expr-list (parse-element expr-list))
+           (setf expr-list (parse-vector expr-list)))))
+  expr-list)
+  
 (defun count-elements (expr-list)
   (let ((count (make-hash-table :test 'equal))
         (parens 0))
@@ -939,6 +969,13 @@
             (progn
               (dbg "parse-expression: parse singleiline comment")
               (setf expr-list (parse-single-line-comment (cdr expr-list)))
+              (return-from parse-expression expr-list)))
+        (if (equal "[" (car expr-list))
+            (progn
+              (add-code "[")
+              (dbg "parse-expression: parse vector " (car expr-list))
+              (setf expr-list (parse-vector (cdr expr-list)))
+              (add-code (format nil "];~%"))
               (return-from parse-expression expr-list)))
         (if (numberp (parse-integer (car expr-list) :junk-allowed t))
             (progn

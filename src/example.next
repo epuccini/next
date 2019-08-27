@@ -8,6 +8,8 @@ by Edward Puccini |;
 ; (mod 11 (mod 15 9))
 ; (mod 11 (mod 15 (mod 23 4)))
 
+[1 2 3 4 5 6];
+
 (defn test:int32 [op1:float32 op2:float32]
 	(println op1)
 	(println op2)
