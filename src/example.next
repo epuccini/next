@@ -16,12 +16,15 @@ by Edward Puccini |;
 	(return 111))
 
 (defn main:int32 [argc:int32]
-  (let [float1:float32 0.0 float2:float32 0.0]
+  (let [float1:float32 0.0
+        float2:float32 0.0
+        array:int32# [1 2 3 4 5 6]]
     (println argc)
     (set float1 666.0)
     (set argc (+ 100 1000 500))
     (set argc (+ 100 (+ 1000 999)))
-    (for [cnt:int32 0 < 100]
+    (for [cnt:int32 0 < 5]
+         (elt array cnt)
          (println cnt))
     (println float1)
     (println float2)
