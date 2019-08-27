@@ -25,7 +25,8 @@ by Edward Puccini |;
     (set argc (+ 100 (+ 1000 999)))
     (for [cnt:int32 0 < 5]
          (elt array cnt)
-         (println cnt))
+        ;(print-format "%d" (elt array cnt))
+        (println cnt))
     (println float1)
     (println float2)
     (println argc)
