@@ -17,6 +17,8 @@
 (defvar *paranteses* 0)
 (defvar *variables* nil)
 (defvar *functions* nil)
+(defvar *signatures* nil)
+(defvar *current-function* nil)
 (defvar *arguments* 0)
 (defvar *block* 0)
 (defvar *generics-template* "")
@@ -157,6 +159,12 @@
                (skip-expression (cdr expr) p))))
         ((or (equal (car expr) "(") (not (equal (car expr) ")")))
          (skip-expression (cdr expr) p))))
+
+(defun get-current-function ()
+  (gethash *paranteses* *current-function*))
+
+(defun get-last-function ()
+  (gethash (1- *paranteses*) *current-function*))
 
 (defun get-variable-name (name)
   (format nil "~a_~a" name *block*))
@@ -822,6 +830,7 @@
                (number-type (type-of-number-string (cadr expr-list)))
                (function-type (inspect-function-type (cdr expr-list)))
                (tp nil))
+           (setf (gethash *paranteses* *current-function*) "set")
            (dbg "parse-call: set BLOCK " *block* " Parens " *paranteses*)
            (cond ((remove-if-not #'(lambda (x)
                                      (equal x (get-iter-variable-name (cadr expr-list))))
@@ -857,6 +866,7 @@
                (number-type (type-of-number-string (cadr expr-list)))
                (function-type (inspect-function-type (cdr expr-list)))
                (tp nil))
+           (setf (gethash *paranteses* *current-function*) "elt")
            (dbg "parse-call: elt BLOCK " *block* " Parens " *paranteses*)
            (cond ((remove-if-not #'(lambda (x)
                                      (equal x (get-iter-variable-name (cadr expr-list))))
@@ -866,7 +876,7 @@
                   (setf tp function-type))
                  (number-type
                   (setf tp number-type)))
-           (if (not (equal (get-last-code) "("))
+           (if (equal (cadr (gethash (get-last-function) *signatures*)) "value")
                (add-code "*"))
            (cond ((equal tp 'boolean-array)
                   (add-code "elt_bool"))
@@ -887,6 +897,7 @@
                (number-type (type-of-number-string (cadr expr-list)))
                (function-type (inspect-function-type (cdr expr-list)))
                (tp nil))
+           (setf (gethash *paranteses* *current-function*) "add")
            (dbg "parse-call: add BLOCK " *block* " Parens " *paranteses*)
            (cond ((remove-if-not #'(lambda (x)
                                      (equal x (get-iter-variable-name (cadr expr-list))))
@@ -912,6 +923,7 @@
            (setf expr-list (parse-arguments (cdr expr-list) (1- (count-elements expr-list))))))
         ((equal "print-format" (car expr-list))
          (progn
+           (setf (gethash *paranteses* *current-function*) "print-format")
            (add-code "print_format")
            (add-code "(")
            (zero-arg)
@@ -921,6 +933,7 @@
                (number-type (type-of-number-string (cadr expr-list)))
                (function-type (inspect-function-type (cdr expr-list)))
                (tp nil))
+           (setf (gethash *paranteses* *current-function*) "println")
            (dbg "parse-call: println BLOCK " *block* " Parens " *paranteses*)
            (cond ((remove-if-not #'(lambda (x)
                                      (equal x (get-iter-variable-name (cadr expr-list))))
@@ -949,6 +962,7 @@
                (number-type (type-of-number-string (cadr expr-list)))
                (function-type (inspect-function-type (cdr expr-list)))
                (tp nil))
+           (setf (gethash *paranteses* *current-function*) "print")
            (cond ((remove-if-not #'(lambda (x)
                                      (equal x (get-iter-variable-name (cadr expr-list))))
                                  (hash-table-keys *variables*))
@@ -973,17 +987,20 @@
            (setf expr-list (parse-arguments (cdr expr-list) 1))))
         ((equal "let" (car expr-list))
          (progn
+           (setf (gethash *paranteses* *current-function*) "let")
            (zero-arg)
            (dbg "parse-call: LET INC BLOCK " *block* " PARENS " *paranteses*)
            (setf expr-list (parse-let (cdr expr-list)))))
         ((equal "for" (car expr-list))
          (progn
+           (setf (gethash *paranteses* *current-function*) "for")
            (zero-arg)
            (dbg "parse-call: FOR INC BLOCK " *block* " PARENS " *paranteses*)
            (setf expr-list (parse-for (cdr expr-list)))))
         ((or (equal "mod" (car expr-list))
              (equal "%" (car expr-list)))
          (progn
+           (setf (gethash *paranteses* *current-function*) "mod")
            (add-code "mod")
            (add-code "(")
            (zero-arg)
@@ -1093,7 +1110,7 @@
               (dbg "parse-expression: CLOSE parens " *paranteses* " block " *block*)
               (zero-arg)
               (return-from parse-expression expr-list))))))
-
+  
 (defun parse (expression)
   "Parse expression."
   (let ((expr-list (preprocess expression)))
@@ -1105,7 +1122,10 @@
     (setf *arguments* (make-hash-table))
     (setf *variables* (make-hash-table :test 'equal))
     (setf *functions* (make-hash-table :test 'equal))
+    (setf *signatures* (make-hash-table :test 'equal))
+    (setf *current-function* (make-hash-table :test 'equal))
     (setf (gethash *paranteses* *arguments*) 0)
+    (setup-signatures)
     (loop while (and (find "(" expr-list :test #'equal)
                      (> (length expr-list) 0)) do
          (setf expr-list (parse-expression expr-list))
@@ -1114,37 +1134,3 @@
                   (not (equal "\n" (car expr-list))))
              (add-code (format nil ";~%")))))
   (emit-code-call))
-
-(defun repl ()
-  (format t "~%>")
-  (loop for input = (read-line)
-       while input do
-       (parse input)
-       (format t "~%>")))
-
-(defun evaluate (expression)
-  (parse expression))
-
-(defun compile-next (infile outfile)
-  (let ((infile-data (load-binary-data infile)))
-    (load-templates)
-    (multiple-value-bind (code definition implementation) (parse infile-data)
-      (let* ((outfile-data (concatenate 'string *impl-template* code))
-             (outfilename (pathname-name outfile))
-             (outfilepath (directory-namestring outfile))
-             (definition-data (concatenate 'string *def-template*
-                                           (format nil "~a" definition))))
-        (setf outfile-data (regex-replace-all "\\$\\(OUTPUT_H\\)"
-                                                 outfile-data
-                                                 (concatenate 'string
-                                                              outfilename ".h")))
-        (setf outfile-data (regex-replace-all "\\$\\(IMPLEMENTATION\\)"
-                                              outfile-data
-                                              implementation))
-        (save-binary-data (concatenate 'string
-                                          outfilepath
-                                          outfilename ".h") definition-data)
-        (save-binary-data (concatenate 'string
-                                       outfilepath
-                                       outfilename ".c") outfile-data)))))
-

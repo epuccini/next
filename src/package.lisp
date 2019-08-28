@@ -23,6 +23,9 @@
      #:*variables*
      #:evaluate
      #:compile-next
+     #:setup-signatures
+     #:get-current-function
+     #:get-last-function
      #:*call*
      #:*code*
      #:*def-template*
