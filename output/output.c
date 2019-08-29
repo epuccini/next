@@ -171,72 +171,6 @@ void set_string(char** ptr, char* val) {
     *ptr = val;
 }
 
-short add_byte(int size, ...) {
-    va_list arglist;
-    va_start(arglist, size);
-    short result = 0;
-    
-    for (int i = 0; i < size; i++) {
-        result += (char)va_arg(arglist, int);
-    }
-    return (short)result;
-}
-
-short add_int16(int size, ...) {
-    va_list arglist;
-    va_start(arglist, size);
-    short result = 0;
-    
-    for (int i = 0; i < size; i++) {
-        result += (short) va_arg(arglist, int);
-    }
-    return result;
-}
-
-int add_int32(int size, ...) {
-    va_list arglist;
-    va_start(arglist, size);
-    int result = 0;
-    
-    for (int i = 0; i < size; i++) {
-        result += va_arg(arglist, int);
-    }
-    return result;
-}
-
-long add_int64(int size, ...) {
-    va_list arglist;
-    va_start(arglist, size);
-    long result = 0;
-    
-    for (int i = 0; i < size; i++) {
-        result += va_arg(arglist, long);
-    }
-    return result;
-}
-
-float add_float32(int size, ...) {
-    va_list arglist;
-    va_start(arglist, size);
-    float result = 0;
-    
-    for (int i = 0; i < size; i++) {
-        result += (float) va_arg(arglist, double);
-    }
-    return result;
-}
-
-double add_float64(int size, ...) {
-    va_list arglist;
-    va_start(arglist, size);
-    double result = 0;
-    
-    for (int i = 0; i < size; i++) {
-        result += va_arg(arglist, double);
-    }
-    return result;
-}
-
 
 float test_1(float op1_1,float op2_1)
 {
@@ -251,8 +185,10 @@ float float1_2=0.0;
 float float2_2=0.0;
 int array_2[]={1, 2, 3, 4, 5, 6};
 set_float32(&float1_2,666.0);
-set_int32(&argc_1,add_int(3,100,1000,500));
-set_int32(&argc_1,add_int(2,100,add_int(2,1000,999)));
+set_int32(&argc_1,add_int(2,100,max_int(1000,500)));
+println_int32(argc_1);
+set_int32(&argc_1,add_int(2,100,sub_int(2,1000,999)));
+println_int32(argc_1);
 int cnt_3=0;
 for(cnt_3=0;cnt_3<5;cnt_3++)
 {

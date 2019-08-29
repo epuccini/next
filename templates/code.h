@@ -24,12 +24,6 @@ void println_float32(float val);
 void println_float64(double val);
 void println_str(const char* str);
 void print_format(const char* fmt, ...);
-short add_byte(int size, ...);
-short add_short(int size, ...);
-int add_int32(int size, ...);
-long add_int64(int size, ...);
-float add_float32(int size, ...);
-double add_float64(int size, ...);
 bool* elt_bool(bool* ptr, int idx);
 char* elt_byte(char* ptr, int idx);
 short* elt_int16(short* ptr, int idx);
@@ -120,7 +114,7 @@ define_eq(double)
 #define define_add_typed(T) \
 T add_typed_##T(T a, T b){ \
     return a+b; \
-}\
+}
 
 define_add_typed(short)
 define_add_typed(int)
@@ -131,7 +125,7 @@ define_add_typed(double)
 #define define_sub_typed(T) \
 T sub_typed_##T(T a, T b){ \
     return a-b; \
-}\
+}
 
 define_sub_typed(short)
 define_sub_typed(int)
@@ -142,7 +136,7 @@ define_sub_typed(double)
 #define define_mul_typed(T) \
 T mul_typed_##T(T a, T b){ \
     return a*b; \
-}\
+}
 
 define_mul_typed(short)
 define_mul_typed(int)
@@ -156,7 +150,7 @@ T div_typed_##T(T a, T b){ \
 		return a/b; \
 	else \
 		return b; \
-}\
+}
 
 define_div_typed(short)
 define_div_typed(int)
@@ -174,7 +168,7 @@ T add_##T(int size, ...){ \
         result += (T)va_arg(arglist, T); \
     } \
     return (T)result; \
-}\
+}
 
 
 define_add(int)
@@ -184,13 +178,13 @@ define_add(double)
 T sub_##T(int size, ...){ \
     va_list arglist; \
     va_start(arglist, size); \
-    T result = 0; \
+    T result = va_arg(arglist, T); \
     \
-    for (int i = 0; i < size; i++) { \
+    for (int i = 1; i < size; i++) { \
         result -= (T)va_arg(arglist, T); \
     } \
     return (T)result; \
-}\
+}
 
 define_sub(int)
 define_sub(double)
@@ -205,7 +199,7 @@ T mul_##T(int size, ...){ \
         result *= (T)va_arg(arglist, T); \
     } \
     return (T)result; \
-}\
+}
 
 define_mul(int)
 define_mul(double)
@@ -214,14 +208,14 @@ define_mul(double)
 T div_##T(int size, ...){ \
     va_list arglist; \
     va_start(arglist, size); \
-    T result = 0; \
+    T result = va_arg(arglist, T); \
     \
-    for (int i = 0; i < size; i++) { \
+    for (int i = 1; i < size; i++) { \
 		if (va_arg(arglist, int) != 0) \
         result /= (T)va_arg(arglist, T); \
     } \
     return (T)result; \
-}\
+}
 
 define_div(int)
 define_div(double)
@@ -229,7 +223,7 @@ define_div(double)
 #define define_sqrt(T) \
 T sqrt_##T(T a){ \
 	return (T)sqrt(a); \
-}\
+}
 
 define_sqrt(short)
 define_sqrt(int)
@@ -240,10 +234,41 @@ define_sqrt(double)
 #define define_power(T) \
 T power_##T(T a, T b){ \
 	return (T)pow(a, b) ; \
-}\
+}
 
 define_power(short)
 define_power(int)
 define_power(long)
 define_power(float)
 define_power(double)
+
+#define define_max(T) \
+T max_##T(T a, T b){ \
+ \
+	if (a > b) \
+		return a; \
+	else \
+		return b; \
+} 
+
+define_max(short)
+define_max(int)
+define_max(long)
+define_max(float)
+define_max(double)
+
+#define define_min(T) \
+T min_##T(T a, T b) { \
+ \
+	if (a < b) \
+		return a; \
+	else \
+		return b; \
+} 
+
+define_min(short)
+define_min(int)
+define_min(long)
+define_min(float)
+define_min(double)
+
