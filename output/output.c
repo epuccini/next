@@ -194,6 +194,7 @@ for(cnt_3=0;cnt_3<max_int(20,10);
 cnt_3++)
 {
 set_int32(elt_int32(array_2,cnt_3),1000);
+print_format("%d",power_int(2,8));
 print_str("ELT:");
 print_format("%d",*elt_int32(array_2,cnt_3));
 print_str("CNT:");

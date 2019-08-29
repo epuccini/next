@@ -1244,7 +1244,7 @@
            (zero-arg)
            (setf expr-list (parse-arguments (cdr expr-list) 2))
            (return-from parse-call expr-list)))
-        ((or (equal "power" (car expr-list)) (equal "^^^" (car expr-list)))
+        ((or (equal "power" (car expr-list)) (equal "^^" (car expr-list)))
          (let ((type (get-type expr-list)))
            (store-current-function "power")
            (add-code (format nil "power_~a" type))

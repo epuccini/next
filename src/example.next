@@ -29,6 +29,7 @@ by Edward Puccini |;
         ;(elt array (mod 11 5))
         ; ^ = set, # = element
         (^ (# array cnt) 1000)
+        (print-format "%d" (^^ 2 8))
         (print "ELT: ")
         (print-format "%d" (elt array cnt))
         (print "CNT: ")
