@@ -190,8 +190,7 @@ println_int32(argc_1);
 set_int32(&argc_1,add_int(2,100,sub_int(2,1000,999)));
 println_int32(argc_1);
 int cnt_3=0;
-for(cnt_3=0;cnt_3<max_int(20,10);
-cnt_3++)
+for(cnt_3=0;cnt_3<max_int(20,10);cnt_3++)
 {
 set_int32(elt_int32(array_2,cnt_3),1000);
 print_format("%d",power_int(2,8));
@@ -208,18 +207,22 @@ else
 {
 println_str("ELSECNT=3!!");
 }
+;
 }
 else
 {
 println_str("CNT!=3");
 }
+;
 println_int32(cnt_3);
 }
+;
 println_float32(float1_2);
 println_float32(float2_2);
 println_int32(argc_1);
 println_str("ENDE");
 }
+;
 println_int32(argc_1);
 return(2);
 }
@@ -229,4 +232,7 @@ return(do_1(777));
 }
 
 
+;
+;
+;
 
