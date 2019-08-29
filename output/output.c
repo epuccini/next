@@ -190,7 +190,8 @@ println_int32(argc_1);
 set_int32(&argc_1,add_int(2,100,sub_int(2,1000,999)));
 println_int32(argc_1);
 int cnt_3=0;
-for(cnt_3=0;cnt_3<5;cnt_3++)
+for(cnt_3=0;cnt_3<max_int(20,10);
+cnt_3++)
 {
 set_int32(elt_int32(array_2,cnt_3),1000);
 print_str("ELT:");
