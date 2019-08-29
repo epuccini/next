@@ -259,7 +259,7 @@ set_int32(elt_int32(array_2,cnt_3),1000);
 print_str("ELT:");
 print_format("%d",*elt_int32(array_2,cnt_3));
 print_str("CNT:");
-break;
+if(eq_int(cnt_3,3));
 println_int32(cnt_3);
 }
 println_float32(float1_2);

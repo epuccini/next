@@ -75,36 +75,42 @@ bool eq_##T(T a, T b){ \
 }
 
 define_lt(bool)
+define_lt(short)
 define_lt(int)
 define_lt(long)
 define_lt(float)
 define_lt(double)
 
 define_leqt(bool)
+define_leqt(short)
 define_leqt(int)
 define_leqt(long)
 define_leqt(float)
 define_leqt(double)
 
 define_gt(bool)
+define_gt(short)
 define_gt(int)
 define_gt(long)
 define_gt(float)
 define_gt(double)
 
 define_geqt(bool)
+define_geqt(short)
 define_geqt(int)
 define_geqt(long)
 define_geqt(float)
 define_geqt(double)
 
 define_neq(bool)
+define_neq(short)
 define_neq(int)
 define_neq(long)
 define_neq(float)
 define_neq(double)
 
 define_eq(bool)
+define_eq(short)
 define_eq(int)
 define_eq(long)
 define_eq(float)
