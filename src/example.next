@@ -24,10 +24,7 @@ by Edward Puccini |;
     (println argc)
     (set argc (+ 100 (- 1000 999)))
     (println argc)
-    (for [cnt:int32 0 < (max 20 10)]
-        ;(elt array cnt)
-        ;(elt array (mod 11 5))
-        ; ^ = set, # = element
+    (for [cnt:int32 argc < (max 20 10)]
         (^ (# array cnt) 1000)
         (print-format "%d" (^^ 2 8))
         (print "ELT: ")
