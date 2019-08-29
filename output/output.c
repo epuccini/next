@@ -238,14 +238,13 @@ double add_float64(int size, ...) {
 }
 
 
-int test_1(float op1_1,float op2_1)
+float test_1(float op1_1,float op2_1)
 {
-println_float32(op1_1);
-println_float32(op2_1);
-return(111);
+return(add_float32(2,op1_1,op2_1));
 }
 int do_1(int argc_1)
 {
+println_float32(test_1(5.5,6.6));
 {
 float float1_2=0.0;
 float float2_2=0.0;

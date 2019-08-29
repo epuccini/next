@@ -10,12 +10,11 @@ by Edward Puccini |;
 
 ; [1 2 3 4 5 6];
 
-(defn test:int32 [op1:float32 op2:float32]
-	(println op1)
-	(println op2)
-	(return 111))
-
+(defn test:float32 [op1:float32 op2:float32]
+	(return (add op1 op2)))
+    
 (defn do:int32 [argc:int32]
+  (println (test 5.5 6.6))
   (let [float1:float32 0.0
         float2:float32 0.0
         array:int32# [1 2 3 4 5 6]]
