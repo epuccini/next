@@ -260,9 +260,12 @@ print_str("ELT:");
 print_format("%d",*elt_int32(array_2,cnt_3));
 print_str("CNT:");
 if(eq_int(cnt_3,3))
+if(eq_int(cnt_3,3))
 println_str("HOME");
 else
-println_str("ELSE");
+println_str("ELSE"));
+else
+print_str("ELSE2");
 println_int32(cnt_3);
 }
 println_float32(float1_2);
