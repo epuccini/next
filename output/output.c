@@ -240,18 +240,19 @@ double add_float64(int size, ...) {
 
 float test_1(float op1_1,float op2_1)
 {
-return(add_float32(2,op1_1,op2_1));
+return(add_double(2,op1_1,op2_1));
 }
 int do_1(int argc_1)
 {
 println_float32(test_1(5.5,6.6));
+println_str("RET");
 {
 float float1_2=0.0;
 float float2_2=0.0;
 int array_2[]={1, 2, 3, 4, 5, 6};
 set_float32(&float1_2,666.0);
-set_int32(&argc_1,add_int32(3,100,1000,500));
-set_int32(&argc_1,add_int32(2,100,add_int32(2,1000,999)));
+set_int32(&argc_1,add_int(3,100,1000,500));
+set_int32(&argc_1,add_int(2,100,add_int(2,1000,999)));
 int cnt_3=0;
 for(cnt_3=0;cnt_3<5;cnt_3++)
 {

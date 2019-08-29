@@ -1,6 +1,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdarg.h>
+#include <math.h>
 
 int mod(int a, int b);
 int int32_mod_int32(int a, int b);
@@ -115,3 +116,85 @@ define_eq(int)
 define_eq(long)
 define_eq(float)
 define_eq(double)
+
+#define define_add(T) \
+T add_##T(int size, ...){ \
+    va_list arglist; \
+    va_start(arglist, size); \
+    T result = 0; \
+    \
+    for (int i = 0; i < size; i++) { \
+        result += (T)va_arg(arglist, T); \
+    } \
+    return (T)result; \
+}\
+
+
+define_add(int)
+define_add(double)
+
+#define define_sub(T) \
+T sub_##T(int size, ...){ \
+    va_list arglist; \
+    va_start(arglist, size); \
+    T result = 0; \
+    \
+    for (int i = 0; i < size; i++) { \
+        result -= (T)va_arg(arglist, T); \
+    } \
+    return (T)result; \
+}\
+
+define_sub(int)
+define_sub(double)
+
+#define define_mul(T) \
+T mul_##T(int size, ...){ \
+    va_list arglist; \
+    va_start(arglist, size); \
+    T result = 0; \
+    \
+    for (int i = 0; i < size; i++) { \
+        result *= (T)va_arg(arglist, T); \
+    } \
+    return (T)result; \
+}\
+
+define_mul(int)
+define_mul(double)
+
+#define define_div(T) \
+T div_##T(int size, ...){ \
+    va_list arglist; \
+    va_start(arglist, size); \
+    T result = 0; \
+    \
+    for (int i = 0; i < size; i++) { \
+		if (va_arg(arglist, int) != 0) \
+        result /= (T)va_arg(arglist, T); \
+    } \
+    return (T)result; \
+}\
+
+
+define_div(int)
+define_div(double)
+
+#define define_sqrt(T) \
+T sqrt_##T(T a){ \
+	return (T)sqrt(a); \
+}\
+
+define_sqrt(int)
+define_sqrt(double)
+
+#define define_power(T) \
+T power_##T(T a, T b){ \
+	return (T)pow(a, b) ; \
+}\
+
+define_power(short)
+define_power(int)
+define_power(long)
+define_power(float)
+define_power(double)
