@@ -133,34 +133,6 @@
         (setf code (format nil "~a}" code)))
     (values code definition implementation)))
 
-(defun skip-expr-or-value (expr p)
-  (cond  ((equal (car expr) "(")
-          (setq p (1+ p))
-          (skip-expr-or-value (cdr expr) p))
-         ((equal (car expr) ")")
-         (progn
-           (setq p (1- p))
-           (if (= p 0)
-               (return-from skip-expr-or-value (cdr expr))
-               (skip-expr-or-value (cdr expr) p))))
-         ((and (not (equal (car expr) "(")) (not (equal (car expr) ")")))
-          (if (> p 0)
-              (skip-expr-or-value (cdr expr) p)
-              (return-from skip-expr-or-value (cdr expr))))))
-
-(defun skip-expression (expr p)
-  (cond  ((or (equal (car expr) "(") (equal (car expr) ";|"))
-          (setq p (1+ p))
-          (skip-expression (cdr expr) p))
-         ((or (equal (car expr) ")") (equal (car expr) "|;"))
-         (progn
-           (setq p (1- p))
-           (if (= p 0)
-               (return-from skip-expression (cdr expr))
-               (skip-expression (cdr expr) p))))
-        ((or (equal (car expr) "(") (not (equal (car expr) ")")))
-         (skip-expression (cdr expr) p))))
-
 (defun get-current-function ()
   (gethash *paranteses* *current-function*))
 
@@ -233,25 +205,6 @@
         ((equal *target* 'definition)
          (car (reverse *definition_list*)))))
 
-(defun get-previous-last-code ()
-  (cond ((equal *target* 'code)
-         (cadr (reverse *code_list*)))
-        ((equal *target* 'implementation)
-         (cadr (reverse  *implementation_list*)))
-        ((equal *target* 'definition)
-         (cadr (reverse *definition_list*)))))
-
-(defun remove-last-code (code)
-  (cond ((equal *target* 'code)
-         (if (equal code (get-last-code))
-             (setf *code_list* (reverse (cdr (reverse *code_list*))))))
-        ((equal *target* 'implementation)
-         (if (equal code (get-last-code))
-             (setf *implementation_list* (reverse (cdr (reverse *implementation_list*))))))
-        ((equal *target* 'definition)
-         (if (equal code (get-last-code))
-             (setf *definition_list* (reverse (cdr (reverse *definition_list*))))))))
-
 (defun type-of-number-string (numstr)
   (cond ((and (typep (parse-integer numstr :junk-allowed t) 'integer)
               (not (find #\. numstr)))
@@ -272,7 +225,8 @@
       (cond ((remove-if-not #'(lambda (x)
                                 (equal x (get-function-name (cadr expr-list))))
                             (hash-table-keys *functions*))
-             (return-from inspect-function-type (gethash (get-function-name (cadr expr-list))
+             (return-from inspect-function-type (gethash
+                                                 (get-function-name (cadr expr-list))
                                                          *functions*))))))
 
 (defun parse-argument (expr-list)
