@@ -197,7 +197,7 @@ set_int32(elt_int32(array_2,cnt_3),1000);
 print_str("ELT:");
 print_format("%d",*elt_int32(array_2,cnt_3));
 print_str("CNT:");
-if(cnt_3==3)
+if(cnt_3==max_int(1,3))
 {
 if(cnt_3==4)
 {
