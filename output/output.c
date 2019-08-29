@@ -184,6 +184,8 @@ println_str("RET");
 float float1_2=0.0;
 float float2_2=0.0;
 int array_2[]={1, 2, 3, 4, 5, 6};
+char string_2[]={'a', 'b', 'c'};
+println_str(string_2);
 set_float32(&float1_2,666.0);
 set_int32(&argc_1,add_int(2,100,max_int(1000,500)));
 println_int32(argc_1);
