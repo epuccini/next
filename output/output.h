@@ -117,6 +117,53 @@ define_eq(long)
 define_eq(float)
 define_eq(double)
 
+#define define_add_typed(T) \
+T add_typed_##T(T a, T b){ \
+    return a+b; \
+}\
+
+define_add_typed(short)
+define_add_typed(int)
+define_add_typed(long)
+define_add_typed(float)
+define_add_typed(double)
+
+#define define_sub_typed(T) \
+T sub_typed_##T(T a, T b){ \
+    return a-b; \
+}\
+
+define_sub_typed(short)
+define_sub_typed(int)
+define_sub_typed(long)
+define_sub_typed(float)
+define_sub_typed(double)
+
+#define define_mul_typed(T) \
+T mul_typed_##T(T a, T b){ \
+    return a*b; \
+}\
+
+define_mul_typed(short)
+define_mul_typed(int)
+define_mul_typed(long)
+define_mul_typed(float)
+define_mul_typed(double)
+
+#define define_div_typed(T) \
+T div_typed_##T(T a, T b){ \
+	if (b != 0) \
+		return a/b; \
+	else \
+		return b; \
+}\
+
+define_div_typed(short)
+define_div_typed(int)
+define_div_typed(long)
+define_div_typed(float)
+define_div_typed(double)
+
 #define define_add(T) \
 T add_##T(int size, ...){ \
     va_list arglist; \
@@ -176,7 +223,6 @@ T div_##T(int size, ...){ \
     return (T)result; \
 }\
 
-
 define_div(int)
 define_div(double)
 
@@ -185,7 +231,10 @@ T sqrt_##T(T a){ \
 	return (T)sqrt(a); \
 }\
 
+define_sqrt(short)
 define_sqrt(int)
+define_sqrt(long)
+define_sqrt(float)
 define_sqrt(double)
 
 #define define_power(T) \
