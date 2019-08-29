@@ -29,11 +29,11 @@ by Edward Puccini |;
         (print "ELT: ")
         (print-format "%d" (elt array cnt))
         (print "CNT: ")
-        (if (== cnt 3)
-            (if (== cnt 3)
-                (println "HOME")
-                (println "ELSE"))
-            (print "ELSE2"))
+        (if [cnt == 3]
+            (if [cnt == 4]
+                (println "Not possible")
+                (println "ELSE CNT = 3!!"))
+            (println "CNT != 3"))
         (println cnt))
     (println float1)
     (println float2)
