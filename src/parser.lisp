@@ -14,6 +14,7 @@
 (defvar *definition_list* '(""))
 (defvar *implementation_list* '(""))
 (defvar *target* 'code)
+(defvar *mode* 'arguments)
 (defvar *paranteses* 0)
 (defvar *variables* nil)
 (defvar *functions* nil)
@@ -40,7 +41,7 @@
   (let ((trace ""))
     (let* ((msg-lst (remove-if #'null
                                (swank-backend:call-with-debugging-environment
-                                (lambda () (swank:backtrace 0 5)))))
+                                (lambda () (swank:backtrace 0 7)))))
            (stack-msg
             (progn
               (mapcar (lambda (msg)
@@ -625,23 +626,6 @@
   (dbg "parse-for " expr-list)
   expr-list)
 
-(defun parse-if (expr-list)
-  (zero-arg)
-  (inc-block)
-  (dbg "parse-if: parse condition block " *block* " parens " *paranteses*)
-  (setf expr-list (parse-expression expr-list))
-  (add-code (format nil "{~%"))
-  (dbg "parse-if: parse condition TRUE block " *block* " parens " *paranteses*)
-  (setf expr-list (parse-expression expr-list))
-  (dbg "parse-if: parse condition FALSE block " *block* " parens " *paranteses*)
-  (setf expr-list (parse-expression expr-list))
-  (dec-block)
-  (dec-parens)
-  (add-code (format nil "}~%"))
-  (dbg "parse-if BLOCK END  block " *block* " parens " *paranteses*)
-  (dbg "parse-if " expr-list)
-  expr-list)
-
 (defun parse-let (expr-list)
   (zero-arg)
   (inc-block)
@@ -762,8 +746,22 @@
          (progn
            (inc-arg)
            (inc-parens)
-           (if (and *paranteses* (not (equal "(" (get-last-code))))
+           (if (and *paranteses*
+                    (not (equal "(" (get-last-code)))
+                    (not (equal *mode* 'if)))
                (add-code ","))
+           (if (and (equal *mode* 'if)
+                    (= (gethash (1- *paranteses*) *arguments*) 2))
+               (progn
+                 (add-code ")")
+                 (add-code (format nil "~%"))))
+           (if (and (equal *mode* 'if)
+                    (= (gethash (1- *paranteses*) *arguments*) 3))
+               (progn
+                 (add-code ";")
+                 (add-code (format nil "~%"))
+                 (add-code "else")
+                 (add-code (format nil "~%"))))
            (dbg "parse-arguments: OPEN ARG ( block " *block* " Parens " *paranteses*)
            (setf expr-list (parse-call (cdr expr-list)))))
         ((equal "\"" (car expr-list))
@@ -779,16 +777,27 @@
            (if (> (- *paranteses* *block*) 0)
                (dec-parens))
            (dbg "parse-arguments: block " *block* " Parens " *paranteses*)
-           (cond ((> (- *paranteses* *block*) 0)
-                  (progn
-                    (add-code ")")
-                    (setf expr-list (cdr expr-list))
-                    (setf expr-list (parse-arguments expr-list max))))
-                 ((<= (- *paranteses* *block*) 0)
-                  (progn
-                    (add-code (format nil ");~%"))
-                    (dbg "parse-arguments: ende " expr-list)
-                    (return-from parse-arguments expr-list))))))
+           (if (equal *mode* 'if)
+               (cond ((> (- *paranteses* *block*) 0)
+                      (progn
+                        (add-code ")")
+                        (setf expr-list (cdr expr-list))
+                        (setf expr-list (parse-arguments expr-list max))))
+                     ((<= (- *paranteses* *block*) 0)
+                      (progn
+                        (add-code (format nil ";~%"))
+                        (dbg "parse-arguments: ende " expr-list)
+                        (return-from parse-arguments expr-list))))
+               (cond ((> (- *paranteses* *block*) 0)
+                      (progn
+                        (add-code ")")
+                        (setf expr-list (cdr expr-list))
+                        (setf expr-list (parse-arguments expr-list max))))
+                     ((<= (- *paranteses* *block*) 0)
+                      (progn
+                        (add-code (format nil ");~%"))
+                        (dbg "parse-arguments: ende " expr-list)
+                        (return-from parse-arguments expr-list)))))))
         ((equal "," (car expr-list))
          (error-syntax-error))
         ((equal "\n" (car expr-list))
@@ -1080,7 +1089,10 @@
          (add-code "if")
          (add-code "(")
          (zero-arg)
-         (setf expr-list (parse-if (cdr expr-list))))
+         (setf *mode* 'if)
+         (setf expr-list (parse-arguments (cdr expr-list) 3))
+         (setf *mode* 'arguments)
+         (return-from parse-call expr-list))
         ((equal "<" (car expr-list))
          (let ((type (get-type expr-list)))
            (add-code (format nil "lt_~a" type))
@@ -1153,6 +1165,7 @@
             (progn
               (setf expr-list (cdr expr-list))
               (dbg "parse-expression: caught \n")
+              (setf expr-list (parse-expression expr-list))
               (return-from parse-expression expr-list)))
         (if (equal "\"" (car expr-list))
             (progn
