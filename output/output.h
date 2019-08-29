@@ -45,3 +45,67 @@ void set_int64(long* ptr, long val);
 void set_float32(float* ptr, float val);
 void set_float64(double* ptr, double val);
 void set_string(char** ptr, char* val);
+
+#define define_lt(T) \
+bool lt_##T(T a, T b){ \
+	return a < b; \
+}
+#define define_leqt(T) \
+bool let_##T(T a, T b){ \
+	return a <= b; \
+}
+
+#define define_gt(T) \
+bool gt_##T(T a, T b){ \
+	return a > b; \
+}
+#define define_geqt(T) \
+bool get_##T(T a, T b){ \
+	return a >= b; \
+}
+
+#define define_neq(T) \
+bool neq_##T(T a, T b){ \
+	return a != b; \
+}
+
+#define define_eq(T) \
+bool eq_##T(T a, T b){ \
+	return a == b; \
+}
+
+define_lt(bool)
+define_lt(int)
+define_lt(long)
+define_lt(float)
+define_lt(double)
+
+define_leqt(bool)
+define_leqt(int)
+define_leqt(long)
+define_leqt(float)
+define_leqt(double)
+
+define_gt(bool)
+define_gt(int)
+define_gt(long)
+define_gt(float)
+define_gt(double)
+
+define_geqt(bool)
+define_geqt(int)
+define_geqt(long)
+define_geqt(float)
+define_geqt(double)
+
+define_neq(bool)
+define_neq(int)
+define_neq(long)
+define_neq(float)
+define_neq(double)
+
+define_eq(bool)
+define_eq(int)
+define_eq(long)
+define_eq(float)
+define_eq(double)

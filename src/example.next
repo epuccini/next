@@ -29,6 +29,7 @@ by Edward Puccini |;
         (print "ELT: ")
         (print-format "%d" (elt array cnt))
         (print "CNT: ")
+        (break)
         (println cnt))
     (println float1)
     (println float2)
