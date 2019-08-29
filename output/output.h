@@ -272,3 +272,41 @@ define_min(long)
 define_min(float)
 define_min(double)
 
+#define define_single_fn(T) \
+typedef T (*single_fn_##T)(T); \
+
+define_single_fn(bool)
+define_single_fn(char)
+define_single_fn(short)
+define_single_fn(int)
+define_single_fn(long)
+define_single_fn(float)
+define_single_fn(double)
+
+#define define_dual_fn(T) \
+typedef T (*dual_fn_##T)(T, T); \
+
+define_dual_fn(bool)
+define_dual_fn(char)
+define_dual_fn(short)
+define_dual_fn(int)
+define_dual_fn(long)
+define_dual_fn(float)
+define_dual_fn(double)
+
+#define define_map(T) \
+T* map_##T(T* a, single_fn_##T b) { \
+    int cnt = 0; \
+    for (cnt = 0; cnt < sizeof(a)-1; cnt++) { \
+        a[cnt] = (*b)(a[cnt]); \
+    } \
+    return a; \
+}
+
+define_map(bool)
+define_map(char)
+define_map(short)
+define_map(int)
+define_map(long)
+define_map(float)
+define_map(double)
