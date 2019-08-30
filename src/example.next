@@ -12,14 +12,13 @@ by Edward Puccini |;
 
 (defn mapit:float32 [op:float32]
   (print "Map ")
-  (println op)
-  (return (add op op)))
+  (println (+ op op))
+  (return (+ op op)))
 
 (defn reduceit:float32 [op1:float32 op2:float32]
   (print "Reduce ")
-  (print op1)
-  (println op2)
-  (return (add op1 op2)))
+  (println (+ op1 op2))
+  (return (+ op1 op2)))
     
 (defn do:int32 [argc:int32]
   (println (mapit 5.5))
@@ -38,8 +37,8 @@ by Edward Puccini |;
     (set argc (+ 100 (- 1000 999)))
     (println argc)
     (for [cnt:int32 0 < (max 20 10)]
-      (^ (# array cnt) 1000)
-      (print-format "%d" (^^ 2 8))
+      (-> (# array cnt) 1000)
+      (print-format "%d" (^ 2 8))
       (print "ELT: ")
       (print-format "%d" (elt array cnt))
       (print "CNT: ")

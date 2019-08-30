@@ -175,14 +175,13 @@ void set_string(char** ptr, char* val) {
 float mapit_1(float op_1)
 {
 print_str("Map");
-println_float32(op_1);
+println_float64(add_double(2,op_1,op_1));
 return(add_double(2,op_1,op_1));
 }
 float reduceit_1(float op1_1,float op2_1)
 {
 print_str("Reduce");
-print_float32(op1_1);
-println_float32(op2_1);
+println_float64(add_double(2,op1_1,op2_1));
 return(add_double(2,op1_1,op2_1));
 }
 int do_1(int argc_1)
