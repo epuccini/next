@@ -12,7 +12,7 @@ by Edward Puccini |;
 
 (defn mapit:float32 [op:float32]
   (print "Map ")
-  (println (float32 (+ op op)))
+  (println (float64 (+ op op)))
   (return (+ op op)))
 
 (defn reduceit:float32 [op1:float32 op2:float32]
