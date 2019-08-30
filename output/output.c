@@ -172,19 +172,23 @@ void set_string(char** ptr, char* val) {
 }
 
 
-float test_1(float op1_1,float op2_1)
+float test_1(float op_1)
 {
-return(add_double(2,op1_1,op2_1));
+print_str("TEST");
+println_float32(op_1);
+return(add_double(2,op_1,op_1));
 }
 int do_1(int argc_1)
 {
-println_float32(test_1(5.5,6.6));
+println_float32(test_1(5.5));
 println_str("RET");
 {
 float float1_2=0.0;
 float float2_2=0.0;
 int array_2[]={1, 2, 3, 4, 5, 6};
+float values_2[]={1.0, 2.0, 3.0, 4.0, 5.0, 6.0};
 char string_2[]={'a', 'b', 'c'};
+map_float(test_1,values_2);
 println_str(string_2);
 set_float32(&float1_2,666.0);
 set_int32(&argc_1,add_int(2,100,max_int(1000,500)));

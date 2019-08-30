@@ -295,12 +295,12 @@ define_dual_fn(float)
 define_dual_fn(double)
 
 #define define_map(T) \
-T* map_##T(T* a, single_fn_##T b) { \
+T* map_##T(single_fn_##T a, T* b) { \
     int cnt = 0; \
-    for (cnt = 0; cnt < sizeof(a)-1; cnt++) { \
-        a[cnt] = (*b)(a[cnt]); \
+    for (cnt = 0; cnt < sizeof(b)-2; cnt++) { \
+        b[cnt] = (*a)(b[cnt]); \
     } \
-    return a; \
+    return b; \
 }
 
 define_map(bool)

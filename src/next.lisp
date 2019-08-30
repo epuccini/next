@@ -23,6 +23,7 @@
   (setf (gethash "power" *signatures*) '("value" "value" "value"))
   (setf (gethash "max" *signatures*) '("value" "value" "value"))
   (setf (gethash "min" *signatures*) '("value" "value" "value"))
+  (setf (gethash "map" *signatures*) '("array" "function" "array"))
   (setf (gethash "lt" *signatures*) '("value" "value" "value"))
   (setf (gethash "leqt" *signatures*) '("value" "value" "value"))
   (setf (gethash "gt" *signatures*) '("value" "value" "value"))
