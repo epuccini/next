@@ -3,6 +3,13 @@
 #include <stdarg.h>
 #include <math.h>
 
+typedef char byte;
+typedef short int16;
+typedef int int32;
+typedef long int64;
+typedef float float32;
+typedef double float64;
+
 int mod(int a, int b);
 int int32_mod_int32(int a, int b);
 bool bool_not_bool(bool a);
