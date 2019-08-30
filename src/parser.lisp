@@ -1398,6 +1398,7 @@
               ;; omit semicolon for blocks
               (if (or (equal "for" (car expr-list))
                       (equal "if" (car expr-list))
+                      (equal "defn" (car expr-list))
                       (equal "let" (car expr-list)))
                   (setf omit t))
               (setf expr-list (parse-call expr-list))
