@@ -220,7 +220,7 @@
         ((typep numstr 'string)
          'string)))
 
-(defun inspect-function-type(expr-list)
+(defun inspect-function-type (expr-list)
   (if (equal "(" (car expr-list))
       (cond ((remove-if-not #'(lambda (x)
                                 (equal x (get-function-name (cadr expr-list))))
@@ -231,6 +231,9 @@
         (return-from inspect-function-type (gethash
                                             (get-iter-function-name (car expr-list))
                                             *functions*))))
+
+(defun set-function-type (fn-name type)
+  (setf  (gethash (get-iter-function-name fn-name) *functions*) type))
 
 (defun parse-argument (expr-list)
   (cond ((find #\: (car expr-list))
@@ -1300,6 +1303,14 @@
          (let ((type (get-type expr-list)))
            (store-current-function "map")
            (add-code (format nil "map_~a" type))
+           (add-code "(")
+           (zero-arg)
+           (setf expr-list (parse-arguments (cdr expr-list) 2))
+           (return-from parse-call expr-list)))
+        ((equal "reduce" (car expr-list))
+         (let ((type (get-type expr-list)))
+           (store-current-function "reduce")
+           (add-code (format nil "reduce_~a" type))
            (add-code "(")
            (zero-arg)
            (setf expr-list (parse-arguments (cdr expr-list) 2))

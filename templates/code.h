@@ -310,3 +310,21 @@ define_map(int)
 define_map(long)
 define_map(float)
 define_map(double)
+  
+#define define_reduce(T) \
+T reduce_##T(dual_fn_##T a, T* b) { \
+    int cnt = 0; \
+    T result = b[0]; \
+    for (cnt = 1; cnt < sizeof(b)-2; cnt++) { \
+      result = (*a)(result, b[cnt]);           \
+    } \
+    return result; \
+}
+
+define_reduce(bool)
+define_reduce(char)
+define_reduce(short)
+define_reduce(int)
+define_reduce(long)
+define_reduce(float)
+define_reduce(double)
