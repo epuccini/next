@@ -3,50 +3,51 @@
 #include <stdarg.h>
 #include <math.h>
 
-typedef char byte;
-typedef short int16;
-typedef int int32;
-typedef long int64;
-typedef float float32;
-typedef double float64;
+typedef char b8;
+typedef char c8;
+typedef short i16;
+typedef int i32;
+typedef long i64;
+typedef float f32;
+typedef double f64;
 
-int32 mod(int32 a, int32 b);
-int32 int32_mod_int32(int32 a, int32 b);
+i32 mod(i32 a, i32 b);
+i32 i32_mod_i32(i32 a, i32 b);
 bool bool_not_bool(bool a);
-int32 int32_not_int32(int32 a);
-void print_byte(char val);
-void print_char(char val);
-void print_int16(int16 val);
-void print_int32(int32 val);
-void print_int64(int64 val);
-void print_float32(float32 val);
-void print_float64(float64 val);
-void print_string(const char* str);
-void println_byte(char val);
-void println_char(char val);
-void println_int16(int16 val);
-void println_int32(int32 val);
-void println_int64(int64 val);
-void println_float32(float32 val);
-void println_float64(float64 val);
-void println_string(const char* str);
-void print_format(const char* fmt, ...);
-bool* elt_bool(bool* ptr, int32 idx);
-char* elt_byte(char* ptr, int32 idx);
-int16* elt_int16(int16* ptr, int32 idx);
-int32* elt_int32(int32* ptr, int32 idx);
-int64* elt_int64(int64* ptr, int16 idx);
-float32* elt_float32(float32* ptr, int16 idx);
-float64* elt_float64(float64* ptr, int32 idx);
-char** elt_string(char** ptr, int32 idx);
+i32 i32_not_i32(i32 a);
+void print_b8(c8 val);
+void print_c8(c8 val);
+void print_i16(i16 val);
+void print_i32(i32 val);
+void print_i64(i64 val);
+void print_f32(f32 val);
+void print_f64(f64 val);
+void print_string(const c8* str);
+void println_b8(c8 val);
+void println_c8(c8 val);
+void println_i16(i16 val);
+void println_i32(i32 val);
+void println_i64(i64 val);
+void println_f32(f32 val);
+void println_f64(f64 val);
+void println_string(const c8* str);
+void print_format(const c8* fmt, ...);
+bool* elt_bool(bool* ptr, i32 idx);
+c8* elt_b8(c8* ptr, i32 idx);
+i16* elt_i16(i16* ptr, i32 idx);
+i32* elt_i32(i32* ptr, i32 idx);
+i64* elt_i64(i64* ptr, i16 idx);
+f32* elt_f32(f32* ptr, i16 idx);
+f64* elt_f64(f64* ptr, i32 idx);
+c8** elt_string(c8** ptr, i32 idx);
 void set_bool(bool* ptr, bool val);
-void set_byte(char* ptr, char val);
-void set_int16(int16* ptr, int16 val);
-void set_int32(int32* ptr, int32 val);
-void set_int64(int64* ptr, int64 val);
-void set_float32(float32* ptr, float32 val);
-void set_float64(float64* ptr, float64 val);
-void set_string(char** ptr, char* val);
+void set_b8(c8* ptr, c8 val);
+void set_i16(i16* ptr, i16 val);
+void set_i32(i32* ptr, i32 val);
+void set_i64(i64* ptr, i64 val);
+void set_f32(f32* ptr, f32 val);
+void set_f64(f64* ptr, f64 val);
+void set_string(c8** ptr, c8* val);
 
 #define define_lt(T) \
 bool lt_##T(T a, T b){ \
@@ -77,79 +78,79 @@ bool eq_##T(T a, T b){ \
 }
 
 define_lt(bool)
-define_lt(int16)
-define_lt(int32)
-define_lt(int64)
-define_lt(float32)
-define_lt(float64)
+define_lt(i16)
+define_lt(i32)
+define_lt(i64)
+define_lt(f32)
+define_lt(f64)
 
 define_leqt(bool)
-define_leqt(int16)
-define_leqt(int32)
-define_leqt(int64)
-define_leqt(float32)
-define_leqt(float64)
+define_leqt(i16)
+define_leqt(i32)
+define_leqt(i64)
+define_leqt(f32)
+define_leqt(f64)
 
 define_gt(bool)
-define_gt(int16)
-define_gt(int32)
-define_gt(int64)
-define_gt(float32)
-define_gt(float64)
+define_gt(i16)
+define_gt(i32)
+define_gt(i64)
+define_gt(f32)
+define_gt(f64)
 
 define_geqt(bool)
-define_geqt(int16)
-define_geqt(int32)
-define_geqt(int64)
-define_geqt(float32)
-define_geqt(float64)
+define_geqt(i16)
+define_geqt(i32)
+define_geqt(i64)
+define_geqt(f32)
+define_geqt(f64)
 
 define_neq(bool)
-define_neq(int16)
-define_neq(int32)
-define_neq(int64)
-define_neq(float32)
-define_neq(float64)
+define_neq(i16)
+define_neq(i32)
+define_neq(i64)
+define_neq(f32)
+define_neq(f64)
 
 define_eq(bool)
-define_eq(int16)
-define_eq(int32)
-define_eq(int64)
-define_eq(float32)
-define_eq(float64)
+define_eq(i16)
+define_eq(i32)
+define_eq(i64)
+define_eq(f32)
+define_eq(f64)
 
 #define define_add_typed(T) \
 T add_typed_##T(T a, T b){ \
     return a+b; \
 }
 
-define_add_typed(int16)
-define_add_typed(int32)
-define_add_typed(int64)
-define_add_typed(float32)
-define_add_typed(float64)
+define_add_typed(i16)
+define_add_typed(i32)
+define_add_typed(i64)
+define_add_typed(f32)
+define_add_typed(f64)
 
 #define define_sub_typed(T) \
 T sub_typed_##T(T a, T b){ \
     return a-b; \
 }
 
-define_sub_typed(int16)
-define_sub_typed(int32)
-define_sub_typed(int64)
-define_sub_typed(float32)
-define_sub_typed(float64)
+define_sub_typed(i16)
+define_sub_typed(i32)
+define_sub_typed(i64)
+define_sub_typed(f32)
+define_sub_typed(f64)
 
 #define define_mul_typed(T) \
 T mul_typed_##T(T a, T b){ \
     return a*b; \
 }
 
-define_mul_typed(int16)
-define_mul_typed(int32)
-define_mul_typed(int64)
-define_mul_typed(float32)
-define_mul_typed(float64)
+define_mul_typed(i16)
+define_mul_typed(i32)
+define_mul_typed(i64)
+define_mul_typed(f32)
+define_mul_typed(f64)
 
 #define define_div_typed(T) \
 T div_typed_##T(T a, T b){ \
@@ -159,95 +160,95 @@ T div_typed_##T(T a, T b){ \
 		return b; \
 }
 
-define_div_typed(int16)
-define_div_typed(int32)
-define_div_typed(int64)
-define_div_typed(float32)
-define_div_typed(float64)
+define_div_typed(i16)
+define_div_typed(i32)
+define_div_typed(i64)
+define_div_typed(f32)
+define_div_typed(f64)
 
 #define define_add(T) \
-T add_##T(int32 size, ...){ \
+T add_##T(i32 size, ...){ \
     va_list arglist; \
     va_start(arglist, size); \
     T result = 0; \
     \
-    for (int32 i = 0; i < size; i++) { \
+    for (i32 i = 0; i < size; i++) { \
         result += (T)va_arg(arglist, T); \
     } \
     return (T)result; \
 }
 
 
-define_add(int32)
-define_add(float64)
+define_add(i32)
+define_add(f64)
 
 #define define_sub(T) \
-T sub_##T(int32 size, ...){ \
+T sub_##T(i32 size, ...){ \
     va_list arglist; \
     va_start(arglist, size); \
     T result = va_arg(arglist, T); \
     \
-    for (int32 i = 1; i < size; i++) { \
+    for (i32 i = 1; i < size; i++) { \
         result -= (T)va_arg(arglist, T); \
     } \
     return (T)result; \
 }
 
-define_sub(int32)
-define_sub(float64)
+define_sub(i32)
+define_sub(f64)
 
 #define define_mul(T) \
-T mul_##T(int32 size, ...){ \
+T mul_##T(i32 size, ...){ \
     va_list arglist; \
     va_start(arglist, size); \
     T result = 0; \
     \
-    for (int32 i = 0; i < size; i++) { \
+    for (i32 i = 0; i < size; i++) { \
         result *= (T)va_arg(arglist, T); \
     } \
     return (T)result; \
 }
 
-define_mul(int32)
-define_mul(float64)
+define_mul(i32)
+define_mul(f64)
 
 #define define_div(T) \
-T div_##T(int32 size, ...){ \
+T div_##T(i32 size, ...){ \
     va_list arglist; \
     va_start(arglist, size); \
     T result = va_arg(arglist, T); \
     \
-    for (int32 i = 1; i < size; i++) { \
-		if (va_arg(arglist, int32) != 0) \
+    for (i32 i = 1; i < size; i++) { \
+		if (va_arg(arglist, i32) != 0) \
         result /= (T)va_arg(arglist, T); \
     } \
     return (T)result; \
 }
 
-define_div(int32)
-define_div(float64)
+define_div(i32)
+define_div(f64)
 
 #define define_sqrt(T) \
 T sqrt_##T(T a){ \
 	return (T)sqrt(a); \
 }
 
-define_sqrt(int16)
-define_sqrt(int32)
-define_sqrt(int64)
-define_sqrt(float32)
-define_sqrt(float64)
+define_sqrt(i16)
+define_sqrt(i32)
+define_sqrt(i64)
+define_sqrt(f32)
+define_sqrt(f64)
 
 #define define_power(T) \
 T power_##T(T a, T b){ \
 	return (T)pow(a, b) ; \
 }
 
-define_power(int16)
-define_power(int32)
-define_power(int64)
-define_power(float32)
-define_power(float64)
+define_power(i16)
+define_power(i32)
+define_power(i64)
+define_power(f32)
+define_power(f64)
 
 #define define_max(T) \
 T max_##T(T a, T b){ \
@@ -258,11 +259,11 @@ T max_##T(T a, T b){ \
 		return b; \
 } 
 
-define_max(int16)
-define_max(int32)
-define_max(int64)
-define_max(float32)
-define_max(float64)
+define_max(i16)
+define_max(i32)
+define_max(i64)
+define_max(f32)
+define_max(f64)
 
 #define define_min(T) \
 T min_##T(T a, T b) { \
@@ -273,37 +274,37 @@ T min_##T(T a, T b) { \
 		return b; \
 } 
 
-define_min(int16)
-define_min(int32)
-define_min(int64)
-define_min(float32)
-define_min(float64)
+define_min(i16)
+define_min(i32)
+define_min(i64)
+define_min(f32)
+define_min(f64)
 
 #define define_single_fn(T) \
 typedef T (*single_fn_##T)(T); \
 
 define_single_fn(bool)
-define_single_fn(char)
-define_single_fn(int16)
-define_single_fn(int32)
-define_single_fn(int64)
-define_single_fn(float32)
-define_single_fn(float64)
+define_single_fn(c8)
+define_single_fn(i16)
+define_single_fn(i32)
+define_single_fn(i64)
+define_single_fn(f32)
+define_single_fn(f64)
 
 #define define_dual_fn(T) \
 typedef T (*dual_fn_##T)(T, T); \
 
 define_dual_fn(bool)
-define_dual_fn(char)
-define_dual_fn(int16)
-define_dual_fn(int32)
-define_dual_fn(int64)
-define_dual_fn(float32)
-define_dual_fn(float64)
+define_dual_fn(c8)
+define_dual_fn(i16)
+define_dual_fn(i32)
+define_dual_fn(i64)
+define_dual_fn(f32)
+define_dual_fn(f64)
 
 #define define_map(T) \
 T* map_##T(single_fn_##T a, T* b) { \
-    int32 cnt = 0; \
+    i32 cnt = 0; \
     for (cnt = 0; cnt < sizeof(b)-2; cnt++) { \
         b[cnt] = (*a)(b[cnt]); \
     } \
@@ -311,16 +312,16 @@ T* map_##T(single_fn_##T a, T* b) { \
 }
 
 define_map(bool)
-define_map(char)
-define_map(int16)
-define_map(int32)
-define_map(int64)
-define_map(float32)
-define_map(float64)
+define_map(c8)
+define_map(i16)
+define_map(i32)
+define_map(i64)
+define_map(f32)
+define_map(f64)
   
 #define define_reduce(T) \
 T reduce_##T(dual_fn_##T a, T* b) { \
-    int32 cnt = 0; \
+    i32 cnt = 0; \
     T result = b[0]; \
     for (cnt = 1; cnt < sizeof(b)-2; cnt++) { \
       result = (*a)(result, b[cnt]);           \
@@ -329,9 +330,9 @@ T reduce_##T(dual_fn_##T a, T* b) { \
 }
 
 define_reduce(bool)
-define_reduce(char)
-define_reduce(int16)
-define_reduce(int32)
-define_reduce(int64)
-define_reduce(float32)
-define_reduce(float64)
+define_reduce(c8)
+define_reduce(i16)
+define_reduce(i32)
+define_reduce(i64)
+define_reduce(f32)
+define_reduce(f64)

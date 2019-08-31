@@ -13,9 +13,9 @@
   (setf (gethash "set" *signatures*) '("void" "array" "value"))
   (setf (gethash "#" *signatures*) '("array" "array" "value"))
   (setf (gethash "->" *signatures*) '("void" "array" "value"))
-  (setf (gethash "print" *signatures*) '("void" "value"))
-  (setf (gethash "println" *signatures*) '("void" "value"))
-  (setf (gethash "print-format" *signatures*) '("void" "value" "value"))
+  (setf (gethash "prn" *signatures*) '("void" "value"))
+  (setf (gethash "prnl" *signatures*) '("void" "value"))
+  (setf (gethash "prnfmt" *signatures*) '("void" "value" "value"))
   (setf (gethash "mod" *signatures*) '("value" "value" "value"))
   (setf (gethash "add" *signatures*) '("value" "value" "value"))
   (setf (gethash "sub" *signatures*) '("value" "value" "value"))
@@ -38,7 +38,13 @@
   (set-function-type "#" 'integer)
   (set-function-type "->" 'integer)
   (set-function-type "bool" 'boolean)
-  (set-function-type "b8" 'char)
+  (set-function-type "elt_b8" 'char)
+  (set-function-type "elt_i16" 'integer)
+  (set-function-type "elt_i32" 'integer)
+  (set-function-type "elt_i64" 'bigint)
+  (set-function-type "elt_f32" 'single-float)
+  (set-function-type "elt_f64" 'double-float)
+  (set-function-type "elt_b8" 'char)
   (set-function-type "i16" 'integer)
   (set-function-type "i32" 'integer)
   (set-function-type "i64" 'bigint)
@@ -88,9 +94,11 @@
         (setf outfile-data (regex-replace-all "\\$\\(IMPLEMENTATION\\)"
                                               outfile-data
                                               implementation))
+        (inf "Save definition to " outfile)
         (save-binary-data (concatenate 'string
                                           outfilepath
                                           outfilename ".h") definition-data)
+        (inf "Save implementation to " outfile)
         (save-binary-data (concatenate 'string
                                        outfilepath
                                        outfilename ".c") outfile-data)))))

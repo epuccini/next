@@ -71,8 +71,8 @@
 (defun error-missing-expression ()
   (error-msg "Error missing expression!~%"))
 
-(defun error-type-unkown ()
-  (error-msg "Error type unkown!~%"))
+(defun error-function-type-unkown ()
+  (error-msg "Error function type unkown!~%"))
 
 (defun error-syntax-error ()
   (error-msg "Error syntax error!~%"))
@@ -293,6 +293,10 @@
            (add-code "bool")
            (setf (gethash (get-function-name fn-name) *functions*) 'boolean)
            (setf expr-list (cdr expr-list)))
+          ((equal "bool#" type)
+           (add-code "bool")
+           (setf (gethash (get-function-name fn-name) *functions*) 'boolean-array)
+           (setf expr-list (cdr expr-list)))
           ((equal "b8#" type)
            (add-code "b8")
            (setf (gethash (get-function-name fn-name) *functions*) 'char-array)
@@ -325,18 +329,6 @@
            (add-code "char")
            (setf (gethash (get-function-name fn-name) *functions*) 'char-array)
            (setf expr-list (cdr expr-list)))
-          ((equal "b8#" type)
-           (add-code "char")
-           (setf (gethash (get-function-name fn-name) *functions*) 'char-array)
-           (setf expr-list (cdr expr-list)))
-          ((equal "c8#" type)
-           (add-code "char")
-           (setf (gethash (get-function-name fn-name) *functions*) 'char-array)
-           (setf expr-list (cdr expr-list)))
-          ((equal "bool#" type)
-           (add-code "bool")
-           (setf (gethash (get-function-name fn-name) *functions*) 'boolean-array)
-           (setf expr-list (cdr expr-list)))
           ((equal "void" type)
            (add-code "void")
            (setf (gethash (get-function-name fn-name) *functions*) 'void)
@@ -345,7 +337,7 @@
            (add-code "void")
            (setf (gethash (get-function-name fn-name) *functions*) 'void))
           (t
-           (error-type-unkown))))
+           (error-function-type-unkown))))
    
   expr-list)
 
@@ -358,7 +350,7 @@
            (cond ((equal fn-name "main")
                   (setf *is-main-defined* t)
                   (add-code fn-name))
-                 ((not (equal fn-name "main"))
+                 (t
                   (add-code (get-function-name fn-name)))))))
   (dbg "parse-function-name-and-type: EXIT Rest. " expr-list)
   expr-list)

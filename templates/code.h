@@ -4,6 +4,7 @@
 #include <math.h>
 
 typedef char b8;
+typedef char c8;
 typedef short i16;
 typedef int i32;
 typedef long i64;

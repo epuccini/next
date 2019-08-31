@@ -40,7 +40,7 @@ by Edward Puccini |;
       (:: (# array cnt) 1000)
       (prnfmt "%d" (^ 2 8))
       (prn "ELT: ")
-      (prnfmt "%d" (elt array cnt))
+      (prnfmt "%d" (# array cnt))
       (prn "CNT: ")
       (if [cnt == (max 1 3)]
         (if [cnt == 4]
@@ -55,5 +55,5 @@ by Edward Puccini |;
   (prnl argc)
   (return 2))
 
-(defn main:int32 []
+(defn main:i32 []
   (return (do 777)))

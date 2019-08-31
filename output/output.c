@@ -1,10 +1,10 @@
 #include "output.h"
 
-int32 mod(int32 a, int32 b) {
+i32 mod(i32 a, i32 b) {
 	return a % b;
 }
 
-int32 int32_mod_int32(int32 a, int32 b) {
+i32 i32_mod_i32(i32 a, i32 b) {
     return a % b;
 }
 
@@ -12,92 +12,92 @@ bool bool_not_bool(bool a) {
     return !a;
 }
 
-int32 int32_not_int32(int32 a) {
+i32 i32_not_i32(i32 a) {
     return !a;
 }
 
-void print_char(char val) {
+void print_c8(c8 val) {
     printf("%c", val);
 }
 
-void print_byte(char val) {
+void print_b8(c8 val) {
     printf("%d", val);
 }
 
-void print_int16(int16 val) {
+void print_i16(i16 val) {
     printf("%d", val);
 }
 
-void print_int32(int32 val) {
+void print_i32(i32 val) {
     printf("%d", val);
 }
 
-void print_int64(long val) {
+void print_i64(long val) {
     printf("%ld", val);
 }
 
-void print_float32(float32 val) {
+void print_f32(f32 val) {
     printf("%f", val);
 }
 
-void print_float64(float64 val) {
+void print_f64(f64 val) {
     printf("%lf", val);
 }
 
-void print_string(const char* str) {
+void print_string(const c8* str) {
     printf("%s", str);
 }
 
-void println_byte(char val) {
+void println_b8(c8 val) {
     printf("%d\n", val);
 }
 
-void println_char(char val) {
+void println_c8(c8 val) {
     printf("%c\n", val);
 }
 
-void println_int16(int16 val) {
+void println_i16(i16 val) {
     printf("%d\n", val);
 }
 
-void println_int32(int32 val) {
+void println_i32(i32 val) {
     printf("%d \n", val);
 }
 
-void println_int64(long val) {
+void println_i64(long val) {
     printf("%ld \n", val);
 }
 
-void println_float32(float32 val) {
+void println_f32(f32 val) {
     printf("%f \n", val);
 }
 
-void println_float64(float64 val) {
+void println_f64(f64 val) {
     printf("%lf \n", val);
 }
 
-void println_string(const char* str) {
+void println_string(const c8* str) {
     printf("%s \n", str);
 }
 
-void print_format(const char* fmt, ...) {
+void print_format(const c8* fmt, ...) {
     va_list arglist;
     va_start(arglist, fmt);
-    const char* p;
+    const c8* p;
     
     for(p = fmt; *p != '\0'; p++) {
         if (*p == '%') {
             p++;
             if (*p == 'd') {
-                int32 val = va_arg(arglist, int32);
+                i32 val = va_arg(arglist, i32);
                 printf("%d", val);
             }
             if (*p == 's') {
-                char* val = va_arg(arglist, char*);
+                c8* val = va_arg(arglist, c8*);
                 printf("%s", val);
             }
              if (*p == 'c') {
-                 int32 val = va_arg(arglist, int32);
+                 i32 val = va_arg(arglist, i32);
                  printf("%c", val);
             }
             continue;
@@ -107,110 +107,110 @@ void print_format(const char* fmt, ...) {
     printf("\n");
 }
 
-bool* elt_bool(bool* ptr, int32 idx) {
+bool* elt_bool(bool* ptr, i32 idx) {
     return (bool*)&ptr[idx];
 }
 
-char* elt_byte(char* ptr, int32 idx) {
-    return (char*)&ptr[idx];
+c8* elt_b8(c8* ptr, i32 idx) {
+    return (c8*)&ptr[idx];
 }
 
-int16* elt_int16(int16* ptr, int32 idx) {
-    return (int16*)&ptr[idx];
+i16* elt_i16(i16* ptr, i32 idx) {
+    return (i16*)&ptr[idx];
 }
 
-int32* elt_int32(int32* ptr, int32 idx) {
-    return (int32*)&ptr[idx];
+i32* elt_i32(i32* ptr, i32 idx) {
+    return (i32*)&ptr[idx];
 }
 
-long* elt_int64(long* ptr, int16 idx) {
+long* elt_i64(long* ptr, i16 idx) {
     return (long*)&ptr[idx];
 }
 
-float32* elt_float32(float32* ptr, int16 idx) {
-    return (float32*)&ptr[idx];
+f32* elt_f32(f32* ptr, i16 idx) {
+    return (f32*)&ptr[idx];
 }
 
-float64* elt_float64(float64* ptr, int32 idx) {
-    return (float64*)&ptr[idx];
+f64* elt_f64(f64* ptr, i32 idx) {
+    return (f64*)&ptr[idx];
 }
 
-char** elt_string(char** ptr, int32 idx) {
-    return (char**)&ptr[idx];
+c8** elt_string(c8** ptr, i32 idx) {
+    return (c8**)&ptr[idx];
 }
 
 void set_bool(bool* ptr, bool val) {
     *ptr = val;
 }
 
-void set_byte(char* ptr, char val) {
+void set_b8(c8* ptr, c8 val) {
     *ptr= val;
 }
 
-void set_int16(int16* ptr, int16 val) {
+void set_i16(i16* ptr, i16 val) {
     *ptr= val;
 }
 
-void set_int32(int32* ptr, int32 val) {
+void set_i32(i32* ptr, i32 val) {
     *ptr = val;
 }
 
-void set_int64(long* ptr, long val) {
+void set_i64(long* ptr, long val) {
     *ptr = val;
 }
 
-void set_float32(float32* ptr, float32 val) {
+void set_f32(f32* ptr, f32 val) {
     *ptr = val;
 }
 
-void set_float64(float64* ptr, float64 val) {
+void set_f64(f64* ptr, f64 val) {
     *ptr = val;
 }
 
-void set_string(char** ptr, char* val) {
+void set_string(c8** ptr, c8* val) {
     *ptr = val;
 }
 
 
-float32 mapit_1(float32 op_1)
+f32 mapit_1(f32 op_1)
 {
 print_string("Map");
-println_float64(add_float64(2,op_1,op_1));
-return(add_float64(2,op_1,op_1));
+println_f64(add_f64(2,op_1,op_1));
+return(add_f64(2,op_1,op_1));
 }
-float32 reduceit_1(float32 op1_1,float32 op2_1)
+f32 reduceit_1(f32 op1_1,f32 op2_1)
 {
 print_string("Reduce");
-println_float64(add_float64(2,op1_1,op2_1));
-return(add_float64(2,op1_1,op2_1));
+println_f64(add_f64(2,op1_1,op2_1));
+return(add_f64(2,op1_1,op2_1));
 }
-int32 do_1(int32 argc_1)
+i32 do_1(i32 argc_1)
 {
-println_float32(mapit_1(5.5));
+println_f32(mapit_1(5.5));
 println_string("RET");
 {
-float32 float1_2=0.0;
-float32 float2_2=0.0;
-int32 array_2[]={1, 2, 3, 4, 5, 6};
-float32 values_2[]={1.0, 2.0, 3.0, 4.0, 5.0, 6.0};
+f32 float1_2=0.0;
+f32 float2_2=0.0;
+i32 array_2[]={1, 2, 3, 4, 5, 6};
+f32 values_2[]={1.0, 2.0, 3.0, 4.0, 5.0, 6.0};
 char string_2[]={'a', 'b', 'c'};
-map_float32(mapit_1,values_2);
-reduce_float32(reduceit_1,values_2);
+map_f32(mapit_1,values_2);
+reduce_f32(reduceit_1,values_2);
 println_string(string_2);
-set_float32(&float1_2,666.0);
-set_int32(&argc_1,add_int32(2,100,max_int32(1000,500)));
-println_int32(argc_1);
-set_int32(&argc_1,add_int32(2,100,sub_int32(2,1000,999)));
-println_int32(argc_1);
-int32 cnt_3=0;
-for(cnt_3=0;cnt_3<max_int32(20,10);cnt_3++)
+set_f32(&float1_2,666.0);
+set_i32(&argc_1,add_i32(2,100,max_i32(1000,500)));
+println_i32(argc_1);
+set_i32(&argc_1,add_i32(2,100,sub_i32(2,1000,999)));
+println_i32(argc_1);
+i32 cnt_3=0;
+for(cnt_3=0;cnt_3<max_i32(20,10);cnt_3++)
 {
-set_int32(elt_int32(array_2,cnt_3),1000);
-print_format("%d",power_int32(2,8));
+set_i32(elt_i32(array_2,cnt_3),1000);
+print_format("%d",power_i32(2,8));
 print_string("ELT:");
-print_format("%d",elt_int32(array_2,cnt_3));
+print_format("%d",*elt_i32(array_2,cnt_3));
 print_string("CNT:");
-if(cnt_3==max_int32(1,3))
+if(cnt_3==max_i32(1,3))
 {
 if(cnt_3==4)
 {
@@ -225,17 +225,17 @@ else
 {
 println_string("CNT!=3");
 }
-println_int32(cnt_3);
+println_i32(cnt_3);
 }
-println_float32(float1_2);
-println_float32(float2_2);
-println_int32(argc_1);
+println_f32(float1_2);
+println_f32(float2_2);
+println_i32(argc_1);
 println_string("ENDE");
 }
-println_int32(argc_1);
+println_i32(argc_1);
 return(2);
 }
-int32 main()
+i32 main()
 {
 return(do_1(777));
 }
