@@ -10,49 +10,49 @@ by Edward Puccini |;
 
 ; [1 2 3 4 5 6];
 
-(defn mapit:float32 [op:float32]
-  (print "Map ")
-  (println (float64 (+ op op)))
+(defn mapit:f32 [op:f32]
+  (prn "Map ")
+  (prnl (+ op op))
   (return (+ op op)))
 
-(defn reduceit:float32 [op1:float32 op2:float32]
-  (print "Reduce ")
-  (println (+ op1 op2))
+(defn reduceit:f32 [op1:f32 op2:f32]
+  (prn "Reduce ")
+  (prnl (+ op1 op2))
   (return (+ op1 op2)))
     
-(defn do:int32 [argc:int32]
-  (println (mapit 5.5))
-  (println "RET")
-  (let [float1:float32 0.0
-        float2:float32 0.0
-        array:int32# [1 2 3 4 5 6]
-        values:float32# [1.0 2.0 3.0 4.0 5.0 6.0]  
-        string:byte# ['a' 'b' 'c']]
+(defn do:i32 [argc:i32]
+  (prnl (mapit 5.5))
+  (prnl "RET")
+  (let [float1:f32 0.0
+        float2:f32 0.0
+        array:i32# [1 2 3 4 5 6]
+        values:f32# [1.0 2.0 3.0 4.0 5.0 6.0]  
+        string:c8# ['a' 'b' 'c']]
     (map mapit values)
     (reduce reduceit values)
-    (println string)
-    (set float1 666.0)
-    (set argc (+ 100 (max 1000 500)))
-    (println argc)
-    (set argc (+ 100 (- 1000 999)))
-    (println argc)
-    (for [cnt:int32 0 < (max 20 10)]
-      (-> (# array cnt) 1000)
-      (print-format "%d" (^ 2 8))
-      (print "ELT: ")
-      (print-format "%d" (elt array cnt))
-      (print "CNT: ")
+    (prnl string)
+    (:: float1 666.0)
+    (:: argc (+ 100 (max 1000 500)))
+    (prnl argc)
+    (:: argc (+ 100 (- 1000 999)))
+    (prnl argc)
+    (for [cnt:i32 0 < (max 20 10)]
+      (:: (# array cnt) 1000)
+      (prnfmt "%d" (^ 2 8))
+      (prn "ELT: ")
+      (prnfmt "%d" (elt array cnt))
+      (prn "CNT: ")
       (if [cnt == (max 1 3)]
         (if [cnt == 4]
-          (println "Not possible")
-          (println "ELSE CNT = 3!!"))
-        (println "CNT != 3"))
-      (println cnt))
-    (println float1)
-    (println float2)
-    (println argc)
-    (println "ENDE"))
-  (println argc)
+          (prnl "Not possible")
+          (prnl "ELSE CNT = 3!!"))
+        (prnl "CNT != 3"))
+      (prnl cnt))
+    (prnl float1)
+    (prnl float2)
+    (prnl argc)
+    (prnl "ENDE"))
+  (prnl argc)
   (return 2))
 
 (defn main:int32 []

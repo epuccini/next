@@ -175,7 +175,7 @@ void set_string(char** ptr, char* val) {
 float32 mapit_1(float32 op_1)
 {
 print_string("Map");
-println_float64((float64)add_float64(2,op_1,op_1));
+println_float64(add_float64(2,op_1,op_1));
 return(add_float64(2,op_1,op_1));
 }
 float32 reduceit_1(float32 op1_1,float32 op2_1)
@@ -208,7 +208,7 @@ for(cnt_3=0;cnt_3<max_int32(20,10);cnt_3++)
 set_int32(elt_int32(array_2,cnt_3),1000);
 print_format("%d",power_int32(2,8));
 print_string("ELT:");
-print_format("%d",*elt_int32(array_2,cnt_3));
+print_format("%d",elt_int32(array_2,cnt_3));
 print_string("CNT:");
 if(cnt_3==max_int32(1,3))
 {
