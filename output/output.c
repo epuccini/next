@@ -198,7 +198,7 @@ map_f32(mapit_1,values_2);
 reduce_f32(reduceit_1,values_2);
 println_string(string_2);
 set_f32(&float1_2,666.0);
-set_i32(&argc_1,add_i32(2,100,max_i32(1000,500)));
+set_i32(&argc_1,add_i32(4,100,max_i32(1000,500),100,max_i32(1000,500)));
 println_i32(argc_1);
 set_i32(&argc_1,add_i32(2,100,sub_i32(2,1000,999)));
 println_i32(argc_1);

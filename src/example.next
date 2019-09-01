@@ -7,6 +7,7 @@ by Edward Puccini |;
 ; (mod 10 5)
 ; (mod 11 (mod 15 9))
 ; (mod 11 (mod 15 (mod 23 4)))
+; (mod (mod 15 (mod 23 4)) 11)
 
 ; [1 2 3 4 5 6];
 
@@ -32,7 +33,7 @@ by Edward Puccini |;
     (reduce reduceit values)
     (prnl string)
     (:: float1 666.0)
-    (:: argc (+ 100 (max 1000 500)))
+    (:: argc (+ 100 (max 1000 500) 100 (max 1000 500)))
     (prnl argc)
     (:: argc (+ 100 (- 1000 999)))
     (prnl argc)
