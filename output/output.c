@@ -171,18 +171,198 @@ void set_string(c8** ptr, c8* val) {
     *ptr = val;
 }
 
+i32 add_i32(i32 size, ...){ \
+    va_list arglist; \
+    va_start(arglist, size); \
+    i32 result = 0; \
+    \
+    for (i32 i = 0; i < size; i++) { \
+        result += (i32)va_arg(arglist, int); \
+    } \
+    return (i32)result; \
+}
+
+i64 add_i64(i32 size, ...){ \
+    va_list arglist; \
+    va_start(arglist, size); \
+    i64 result = 0; \
+    \
+    for (i32 i = 0; i < size; i++) { \
+        result += (i64)va_arg(arglist, int); \
+    } \
+    return (i64)result; \
+}
+
+f32 add_f32(i32 size, ...){ \
+    va_list arglist; \
+    va_start(arglist, size); \
+    f32 result = 0; \
+    \
+    for (i32 i = 0; i < size; i++) { \
+        result += (f32)va_arg(arglist, double); \
+    } \
+    return (f32)result; \
+}
+
+f64 add_f64(i32 size, ...){ \
+    va_list arglist; \
+    va_start(arglist, size); \
+    f64 result = 0; \
+    \
+    for (i32 i = 0; i < size; i++) { \
+        result += (f64)va_arg(arglist, double); \
+    } \
+    return (f64)result; \
+}
+
+i32 sub_i32(i32 size, ...){ \
+    va_list arglist; \
+    va_start(arglist, size); \
+    i32 result = va_arg(arglist, int); \
+    \
+    for (i32 i = 1; i < size; i++) { \
+        result -= (i32)va_arg(arglist, int); \
+    } \
+    return (i32)result; \
+}
+
+i64 sub_i64(i32 size, ...){ \
+    va_list arglist; \
+    va_start(arglist, size); \
+    i64 result = va_arg(arglist, int); \
+    \
+    for (i32 i = 1; i < size; i++) { \
+        result -= (i64)va_arg(arglist, int); \
+    } \
+    return (i64)result; \
+}
+
+f32 sub_f32(i32 size, ...){ \
+    va_list arglist; \
+    va_start(arglist, size); \
+    f32 result = va_arg(arglist, double); \
+    \
+    for (i32 i = 1; i < size; i++) { \
+        result -= (f32)va_arg(arglist, double); \
+    } \
+    return (f32)result; \
+}
+
+f64 sub_f64(i32 size, ...){ \
+    va_list arglist; \
+    va_start(arglist, size); \
+    f64 result = va_arg(arglist, double); \
+    \
+    for (i32 i = 1; i < size; i++) { \
+        result -= (f64)va_arg(arglist, double); \
+    } \
+    return (f64)result; \
+}
+
+i32 mul_i32(i32 size, ...){ \
+    va_list arglist; \
+    va_start(arglist, size); \
+    i32 result = 0; \
+    \
+    for (i32 i = 0; i < size; i++) { \
+        result *= (i32)va_arg(arglist, int); \
+    } \
+    return (i32)result; \
+}
+
+i64 mul_i64(i32 size, ...){ \
+    va_list arglist; \
+    va_start(arglist, size); \
+    i64 result = 0; \
+    \
+    for (i32 i = 0; i < size; i++) { \
+        result *= (i64)va_arg(arglist, int); \
+    } \
+    return (i64)result; \
+}
+
+f32 mul_f32(i32 size, ...){ \
+    va_list arglist; \
+    va_start(arglist, size); \
+    f32 result = 0; \
+    \
+    for (i32 i = 0; i < size; i++) { \
+        result *= (f32)va_arg(arglist, double); \
+    } \
+    return (f32)result; \
+}
+
+f64 mul_f64(i32 size, ...){ \
+    va_list arglist; \
+    va_start(arglist, size); \
+    f64 result = 0; \
+    \
+    for (i32 i = 0; i < size; i++) { \
+        result *= (f64)va_arg(arglist, double); \
+    } \
+    return (f64)result; \
+}
+
+i32 div_i32(i32 size, ...){ \
+    va_list arglist; \
+    va_start(arglist, size); \
+    i32 result = va_arg(arglist, int); \
+    \
+    for (i32 i = 1; i < size; i++) { \
+        if (va_arg(arglist, i32) != 0) \
+            result /= (i32)va_arg(arglist, int); \
+    } \
+    return (i32)result; \
+}
+
+i64 div_i64(i32 size, ...){ \
+    va_list arglist; \
+    va_start(arglist, size); \
+    i64 result = va_arg(arglist, int); \
+    \
+    for (i32 i = 1; i < size; i++) { \
+        if (va_arg(arglist, i32) != 0) \
+            result /= (i64)va_arg(arglist, int); \
+    } \
+    return (i64)result; \
+}
+
+f32 div_f32(i32 size, ...){ \
+    va_list arglist; \
+    va_start(arglist, size); \
+    f32 result = va_arg(arglist, double); \
+    \
+    for (i32 i = 1; i < size; i++) { \
+        if (va_arg(arglist, i32) != 0) \
+            result /= (f32)va_arg(arglist, double); \
+    } \
+    return (f32)result; \
+}
+
+f64 div_f64(i32 size, ...){ \
+    va_list arglist; \
+    va_start(arglist, size); \
+    f64 result = va_arg(arglist, double); \
+    \
+    for (i32 i = 1; i < size; i++) { \
+        if (va_arg(arglist, i32) != 0) \
+            result /= (f64)va_arg(arglist, double); \
+    } \
+    return (f64)result; \
+}
+
 
 f32 mapit_1(f32 op_1)
 {
 print_string("Map");
-println_f64(add_f64(2,op_1,op_1));
-return(add_f64(2,op_1,op_1));
+println_f64(add_f32(2,op_1,op_1));
+return(add_f32(2,op_1,op_1));
 }
 f32 reduceit_1(f32 op1_1,f32 op2_1)
 {
 print_string("Reduce");
-println_f64(add_f64(2,op1_1,op2_1));
-return(add_f64(2,op1_1,op2_1));
+println_f64(add_f32(2,op1_1,op2_1));
+return(add_f32(2,op1_1,op2_1));
 }
 i32 do_1(i32 argc_1)
 {
@@ -237,7 +417,7 @@ return(2);
 }
 i32 main()
 {
-return(do_1(777));
+return(do_1(77));
 }
 
 

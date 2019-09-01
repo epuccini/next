@@ -167,66 +167,36 @@ define_div_typed(f32)
 define_div_typed(f64)
 
 #define define_add(T) \
-T add_##T(i32 size, ...){ \
-    va_list arglist; \
-    va_start(arglist, size); \
-    T result = 0; \
-    \
-    for (i32 i = 0; i < size; i++) { \
-        result += (T)va_arg(arglist, T); \
-    } \
-    return (T)result; \
-}
-
+T add_##T(i32 size, ...); \
 
 define_add(i32)
+define_add(i64)
+define_add(f32)
 define_add(f64)
 
 #define define_sub(T) \
-T sub_##T(i32 size, ...){ \
-    va_list arglist; \
-    va_start(arglist, size); \
-    T result = va_arg(arglist, T); \
-    \
-    for (i32 i = 1; i < size; i++) { \
-        result -= (T)va_arg(arglist, T); \
-    } \
-    return (T)result; \
-}
+T sub_##T(i32 size, ...); \
 
 define_sub(i32)
+define_sub(i64)
+define_sub(f32)
 define_sub(f64)
 
 #define define_mul(T) \
-T mul_##T(i32 size, ...){ \
-    va_list arglist; \
-    va_start(arglist, size); \
-    T result = 0; \
-    \
-    for (i32 i = 0; i < size; i++) { \
-        result *= (T)va_arg(arglist, T); \
-    } \
-    return (T)result; \
-}
+T mul_##T(i32 size, ...); \
 
 define_mul(i32)
+define_mul(i64)
+define_mul(f32)
 define_mul(f64)
 
 #define define_div(T) \
-T div_##T(i32 size, ...){ \
-    va_list arglist; \
-    va_start(arglist, size); \
-    T result = va_arg(arglist, T); \
-    \
-    for (i32 i = 1; i < size; i++) { \
-		if (va_arg(arglist, i32) != 0) \
-        result /= (T)va_arg(arglist, T); \
-    } \
-    return (T)result; \
-}
+T div_##T(i32 size, ...); \
 
 define_div(i32)
+define_div(i64)
 define_div(f64)
+define_div(f32)
 
 #define define_sqrt(T) \
 T sqrt_##T(T a){ \

@@ -57,4 +57,4 @@ by Edward Puccini |;
   (return 2))
 
 (defn main:i32 []
-  (return (do 777)))
+  (return (do 77)))
