@@ -18,7 +18,7 @@ by Edward Puccini |;
 
 (defn reduceit:f32 [op1:f32 op2:f32]
   (prn "Reduce ")
-  (prnl (+ op1 op2))
+  (prnl (f32 (+ op1 op2)))
   (return (+ op1 op2)))
     
 (defn do:i32 [argc:i32]

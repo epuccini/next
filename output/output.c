@@ -361,7 +361,7 @@ return(add_f32(2,op_1,op_1));
 f32 reduceit_1(f32 op1_1,f32 op2_1)
 {
 print_string("Reduce");
-println_f64(add_f32(2,op1_1,op2_1));
+println_f32((f32)add_f32(2,op1_1,op2_1));
 return(add_f32(2,op1_1,op2_1));
 }
 i32 do_1(i32 argc_1)
