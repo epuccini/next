@@ -33,7 +33,7 @@ by Edward Puccini |;
     (reduce reduceit values)
     (prnl string)
     (:: float1 666.0)
-    (:: argc (+ 100 (max 1000 500) 100 (max 1000 500)))
+    (:: argc (+ 100 (- 1000 500) 100 (* 1000 500)))
     (prnl argc)
     (:: argc (+ 100 (- 1000 999)))
     (prnl argc)

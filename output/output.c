@@ -355,14 +355,14 @@ f64 div_f64(i32 size, ...){ \
 f32 mapit_1(f32 op_1)
 {
 print_string("Map");
-println_f64(add_f32(2,op_1,op_1));
-return(add_f32(2,op_1,op_1));
+println_f64((op_1+op_1));
+return((op_1+op_1));
 }
 f32 reduceit_1(f32 op1_1,f32 op2_1)
 {
 print_string("Reduce");
-println_f32((f32)add_f32(2,op1_1,op2_1));
-return(add_f32(2,op1_1,op2_1));
+println_f32((f32)(op1_1+op2_1));
+return((op1_1+op2_1));
 }
 i32 do_1(i32 argc_1)
 {
@@ -378,9 +378,9 @@ map_f32(mapit_1,values_2);
 reduce_f32(reduceit_1,values_2);
 println_string(string_2);
 set_f32(&float1_2,666.0);
-set_i32(&argc_1,add_i32(4,100,max_i32(1000,500),100,max_i32(1000,500)));
+set_i32(&argc_1,(100+(1000-500)+100+(1000*500)));
 println_i32(argc_1);
-set_i32(&argc_1,add_i32(2,100,sub_i32(2,1000,999)));
+set_i32(&argc_1,(100+(1000-999)));
 println_i32(argc_1);
 i32 cnt_3=0;
 for(cnt_3=0;cnt_3<max_i32(20,10);cnt_3++)
