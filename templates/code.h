@@ -166,6 +166,66 @@ define_div_typed(i64)
 define_div_typed(f32)
 define_div_typed(f64)
 
+#define define_addn(T) \
+T addn_##T(T* array) { \
+    T result = array[0]; \
+    int cnt = 0; \
+    for (cnt = 1; cnt < sizeof(array)-1; cnt++) { \
+        result += array[cnt]; \
+    } \
+    return result; \
+} \
+
+define_addn(i32)
+define_addn(i64)
+define_addn(f32)
+define_addn(f64)
+
+#define define_subn(T) \
+T subn_##T(T* array) { \
+    T result = array[0]; \
+    int cnt = 0; \
+    for (cnt = 1; cnt < sizeof(array)-1; cnt++) { \
+        result -= array[cnt]; \
+    } \
+    return result; \
+} \
+
+define_subn(i32)
+define_subn(i64)
+define_subn(f32)
+define_subn(f64)
+
+#define define_muln(T) \
+T muln_##T(T* array) { \
+    T result = array[0]; \
+    int cnt = 0; \
+    for (cnt = 1; cnt < sizeof(array)-1; cnt++) { \
+        result *= array[cnt]; \
+    } \
+    return result; \
+} \
+
+define_muln(i32)
+define_muln(i64)
+define_muln(f32)
+define_muln(f64)
+
+#define define_divn(T) \
+T divn_##T(T* array) { \
+    T result = array[0]; \
+    int cnt = 0; \
+    for (cnt = 1; cnt < sizeof(array)-1; cnt++) { \
+        result /= array[cnt]; \
+    } \
+    return result; \
+} \
+
+define_divn(i32)
+define_divn(i64)
+define_divn(f32)
+define_divn(f64)
+
 #define define_add(T) \
 T add_##T(i32 size, ...); \
 
