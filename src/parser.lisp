@@ -1174,9 +1174,6 @@
                (setf expr-list (parse-infix expr-list "+")))
              (error-operator-not-defined))
          (zero-arg)
-         (dbg "parse-call: max " (format nil "~a" (count-elements expr-list)))
-         (setf expr-list (parse-arguments expr-list
-                                              (count-elements expr-list)))
          (setf expr-list (parse-arguments expr-list
                                               (count-elements expr-list)))
          (return-from parse-call expr-list))
@@ -1193,9 +1190,6 @@
                (setf expr-list (parse-infix expr-list "-")))
              (error-operator-not-defined))
          (zero-arg)
-         (dbg "parse-call: max " (format nil "~a" (count-elements expr-list)))
-         (setf expr-list (parse-arguments expr-list
-                                              (count-elements expr-list)))
          (setf expr-list (parse-arguments expr-list
                                               (count-elements expr-list)))
          (return-from parse-call expr-list))
@@ -1212,9 +1206,6 @@
                (setf expr-list (parse-infix expr-list "*")))
              (error-operator-not-defined))
          (zero-arg)
-         (dbg "parse-call: max " (format nil "~a" (count-elements expr-list)))
-         (setf expr-list (parse-arguments expr-list
-                                              (count-elements expr-list)))
          (setf expr-list (parse-arguments expr-list
                                               (count-elements expr-list)))
          (return-from parse-call expr-list))
@@ -1231,9 +1222,6 @@
                (setf expr-list (parse-infix expr-list "/")))
              (error-operator-not-defined))
          (zero-arg)
-         (dbg "parse-call: max " (format nil "~a" (count-elements expr-list)))
-         (setf expr-list (parse-arguments expr-list
-                                              (count-elements expr-list)))
          (setf expr-list (parse-arguments expr-list
                                               (count-elements expr-list)))
          (return-from parse-call expr-list))
