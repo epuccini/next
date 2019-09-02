@@ -115,7 +115,8 @@
          (new-expr8 (regex-replace-all (format nil "~a" #\tab) new-expr7
                                        (format nil " ")))
          (new-expr9 (regex-replace-all "\\," new-expr8 "°,°"))
-         (expr-list (split " |°" new-expr9)))
+         (new-expr10 (regex-replace-all "->" new-expr9 "°->°"))
+         (expr-list (split " |°" new-expr10)))
     (remove-if #'(lambda(x) (= (length x) 0)) expr-list)))
 
 (defun emit-code-call ()
@@ -285,13 +286,20 @@
          (let ((def (split ":" (car expr-list))))
            (dbg "parse-argument: DEFINE " (car expr-list))
            (inc-arg)
-           (parse-variable-type (car def) (cadr def))
-           (add-code " ")
-           (add-code (get-variable-name (car def)))
+           (if (and (equal "fun" (cadr def)) (equal "[" (cadr expr-list)))
+               (progn
+                 (setf expr-list (parse-signature-vector (car def) (cdr expr-list)))
+                 (dbg "parse-argumemt: signature " (gethash (car def) *signatures*))
+                 (parse-variable-type (car def) (cadr def) (gethash (car def) *signatures*)))
+               (progn
+                 (parse-variable-type (car def) (cadr def))
+                 (setf expr-list (cdr expr-list))
+                 (add-code " ")
+                 (add-code (get-variable-name (car def)))))
            (dbg "parse-argument: OPEN ARG")
-           (if (find #\: (cadr expr-list))
+           (if (find #\: (car expr-list))
                (add-code ","))
-           (setf expr-list (parse-argument (cdr expr-list))))))
+           (setf expr-list (parse-argument expr-list)))))
   expr-list)
 
 (defun parse-function-type (expr-list)
@@ -391,7 +399,7 @@
   (dbg "parse-function-name-and-type: EXIT Rest. " expr-list)
   expr-list)
 
-(defun parse-variable-type (var-name type-name)
+(defun parse-variable-type (var-name type-name &optional (signature nil))
   (cond ((equal "i16" type-name)
          (add-code "i16")
          (setf (gethash (get-variable-name var-name) *variables*) 'integer))
@@ -444,11 +452,46 @@
          (add-code "bool")
          (setf (gethash (get-variable-name var-name) *variables*) 'boolean-array))
         ((equal "fun" type-name)
-         (add-code (format nil "single_fn_f32" (get-variable-name var-name)))
-         (setf (gethash (get-variable-name var-name) *variables*) 'function))
+         (if signature
+             (progn
+               (dbg "parse-variable-type: signature " signature)
+               (dbg "parse-variable-type: signature "
+                    (format nil "~a (*~a)(~a)"
+                            (car (reverse signature))
+                            (get-variable-name var-name)
+                            (cdr (reverse signature))))
+               (add-code (format nil "~a (*~a)(~a)"
+                                 (car (reverse signature))
+                                 (get-variable-name var-name)
+                                 (cadr (reverse signature))))
+               (setf (gethash (get-variable-name var-name) *variables*) 'function))
+             (progn
+               (add-code "single_fn_f32")
+               (setf (gethash (get-variable-name var-name) *variables*) 'function))))
         ((not type-name)
          (error-no-type-def))))
 
+(defun parse-signature-vector (var-name expr-list)
+  (dbg "parse-signature-vector: ENTRY " (car expr-list))
+  (if (equal "->" (car expr-list))
+      (setf expr-list (cdr expr-list)))
+  (if (equal "[" (car expr-list))
+      (setf expr-list (cdr expr-list)))
+  (if (not (equal "]" (car expr-list)))
+      (progn
+        (dbg "parse-signature-vector: " (car expr-list))
+        (setf (gethash var-name *signatures*) (append
+                                               (gethash var-name *signatures*)
+                                               (list (car expr-list))))
+        (dbg "parse-signature-vector: " (gethash var-name *signatures*))
+        (setf expr-list (parse-signature-vector var-name (cdr expr-list)))))
+  (if (equal "]" (car expr-list))
+      (progn
+        (dbg "parse-signature-vector: EXIT " (car expr-list))
+        (setf expr-list (cdr expr-list))
+        (return-from parse-signature-vector expr-list)))
+  expr-list)
+  
 (defun parse-variable (expr-list)
   (dbg "parse-variable: " (car expr-list))
   (cond ((equal "\n" (car expr-list))
@@ -457,15 +500,24 @@
         ((find #\: (car expr-list))
          (let ((def (split ":" (car expr-list))))
            (dbg "parse-variable: DEFINE " (car expr-list))
-           (parse-variable-type (car def) (cadr def))
            (if (or (equal "\n" (cadr expr-list))
                    (equal "]" (cadr expr-list)))
                (error-no-type-def))
+           (if (and (equal "fun" (cadr def)) (equal "[" (cadr expr-list)))
+               (progn
+                 (setf expr-list (parse-signature-vector (car def) (cdr expr-list)))
+                 (dbg "parse-argumemt: signature " (gethash (car def) *signatures*))
+                 (parse-variable-type (car def) (cadr def) (gethash (car def) *signatures*)))
+               (progn
+                 (parse-variable-type (car def) (cadr def))
+                 (setf expr-list (cdr expr-list))))
            (if (equal (format nil "~a" (gethash (get-variable-name (car def)) *variables*))
                       "FUNCTION")
-               (register-function (car def) (cadr expr-list)))
-           (add-code " ")
-           (add-code (get-variable-name (car def)))
+               (register-function (car def) (car expr-list))
+               (progn
+                 (add-code " ")
+                 (add-code (get-variable-name (car def)))))
+
            (let ((split (split "-"
                                (format nil "~a"
                                        (gethash (get-variable-name (car def))
@@ -482,10 +534,10 @@
                           (add-code "[]"))))))
            (add-code "=")
            (dbg "parse-variable: OPEN ARG")
-           (if (equal (cadr expr-list) "]")
+           (if (equal (car expr-list) "]")
                (error-missing-expression))
-           (dbg "parse-variable: next " (cdr expr-list))
-           (setf expr-list (parse-expression (cdr expr-list)))
+           (dbg "parse-variable: next " expr-list)
+           (setf expr-list (parse-expression expr-list))
            (add-code (format nil ";~%"))
            (dbg "parse-variable: rest " expr-list)))
         ((not (find #\: (car expr-list)))
