@@ -374,6 +374,8 @@ f32 float2_2=0.0;
 i32 array_2[]={1, 2, 3, 4, 5, 6};
 f32 values_2[]={1.0, 2.0, 3.0, 4.0, 5.0, 6.0};
 char string_2[]={'a', 'b', 'c'};
+char* myfun_2="mapit_1";
+mapit_1(1000.0);
 map_f32(mapit_1,values_2);
 reduce_f32(reduceit_1,values_2);
 println_string(string_2);
