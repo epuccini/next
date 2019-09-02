@@ -22,7 +22,7 @@ by Edward Puccini |;
   (return (+ op1 op2)))
 
 (defn work:void [f:fun arg:i32]
-  (f arg))
+  (prnfmt "%f" (f arg)))
 
 (defn do:i32 [argc:i32]
   (prnl (mapit 5.5))
