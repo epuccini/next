@@ -72,8 +72,8 @@
 (defun error-missing-expression ()
   (error-msg "Error missing expression!~%"))
 
-(defun error-function-type-unkown ()
-  (error-msg "Error function type unkown!~%"))
+(defun error-function-type-unkown (type)
+  (error-msg (format nil "Error function type ~a unkown!~%" type)))
 
 (defun error-syntax-error ()
   (error-msg "Error syntax error!~%"))
@@ -215,15 +215,35 @@
         ((equal *target* 'definition)
          (car (reverse *definition_list*)))))
 
+(defun get-previous-code ()
+  (cond ((equal *target* 'code)
+         (cadr (reverse *code_list*)))
+        ((equal *target* 'implementation)
+         (cadr (reverse  *implementation_list*)))
+        ((equal *target* 'definition)
+         (cadr (reverse *definition_list*)))))
+
 (defun get-function-value (fn-name)
   (gethash fn-name *function-map*))
 
-(defun set-function (fn-name value)
+(defun set-function-map (fn-name value)
   (setf (gethash fn-name *function-map*) value))
 
-(defun is-function-p (fn-name)
+(defun is-function-map-p (fn-name)
   (remove-if-not #'(lambda (fn) (equal fn fn-name)) (hash-table-keys *function-map*)))
 
+(defun register-function (name content)
+  (set-function-map name content)
+  (setf (gethash (get-function-name name) *functions*) 'function)
+  (dbg "register-function: Register function >" name
+       "< var >" content "<"))
+
+(defun emit-named-function-call (sym-name fn-name)
+  (add-code (format nil "if(strcmp(~a, \"~a\") == 0)"
+                    (get-iter-variable-name sym-name) fn-name))
+  (add-code fn-name)
+  (add-code "("))
+  
 (defun type-of-number-string (numstr)
   (cond ((and
           (typep (parse-integer numstr :junk-allowed t) 'integer)
@@ -343,11 +363,15 @@
            (add-code "void")
            (setf (gethash (get-function-name fn-name) *functions*) 'void)
            (setf expr-list (cdr expr-list)))
+          ((equal "fun" type)
+           (add-code "char*")
+           (setf (gethash (get-function-name fn-name) *functions*) 'function)
+           (setf expr-list (cdr expr-list)))
           ((equal "[" type)
            (add-code "void")
            (setf (gethash (get-function-name fn-name) *functions*) 'void))
           (t
-           (error-function-type-unkown))))
+           (error-function-type-unkown type))))
    
   expr-list)
 
@@ -422,7 +446,7 @@
          (setf (gethash (get-variable-name var-name) *variables*) 'function))
         ((not type-name)
          (error-no-type-def))))
-  
+
 (defun parse-variable (expr-list)
   (dbg "parse-variable: " (car expr-list))
   (cond ((equal "\n" (car expr-list))
@@ -437,11 +461,7 @@
                (error-no-type-def))
            (if (equal (format nil "~a" (gethash (get-variable-name (car def)) *variables*))
                       "FUNCTION")
-               (progn
-                 (set-function (car def) (cadr expr-list))
-                 (setf (gethash (get-function-name (car def)) *functions*) 'function)
-                 (dbg "parse-variable: Register function >" (car def)
-                      "< var >" (cadr expr-list) "<") ))
+               (register-function (car def) (cadr expr-list)))
            (add-code " ")
            (add-code (get-variable-name (car def)))
            (let ((split (split "-"
@@ -637,18 +657,21 @@
         (setf expr-list (parse-block (cdr expr-list))))))
 
 (defun parse-function-vector (expr-list)
-  (dbg "parse-function-vector: parse variable")  
-  (setf expr-list (parse-argument expr-list))
-  (if (equal "]" (car expr-list))
-      (return-from parse-function-vector expr-list))
-  (if (equal "\n" (car expr-list))
-      (setf expr-list (parse-function-vector (cdr expr-list))))
-  (if (and (not (find #\: (cadr expr-list))) (not (equal "]" (cadr expr-list))))
-      (error-function-vector-malformed))
-  (if (not (equal "]" (car expr-list)))
-      (progn
-        (dbg "parse-function-vector: next variable")  
-        (setf expr-list (parse-function-vector expr-list))))
+  (let ((temp-list expr-list))
+    (dbg "parse-function-vector: parse variable")  
+    (setf expr-list (parse-argument expr-list))
+    (if (equal "]" (car expr-list))
+        (return-from parse-function-vector expr-list))
+    (if (equal "\n" (car expr-list))
+        (setf expr-list (parse-function-vector (cdr expr-list))))
+    (if (and (not (find #\: (cadr expr-list))) (not (equal "]" (cadr expr-list))))
+        (error-function-vector-malformed))
+    (if (not (equal "]" (car expr-list)))
+        (progn
+          (dbg "parse-function-vector: next variable " (car expr-list))
+          (if (equal temp-list expr-list)
+              (setf expr-list (cdr expr-list)))
+          (setf expr-list (parse-function-vector expr-list)))))
   (dbg "parse-function-vector: exit")
   expr-list)
 
@@ -1002,7 +1025,11 @@
                             (equal x (get-iter-function-name (car expr-list))))
                         (hash-table-keys *functions*))
          (progn
-           (add-code (get-iter-function-name (car expr-list)))
+           (dbg "parse-arguments: last code " (get-previous-code))
+           (if (or (equal "map" (subseq (get-previous-code) 0 3))
+                   (equal "reduce" (subseq (get-previous-code) 0 6)))
+               (add-code (get-iter-function-name (car expr-list)))
+               (add-code (format nil "\"~a\"" (get-iter-function-name (car expr-list)))))
            (setf expr-list (parse-arguments (cdr expr-list) max))))
         ((stringp (car expr-list))
          (dbg "parse-arguments: VARIABLE not defined: "
@@ -1014,7 +1041,6 @@
 (defun parse-infix (expr-list function)
   (if (equal ")" (car expr-list))
       (progn
-        (dec-parens)
         (dbg "parse-infix: parens ) parens " *paranteses* " block " *block*)
         (dbg "parse-infix: EXIT " expr-list)
         (return-from parse-infix expr-list)))
@@ -1294,7 +1320,6 @@
          (add-code "break")
          (add-code (format nil ";~%"))
          (zero-arg)
-         (dec-parens)
          (setf expr-list (cdr expr-list))
          (return-from parse-call expr-list))
         ((equal "bool" (car expr-list))
@@ -1354,17 +1379,38 @@
          (setf expr-list (parse-arguments (cdr expr-list) 1))
          (return-from parse-call expr-list))
         ((remove-if-not #'(lambda (x)
-                            (equal x (get-function-name (car expr-list))))
+                            (equal x (get-iter-function-name (car expr-list))))
                         (hash-table-keys *functions*))
          (progn
-           (if (is-function-p (car expr-list))
+           (if (is-function-map-p (car expr-list))
                (add-code (get-iter-function-name (get-function-value (car expr-list))))
                (add-code (get-iter-function-name (car expr-list))))
            (add-code "(")
            (zero-arg)
            (setf expr-list (parse-arguments (cdr expr-list) *infinite-arguments*))))
+        ((get-iter-variable-name (car expr-list))
+         (dbg "parse-call: FN emit: " (get-function-name (car expr-list)))
+         (zero-arg)
+         (let ((temp-list expr-list)
+               (functions (remove-if-not #'(lambda (x)
+                                             (if (equal (get-iter-function-name "mapit") x)
+                                                 t))
+                                             (hash-table-keys *functions*))))
+           (add-code "//")
+           (setf expr-list (parse-arguments (cdr temp-list)
+                                                 *infinite-arguments*))
+           (loop for fn in functions do
+                (if fn
+                    (progn
+                      (add-code ")")
+                      (add-code ";")
+                      (add-code (format nil "~%"))
+                      (emit-named-function-call (car temp-list) fn)
+                      (zero-arg)
+                      (setf expr-list (parse-arguments (cdr temp-list)
+                                                       *infinite-arguments*)))))))
         ((stringp (car expr-list))
-         (dbg "parse-call: FN not defined: " (car expr-list))
+         (dbg "parse-call: FN not defined: " (get-function-name (car expr-list)))
          (error-function-not-defined)))
    expr-list)
 

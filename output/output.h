@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <math.h>
+#include <string.h>
 
 typedef char b8;
 typedef char c8;

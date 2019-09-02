@@ -364,6 +364,11 @@ print_string("Reduce");
 println_f32((f32)(op1_1+op2_1));
 return((op1_1+op2_1));
 }
+void work_1(char* f_1,i32 arg_1)
+{
+//,arg_1);
+if(strcmp(f_1, "mapit_1") == 0)mapit_1(arg_1);
+}
 i32 do_1(i32 argc_1)
 {
 println_f32(mapit_1(5.5));
@@ -376,6 +381,7 @@ f32 values_2[]={1.0, 2.0, 3.0, 4.0, 5.0, 6.0};
 char string_2[]={'a', 'b', 'c'};
 char* myfun_2="mapit_1";
 mapit_1(1000.0);
+work_1("mapit_1",100);
 map_f32(mapit_1,values_2);
 reduce_f32(reduceit_1,values_2);
 println_string(string_2);

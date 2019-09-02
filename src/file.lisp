@@ -27,6 +27,7 @@
   "Load binary file from path."
   (cl-binary:with-open-binary-file (out path :direction :output)
     (loop for x from 0 to (1- (length data)) do
-         (cl-binary:write-u8 out (char-code (elt data x))))))
+         (if (<= (char-code (elt data x)) 255)
+             (cl-binary:write-u8 out (char-code (elt data x)))))))
 
 
