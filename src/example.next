@@ -34,6 +34,7 @@ by Edward Puccini |;
         my-new-array:f32> (mapn mapit values)
         my-new-floats:f32> (new_f32 10)
         string:string "abc"
+        chars:c8# ['a' 'b' 'c']
         myfun:fun[f32->f32] mapit]
     (:: (f32> (# my-new-array 0)) 888.0)
     (prn "My new array / first element is: ")
@@ -44,6 +45,8 @@ by Edward Puccini |;
     (reduce reduceit values)
     (prn "String: ")
     (prnl string)
+    (prn "Chars: ")
+    (prnl chars)
     (prn "sizeof: ")
     (prnl (@ string)) 
     (:: float1 666.0)
