@@ -22,7 +22,6 @@
                                     (format nil "~a" (code-char line))))))
 	store))
 
-
 (defun save-binary-data (path data)
   "Load binary file from path."
   (cl-binary:with-open-binary-file (out path :direction :output)
