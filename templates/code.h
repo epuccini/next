@@ -412,10 +412,6 @@ typedef struct node_ptr {
 } node_ptr_t;
 
 node_ptr_t* add_ptr(node_ptr_t* list, void* value) {
-	do
-	{
-		list = list->next;
-	} while (list->next != NULL);
 	list->next = (node_ptr_t*)malloc(sizeof(node_ptr_t));
 	list->next->value = value;
 	list = list->start;
@@ -434,12 +430,12 @@ node_ptr_t* remove_ptr(node_ptr_t* list, void* value) {
 }
 
 void destroy_ptr(node_ptr_t* e) {
-	if(e)
+	if(e != NULL)
 	{
 		do 
 		{ 
 			node_ptr_t* temp = e;
-			if (e->value)
+			if (e->value != NULL)
 				free(e->value);
 			free(e);
 			e = temp->next;
@@ -466,13 +462,12 @@ define_map(i64)
 define_map(f32)
 define_map(f64)
 
-/*	if(pointer_list) \
-add_ptr(pointer_list, (void*)ptr); \*/
-
 #define define_mapn(T) \
 T* mapn_##T(single_fn_##T a, T* b) { \
     T* ptr = (T*) malloc(sizeof(b) * sizeof(T)); \
-    i32 cnt = 0; \
+	if(pointer_list) \
+		add_ptr(pointer_list, (void*)ptr);\
+	i32 cnt = 0; \
     for (cnt = 0; cnt < sizeof(b)-2; cnt++) { \
         ptr[cnt] = (*a)(b[cnt]); \
     } \

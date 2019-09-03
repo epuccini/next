@@ -244,13 +244,16 @@ println_string("ENDE");
 println_i32(argc_1);
 return(2);
 }
-i32 main()
+
+
+
+i32 main () 
 {
+pointer_list = (node_ptr_t*)malloc(sizeof(node_ptr_t));
+pointer_list->start = pointer_list;
+
 do_0(77);
+
+
+free(pointer_list);
 }
-
-
-
-
-
-

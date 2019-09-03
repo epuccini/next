@@ -142,7 +142,7 @@
                                  pointers *code_list*))
               (setf code (format nil "~%~%~{~a~}~%" *code_list*)))))
     (if (not (is-main-defined-p))
-        (setf code (format nil "~a~%//destroy_ptr(pointer_list);~%}" code)))
+        (setf code (format nil "~a~%free(pointer_list);~%}" code)))
     (values code definition implementation)))
 
 (defun get-current-function ()

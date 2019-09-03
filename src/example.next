@@ -63,5 +63,5 @@ by Edward Puccini |;
   (prnl argc)
   (return 2))
 
-(defn main:i32 []
-  (do 77))
+
+  (do 77)
