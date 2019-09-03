@@ -39,8 +39,9 @@
 (defun filter-expression (expression)
   (let* ((new-expr1 (regex-replace-all "-" expression "_"))
          (new-expr2 (regex-replace-all "\\√" new-expr1 "sqrt"))
-         (new-expr3 (regex-replace-all "\\^" new-expr2 "power")))
-    new-expr3))
+         (new-expr3 (regex-replace-all "\\^" new-expr2 "power"))
+         (new-expr4 (regex-replace-all "\\∑" new-expr3 "for")))
+    new-expr4))
 
 (defun print-stack ()
   "Use swank to log a stack-trace."
@@ -140,7 +141,7 @@
     (if *code_list*
         (progn
           (setf pointers "pointer_list = init_ptr();") 
-          (setf pointers (format nil "~a~%~a" pointers
+          (setf pointers (format nil "~a~%~a~%~a" pointers
                                  "pointer_list->start = pointer_list;"
                                  "pointer_list->next = (void*)NULL;"))
           (if (not (is-main-defined-p))
@@ -170,7 +171,8 @@
   (setf (gethash name *signatures*) signature))
 
 (defun append-signature (name signature)
-  (setf (gethash name *signatures*) (append (gethash name *signatures*) (list signature))))
+  (setf (gethash name *signatures*)
+        (append (gethash name *signatures*) (list signature))))
 
 (defun inc-parens ()
   (setq *paranteses* (1+ *paranteses*)))
@@ -193,7 +195,8 @@
   (setq *block* 0))
 
 (defun zero-hash-variables ()
-  (mapcar #'(lambda (var) (setf (gethash (get-variable-name var) *variables*) nil) var)
+  (mapcar #'(lambda (var)
+              (setf (gethash (get-variable-name var) *variables*) nil) var)
           (hash-table-keys *variables*)))
 
 (defun dec-arg ()
@@ -224,9 +227,11 @@
       (cond ((equal *target* 'code)
              (setf *code_list* (append *code_list* (list expression))))
             ((equal *target* 'implementation)
-             (setf *implementation_list* (append *implementation_list* (list expression))))
+             (setf *implementation_list* (append *implementation_list*
+                                                 (list expression))))
             ((equal *target* 'definition)
-             (setf *definition_list* (append *definition_list* (list expression)))))))
+             (setf *definition_list* (append *definition_list*
+                                             (list expression)))))))
 
 (defun get-last-code ()
   (cond ((equal *target* 'code)
@@ -295,6 +300,36 @@
 
 (defun set-function-type (fn-name type)
   (setf (gethash (get-function-name fn-name) *functions*) type))
+
+(defun get-iter-variable-name-x (name cnt)
+  (let ((hash  ""))
+    (if (>= cnt 0)
+        (progn
+          (setf hash (format nil "~a_~a" (filter-expression name) cnt))
+          (if (gethash hash *variables*)
+              (progn
+                (return-from get-iter-variable-name-x hash))
+              (progn
+                (setf cnt (- cnt 1))
+                (get-iter-variable-name-x name cnt)))))))
+
+(defun get-iter-variable-name (name)
+  (get-iter-variable-name-x name *block*))
+
+(defun get-iter-function-name-x (name cnt)
+  (let ((hash  ""))
+    (if (>= cnt 0)
+        (progn
+          (setf hash (format nil "~a_~a" (filter-expression name) cnt))
+          (if (gethash hash *functions*)
+              (progn
+                (return-from get-iter-function-name-x hash))
+              (progn
+                (setf cnt (- cnt 1))
+                (get-iter-function-name-x name cnt)))))))
+
+(defun get-iter-function-name (name)
+  (get-iter-function-name-x name *block*))
 
 (defun parse-argument (expr-list)
   (cond ((find #\: (car expr-list))
@@ -578,11 +613,13 @@
                (progn
                  (setf expr-list (parse-signature-vector (car def) (cdr expr-list)))
                  (dbg "parse-argumemt: signature " (gethash (car def) *signatures*))
-                 (parse-variable-type (car def) (cadr def) (gethash (car def) *signatures*)))
+                 (parse-variable-type (car def) (cadr def)
+                                      (gethash (car def) *signatures*)))
                (progn
                  (parse-variable-type (car def) (cadr def))
                  (setf expr-list (cdr expr-list))))
-           (if (equal (format nil "~a" (gethash (get-variable-name (car def)) *variables*))
+           (if (equal (format nil "~a"
+                              (gethash (get-variable-name (car def)) *variables*))
                       "FUNCTION")
                (register-function (car def) (car expr-list))
                (progn
@@ -713,36 +750,6 @@
           ((not (find #\: (car expr-list)))
            (error-syntax-error)))
     expr-list))
-
-(defun get-iter-variable-name-x (name cnt)
-  (let ((hash  ""))
-    (if (>= cnt 0)
-        (progn
-          (setf hash (format nil "~a_~a" (filter-expression name) cnt))
-          (if (gethash hash *variables*)
-              (progn
-                (return-from get-iter-variable-name-x hash))
-              (progn
-                (setf cnt (- cnt 1))
-                (get-iter-variable-name-x name cnt)))))))
-
-(defun get-iter-variable-name (name)
-  (get-iter-variable-name-x name *block*))
-
-(defun get-iter-function-name-x (name cnt)
-  (let ((hash  ""))
-    (if (>= cnt 0)
-        (progn
-          (setf hash (format nil "~a_~a" (filter-expression name) cnt))
-          (if (gethash hash *functions*)
-              (progn
-                (return-from get-iter-function-name-x hash))
-              (progn
-                (setf cnt (- cnt 1))
-                (get-iter-function-name-x name cnt)))))))
-
-(defun get-iter-function-name (name)
-  (get-iter-function-name-x name *block*))
 
 (defun parse-block (expr-list)
   (dbg "parse-block " (car expr-list))
@@ -1076,7 +1083,7 @@
            (setf tp-str "f64"))
           ((equal tp 'single-float-pointer)
            (setf tp-str "f32"))
-          ((not tp)
+          (t
            (setf tp-str "T")
            (error-cant-infer-type)))
     tp-str))
@@ -1116,8 +1123,9 @@
            (setf tp-str "f64"))
           ((equal tp 'single-float-pointer)
            (setf tp-str "f32"))
-          ((not (equal tp 'integer))
-           (setf tp-str "i32")))
+          (t
+           (setf tp-str "T")
+           (error-cant-infer-type)))
     tp-str))
 
 (defun parse-arguments (expr-list max)
@@ -1267,12 +1275,14 @@
          (progn
            (store-current-function "let")
            (zero-arg)
+           (inf "Compile let in block " *block*)
            (dbg "parse-call: LET INC BLOCK " *block* " PARENS " *paranteses*)
            (setf expr-list (parse-let (cdr expr-list)))))
-        ((equal "for" (car expr-list))
+        ((or (equal "for" (car expr-list)) (equal "∑" (car expr-list)))
          (progn
            (store-current-function "for")
            (zero-arg)
+            (inf "Compile for in block " *block*)          
            (dbg "parse-call: FOR INC BLOCK " *block* " PARENS " *paranteses*)
            (setf expr-list (parse-for (cdr expr-list)))))
         ((equal "defn" (car expr-list))
@@ -1294,6 +1304,7 @@
          (progn
            (store-current-function "if")
            (zero-arg)
+           (inf "Compile condition in block " *block*)
            (dbg "parse-call: IF INC BLOCK " *block* " PARENS " *paranteses*)
            (setf expr-list (parse-if (cdr expr-list)))))      
         ((or (equal "mod" (car expr-list))
@@ -1448,6 +1459,13 @@
            (zero-arg)
            (setf expr-list (parse-arguments (cdr expr-list) 2))
            (return-from parse-call expr-list)))
+        ((or (equal "size" (car expr-list)) (equal "@" (car expr-list)))
+         (store-current-function "size")
+         (add-code "sizeof")
+         (add-code "(")
+         (zero-arg)
+         (setf expr-list (parse-arguments (cdr expr-list) 1))
+         (return-from parse-call expr-list))
         ((equal "map" (car expr-list))
          (let ((type (get-type expr-list)))
            (store-current-function "map")

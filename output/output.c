@@ -210,7 +210,10 @@ mapit_0(1000.0);
 work_0(mapit_0,100);
 map_f32(mapit_0,values_2);
 reduce_f32(reduceit_0,values_2);
+println_string("String:");
 println_string(string_2);
+print_string("sizeof:");
+println_i32(sizeof(string_2));
 set_f32(&float1_2,666.0);
 set_i32(&argc_1,(100+(1000-500)+100+(1000*500)));
 println_i32(argc_1);
@@ -256,6 +259,7 @@ i32 main ()
 {
 pointer_list = init_ptr();
 pointer_list->start = pointer_list;
+pointer_list->next = (void*)NULL;
 
 do_0(77);
 
