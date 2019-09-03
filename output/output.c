@@ -199,7 +199,7 @@ i32 array_2[]={1, 2, 3, 4, 5, 6};
 f32 values_2[]={1.0, 2.0, 3.0, 4.0, 5.0, 6.0};
 f32* my_new_array_2=mapn_f32(mapit_0,values_2);
 ;
-f32* array3_2=new_f32(10);
+f32* my_new_floats_2=new_f32(10);
 ;
 char string_2[]={'a', 'b', 'c'};
 f32 (*myfun_2)(f32)=mapit_0;

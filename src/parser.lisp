@@ -36,6 +36,12 @@
 (defun is-main-defined-p ()
   *is-main-defined*)
 
+(defun filter-expression (expression)
+  (let* ((new-expr1 (regex-replace-all "-" expression "_"))
+         (new-expr2 (regex-replace-all "\\√" new-expr1 "sqrt"))
+         (new-expr3 (regex-replace-all "\\^" new-expr2 "power")))
+    new-expr3))
+
 (defun print-stack ()
   "Use swank to log a stack-trace."
   (let ((trace ""))
@@ -155,10 +161,10 @@
   (setf (gethash *paranteses* *current-function*) fun))
 
 (defun get-variable-name (name)
-  (format nil "~a_~a" name *block*))
+  (format nil "~a_~a" (filter-expression name) *block*))
 
 (defun get-function-name (name)
-  (format nil "~a_~a" name *block*))
+  (format nil "~a_~a" (filter-expression name) *block*))
 
 (defun set-signature (name signature)
   (setf (gethash name *signatures*) signature))
@@ -211,12 +217,6 @@
 
 (defun zero-arg ()
   (set-arg 0))
-
-(defun filter-expression (expression)
-  (let* ((new-expr1 (regex-replace-all "[a..z](-)[a..z]" expression "_"))
-         (new-expr2 (regex-replace-all "\\√" new-expr1 "sqrt"))
-         (new-expr3 (regex-replace-all "\\^" new-expr2 "power")))
-  new-expr3))
 
 (defun add-code (expression)
   ;(setf expression (filter-expression expression))
@@ -718,7 +718,7 @@
   (let ((hash  ""))
     (if (>= cnt 0)
         (progn
-          (setf hash (format nil "~a_~a" name cnt))
+          (setf hash (format nil "~a_~a" (filter-expression name) cnt))
           (if (gethash hash *variables*)
               (progn
                 (return-from get-iter-variable-name-x hash))
@@ -733,7 +733,7 @@
   (let ((hash  ""))
     (if (>= cnt 0)
         (progn
-          (setf hash (format nil "~a_~a" name cnt))
+          (setf hash (format nil "~a_~a" (filter-expression name) cnt))
           (if (gethash hash *functions*)
               (progn
                 (return-from get-iter-function-name-x hash))
