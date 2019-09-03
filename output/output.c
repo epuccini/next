@@ -249,11 +249,12 @@ return(2);
 
 i32 main () 
 {
-pointer_list = (node_ptr_t*)malloc(sizeof(node_ptr_t));
+pointer_list = init_ptr();
 pointer_list->start = pointer_list;
 
 do_0(77);
 
 
-free(pointer_list);
+destroy_ptr(pointer_list);
+return 0;
 }

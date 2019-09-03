@@ -133,7 +133,7 @@
               (format nil "~%~{~a~}~%" *implementation_list*)))
     (if *code_list*
         (progn
-          (setf pointers "pointer_list = (node_ptr_t*)malloc(sizeof(node_ptr_t));") 
+          (setf pointers "pointer_list = init_ptr();") 
           (setf pointers (format nil "~a~%~a" pointers
                                  "pointer_list->start = pointer_list;"
                                  "pointer_list->next = (void*)NULL;"))
@@ -142,7 +142,7 @@
                                  pointers *code_list*))
               (setf code (format nil "~%~%~{~a~}~%" *code_list*)))))
     (if (not (is-main-defined-p))
-        (setf code (format nil "~a~%free(pointer_list);~%}" code)))
+        (setf code (format nil "~a~%destroy_ptr(pointer_list);~%return 0;~%}" code)))
     (values code definition implementation)))
 
 (defun get-current-function ()

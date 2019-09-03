@@ -71,9 +71,6 @@
   (set-function-type "max" 'integer)
   (set-function-type "min" 'integer))
 
-(defun get-current-function ()
-  (gethash (1- *paranteses*) *current-function*))
-
 (defun repl ()
   (format t "~%>")
   (loop for input = (read-line)

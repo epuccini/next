@@ -319,15 +319,26 @@ typedef struct node_##T { \
 	define_node(f32)
 	define_node(f64)
 
+#define define_init_node(T) \
+node_##T* init_node_##T() {  \
+	node_##T* ret = (node_##T*)malloc(sizeof(node_##T)); \
+	ret->start = ret; \
+	return ret; \
+} \
+
+define_init_node(bool)
+define_init_node(c8)
+define_init_node(i16)
+define_init_node(i32)
+define_init_node(i64)
+define_init_node(f32)
+define_init_node(f64)
+
 #define define_add_node(T) \
 node_##T* add_node_##T(node_##T* list, T value) {  \
-	do \
-	{ \
-		list = list->next; \
-	} while (list->next != NULL); \
-	list->next = malloc(sizeof(node_##T)); \
-	list->next->value = value; \
-	list = list->start; \
+	list->value = value; \
+	list->next = (node_##T*)malloc(sizeof(node_##T)); \
+	list = list->next; \
 	return list; \
 } \
 
@@ -389,12 +400,18 @@ define_cdr(f64)
 
 #define define_destroy(T) \
 void destroy_##T(node_##T* e) { \
-	do \
-	{ \
-		node_##T* temp = e; \
-		free(e); \
-		e = temp->next;  \
-	} while (e->next != NULL); \
+	if (e != NULL) { \
+		node_##T* temp = e->next; \
+		do \
+		{ \
+			free(e); \
+			e = NULL; \
+			if (temp) { \
+				e = temp; \
+				temp = e->next; \
+			} \
+		} while (e != NULL); \
+	} \
 } \
 
 define_destroy(bool)
@@ -411,10 +428,23 @@ typedef struct node_ptr {
 	struct node_ptr* next;
 } node_ptr_t;
 
+node_ptr_t* init_ptr() {
+	node_ptr_t* ret = (node_ptr_t*)malloc(sizeof(node_ptr_t));
+	ret->start = ret;
+	return ret;
+}
+
 node_ptr_t* add_ptr(node_ptr_t* list, void* value) {
-	list->next = (node_ptr_t*)malloc(sizeof(node_ptr_t));
-	list->next->value = value;
-	list = list->start;
+	if (list == list->start) {
+		list->value = value;
+		list->next = NULL;
+	}
+	else {
+		list->next = (node_ptr_t*)malloc(sizeof(node_ptr_t));
+		list->next->next = NULL;
+		list->next->value = value;
+		list = list->next;
+	}
 	return list;
 }
 
@@ -430,16 +460,19 @@ node_ptr_t* remove_ptr(node_ptr_t* list, void* value) {
 }
 
 void destroy_ptr(node_ptr_t* e) {
-	if(e != NULL)
-	{
-		do 
-		{ 
-			node_ptr_t* temp = e;
-			if (e->value != NULL)
+	if (e != NULL) {
+		node_ptr_t* temp = e->next;
+		do
+		{
+			if (e->value)
 				free(e->value);
 			free(e);
-			e = temp->next;
-		} while (e != NULL); 
+			e = NULL;
+			if (temp) {
+				e = temp;
+				temp = e->next;
+			}
+		} while (e != NULL);
 	}
 } 
 
