@@ -275,33 +275,89 @@ T min_##T(T a, T b) { \
 		return b; \
 } 
 
-define_min(i16)
-define_min(i32)
-define_min(i64)
-define_min(f32)
-define_min(f64)
+	define_min(i16)
+	define_min(i32)
+	define_min(i64)
+	define_min(f32)
+	define_min(f64)
 
 #define define_single_fn(T) \
 typedef T (*single_fn_##T)(T); \
 
-define_single_fn(bool)
-define_single_fn(c8)
-define_single_fn(i16)
-define_single_fn(i32)
-define_single_fn(i64)
-define_single_fn(f32)
-define_single_fn(f64)
+	define_single_fn(bool)
+	define_single_fn(c8)
+	define_single_fn(i16)
+	define_single_fn(i32)
+	define_single_fn(i64)
+	define_single_fn(f32)
+	define_single_fn(f64)
 
 #define define_dual_fn(T) \
 typedef T (*dual_fn_##T)(T, T); \
 
-define_dual_fn(bool)
-define_dual_fn(c8)
-define_dual_fn(i16)
-define_dual_fn(i32)
-define_dual_fn(i64)
-define_dual_fn(f32)
-define_dual_fn(f64)
+	define_dual_fn(bool)
+	define_dual_fn(c8)
+	define_dual_fn(i16)
+	define_dual_fn(i32)
+	define_dual_fn(i64)
+	define_dual_fn(f32)
+	define_dual_fn(f64)
+
+
+#define define_node(T) \
+typedef struct node_##T { \
+	T value; \
+	struct node_##T * next; \
+	struct node_##T * start; \
+} node_##T;\
+
+	define_node(bool)
+	define_node(c8)
+	define_node(i16)
+	define_node(i32)
+	define_node(i64)
+	define_node(f32)
+	define_node(f64)
+
+#define define_create(T) \
+node_##T* create_##T(int size) { \
+	node_##T* head = malloc(sizeof(node_##T));  \
+	head->start = head;  \
+	int cnt = 0; \
+	for (cnt = 1; cnt < size - 1; cnt++) { \
+		head->value = 0; \
+		head->next = malloc(sizeof(node_##T));  \
+		head = head->next; \
+	} \
+	head->next = NULL; \
+	return head; \
+} \
+
+define_create(bool)
+define_create(c8)
+define_create(i16)
+define_create(i32)
+define_create(i64)
+define_create(f32)
+define_create(f64)
+
+#define define_destroy(T) \
+void destroy_##T(node_##T* e) { \
+	do \
+	{ \
+		node_##T* temp = e; \
+		free(e); \
+		e = temp->next;  \
+	} while (e != NULL); \
+} \
+
+define_destroy(bool)
+define_destroy(c8)
+define_destroy(i16)
+define_destroy(i32)
+define_destroy(i64)
+define_destroy(f32)
+define_destroy(f64)
 
 #define define_map(T) \
 T* map_##T(single_fn_##T a, T* b) { \
