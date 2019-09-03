@@ -194,13 +194,11 @@ mapit_0(5.5);
 println_string("RET");
 {
 f32 float1_2=0.0;
-f32 float2_2=0.0;
+f32 float2_2=(0.0+0.0);
 i32 array_2[]={1, 2, 3, 4, 5, 6};
 f32 values_2[]={1.0, 2.0, 3.0, 4.0, 5.0, 6.0};
 f32* my_new_array_2=mapn_f32(mapit_0,values_2);
-;
 f32* my_new_floats_2=new_f32(10);
-;
 char* string_2="abc";
 const char chars_2[]={'a', 'b', 'c'};
 f32 (*myfun_2)(f32)=mapit_0;
