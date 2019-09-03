@@ -123,7 +123,7 @@
                                        (format nil " ")))
          (new-expr9 (regex-replace-all "\\," new-expr8 "°,°"))
          (new-expr10 (regex-replace-all "->" new-expr9 "°->°"))
-         (new-expr11 (regex-replace-all "â" new-expr10 "°∑°"))
+         (new-expr11 (regex-replace-all "â" new-expr10 "°∑°"))
          (expr-list (split " |°" new-expr11)))
     (remove-if #'(lambda(x) (= (length x) 0)) expr-list)))
 

@@ -210,7 +210,7 @@ mapit_0(1000.0);
 work_0(mapit_0,100);
 map_f32(mapit_0,values_2);
 reduce_f32(reduceit_0,values_2);
-println_string("String:");
+print_string("String:");
 println_string(string_2);
 print_string("sizeof:");
 println_i32(sizeof(string_2));

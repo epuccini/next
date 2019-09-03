@@ -42,7 +42,7 @@ by Edward Puccini |;
     (work mapit 100)
     (map mapit values)
     (reduce reduceit values)
-    (prnl "String: ")
+    (prn "String: ")
     (prnl string)
     (prn "sizeof: ")
     (prnl (@ string)) 
@@ -69,6 +69,5 @@ by Edward Puccini |;
     (prnl "ENDE"))
   (prnl argc)
   (return 2))
-
 
   (do 77)
