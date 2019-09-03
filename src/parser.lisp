@@ -122,7 +122,8 @@
 (defun emit-code-call ()
   (let ((code "")
         (definition "")
-        (implementation ""))
+        (implementation "")
+        (pointers ""))
     (if *implementation_list*
         (format t "~%~{~a~}~%" *implementation_list*))
     (if *code_list*
@@ -131,11 +132,17 @@
         (setf implementation
               (format nil "~%~{~a~}~%" *implementation_list*)))
     (if *code_list*
-        (if (not (is-main-defined-p))
-            (setf code (format nil "i32 main () ~%{~%~{~a~}~%" *code_list*))
-            (setf code (format nil "~{~a~}~%" *code_list*))))
+        (progn
+          (setf pointers "pointer_list = (node_ptr_t*)malloc(sizeof(node_ptr_t));") 
+          (setf pointers (format nil "~a~%~a" pointers
+                                 "pointer_list->start = pointer_list;"
+                                 "pointer_list->next = (void*)NULL;"))
+          (if (not (is-main-defined-p))
+              (setf code (format nil "i32 main () ~%{~%~a~%~%~{~a~}~%"
+                                 pointers *code_list*))
+              (setf code (format nil "~%~%~{~a~}~%" *code_list*)))))
     (if (not (is-main-defined-p))
-        (setf code (format nil "~a}" code)))
+        (setf code (format nil "~a~%//destroy_ptr(pointer_list);~%}" code)))
     (values code definition implementation)))
 
 (defun get-current-function ()
@@ -906,9 +913,9 @@
 
 (defun parse-def-function (expr-list)
   (zero-arg)
-  (inc-block)
   (dbg "parse-def-function: name and type block " *block* " parens " *paranteses*)
   (setf expr-list (parse-function-name-and-type expr-list))
+  (inc-block)
   (dbg "parse-def-function: open square")
   (add-code "(")
   (setf expr-list (parse-open-square-bracket expr-list))
@@ -1497,6 +1504,7 @@
                             (equal x (get-iter-function-name (car expr-list))))
                         (hash-table-keys *functions*))
          (progn
+           (dbg "parse-call: FN: " (get-iter-function-name (car expr-list)))
            (if (is-function-map-p (car expr-list))
                (add-code (get-iter-function-name (get-function-value (car expr-list))))
                (add-code (get-iter-function-name (car expr-list))))

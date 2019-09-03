@@ -172,3 +172,4 @@ void set_string(c8** ptr, c8* val) {
 }
 
 $(IMPLEMENTATION)
+

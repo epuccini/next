@@ -25,7 +25,7 @@ by Edward Puccini |;
   (prnfmt "%f" (f arg)))
 
 (defn do:i32 [argc:i32]
-  (prnl (mapit 5.5))
+  (mapit 5.5)
   (prnl "RET")
   (let [float1:f32 0.0
         float2:f32 0.0
@@ -64,4 +64,4 @@ by Edward Puccini |;
   (return 2))
 
 (defn main:i32 []
-  (return (do 77)))
+  (do 77))
