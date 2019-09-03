@@ -507,13 +507,13 @@ T* mapn_##T(single_fn_##T a, T* b) { \
     return ptr; \
 }
 
-define_mapn(bool)
-define_mapn(c8)
-define_mapn(i16)
-define_mapn(i32)
-define_mapn(i64)
-define_mapn(f32)
-define_mapn(f64)
+	define_mapn(bool)
+	define_mapn(c8)
+	define_mapn(i16)
+	define_mapn(i32)
+	define_mapn(i64)
+	define_mapn(f32)
+	define_mapn(f64)
 
 #define define_reduce(T) \
 T reduce_##T(dual_fn_##T a, T* b) { \
@@ -523,13 +523,30 @@ T reduce_##T(dual_fn_##T a, T* b) { \
       result = (*a)(result, b[cnt]);           \
     } \
     return result; \
+} 
+
+	define_reduce(bool)
+	define_reduce(c8)
+	define_reduce(i16)
+	define_reduce(i32)
+	define_reduce(i64)
+	define_reduce(f32)
+	define_reduce(f64)
+
+
+#define define_new(T) \
+T* new_##T(int size) { \
+	T* mem = (T*)malloc(size*sizeof(T)); \
+	if (pointer_list) \
+		add_ptr(pointer_list, (void*)mem); \
+    return mem; \
 }
 
-define_reduce(bool)
-define_reduce(c8)
-define_reduce(i16)
-define_reduce(i32)
-define_reduce(i64)
-define_reduce(f32)
-define_reduce(f64)
+	define_new(bool)
+	define_new(c8)
+	define_new(i16)
+	define_new(i32)
+	define_new(i64)
+	define_new(f32)
+	define_new(f64)
 
