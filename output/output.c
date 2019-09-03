@@ -201,7 +201,7 @@ f32* my_new_array_2=mapn_f32(mapit_0,values_2);
 ;
 f32* my_new_floats_2=new_f32(10);
 ;
-char string_2[]={'a', 'b', 'c'};
+char* string_2="abc";
 f32 (*myfun_2)(f32)=mapit_0;
 set_f32((f32*)elt_f32(my_new_array_2,0),888.0);
 print_string("Mynewarray/firstelementis:");

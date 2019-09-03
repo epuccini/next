@@ -33,7 +33,7 @@ by Edward Puccini |;
         values:f32# [1.0 2.0 3.0 4.0 5.0 6.0]
         my-new-array:f32> (mapn mapit values)
         my-new-floats:f32> (new_f32 10)
-        string:c8# ['a' 'b' 'c']
+        string:string "abc"
         myfun:fun[f32->f32] mapit]
     (:: (f32> (# my-new-array 0)) 888.0)
     (prn "My new array / first element is: ")
