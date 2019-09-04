@@ -178,7 +178,10 @@
   (let ((hash  ""))
     (if (>= cnt 0)
         (progn
-          (setf hash (format nil "~a_~a" (filter-expression name) cnt))
+          (if (equal *current-module* "")
+              (setf hash (format nil "~a_~a" (filter-expression name) cnt))
+              (setf hash (format nil "~a__~a_~a" *current-module*
+                                 (filter-expression name) cnt)))
           (if (gethash hash *variables*)
               (progn
                 (return-from get-iter-variable-name-x hash))
@@ -193,7 +196,10 @@
   (let ((hash  ""))
     (if (>= cnt 0)
         (progn
-          (setf hash (format nil "~a_~a" (filter-expression name) cnt))
+          (if (equal *current-module* "")
+              (setf hash (format nil "~a_~a" (filter-expression name) cnt))
+              (setf hash (format nil "~a__~a_~a" *current-module*
+                                 (filter-expression name) cnt)))
           (if (gethash hash *functions*)
               (progn
                 (return-from get-iter-function-name-x hash))
