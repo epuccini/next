@@ -54,7 +54,7 @@ void set_pointer_i32(i32* ptr, i32 val);
 void set_pointer_i64(i64* ptr, i64 val);
 void set_pointer_f32(f32* ptr, f32 val);
 void set_pointer_f64(f64* ptr, f64 val);
-void set_pointer_string(c8** ptr, const c8* val);
+void set_pointer_string(c8** ptr, c8* val);
 
 #define define_lt(T) \
 bool lt_##T(T a, T b){ \
@@ -309,42 +309,39 @@ define_dual_fn(i64)
 define_dual_fn(f32)
 define_dual_fn(f64)
 
-
 typedef struct node_ptr {
 	void* value;
-	struct node_ptr* start;
 	struct node_ptr* next;
 } node_ptr_t;
 
-node_ptr_t* init_ptr() {
-	node_ptr_t* ret = (node_ptr_t*)malloc(sizeof(node_ptr_t));
-	ret->start = ret;
-	return ret;
-}
-
 node_ptr_t* add_ptr(node_ptr_t* list, void* value) {
-	if (list == list->start) {
-		list->value = value;
-		list->next = NULL;
-	}
-	else {
-		list->next = (node_ptr_t*)malloc(sizeof(node_ptr_t));
-		list->next->next = NULL;
-		list->next->value = value;
-		list = list->next;
-	}
-	return list;
+	node_ptr_t* start = list; \
+	while (list->next != NULL) { \
+		list = list->next; \
+	} \
+	list->next = (node_ptr_t*)malloc(sizeof(node_ptr_t)); \
+	list->next->next = NULL; \
+	list->next->value = value; \
+	list = start; \
+	return list; \
 }
 
-node_ptr_t* remove_ptr(node_ptr_t* list, void* value) {
-	do
-	{
-		list = list->next;
-	} while (list->next != NULL);
-	node_ptr_t* temp = list->start;
-	free(list);
-	list = temp;
-	return list;
+node_ptr_t* remove_ptr(node_ptr_t* list, int pos) {
+	node_ptr_t* start = list; \
+	node_ptr_t* tmp_before; \
+	node_ptr_t* tmp_after; \
+	int cnt = 0; \
+	do \
+	{ \
+		cnt++; \
+		tmp_before = list; \
+		list = list->next; \
+	} while (cnt != pos); \
+	tmp_after = list; \
+	tmp_before->next = tmp_after->next; \
+	free(list); \
+	list = start; \
+	return list; \
 }
 
 void destroy_ptr(node_ptr_t* e) {
@@ -402,15 +399,12 @@ define_init_node(f64)
 
 #define define_add_node(T) \
 node_##T* add_node_##T(node_##T* list, T value) {  \
-	node_##T* start = list; \
-	while (list->next != NULL) { \
-		list = list->next; \
-	} \
-	list->next = (node_##T*)malloc(sizeof(node_##T)); \
-	list->next->next = NULL; \
-	list->next->value = value; \
-	list = start; \
-	return list; \
+	node_##T* head = (node_##T*)malloc(sizeof(node_##T)); \
+	if(pointer_list) \
+		add_ptr(pointer_list, (void*)head);\
+	head->next = list; \
+	head->value = value; \
+	return head; \
 } \
 
 define_add_node(bool)
@@ -432,11 +426,11 @@ node_##T* remove_node_##T(node_##T* list, int pos) { \
 	{ \
 		cnt++; \
 		tmp_before = list; \
-	list = list->next; \
+		list = list->next; \
 	} while (cnt != pos); \
 	tmp_after = list; \
+	tmp_before->next = tmp_after->next; \
 	free(list); \
-	tmp_before->next = tmp_after; \
 	list = start; \
 	return list; \
 } \
@@ -509,7 +503,7 @@ node_##T* create_list_##T(T list[], int size) {  \
 	node_##T* ret = init_node_##T(list[0]); \
 	if(pointer_list) \
 		add_ptr(pointer_list, (void*)ret);\
-	for (cnt = 1; cnt < size - 1; cnt++) { \
+	for (cnt = 1; cnt < size; cnt++) { \
 		ret = add_node_##T(ret, list[cnt]);  \
 	} \
 	return ret; \

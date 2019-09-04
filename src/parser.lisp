@@ -143,10 +143,7 @@
               (format nil "~%~{~a~}~%" *implementation_list*)))
     (if *code_list*
         (progn
-          (setf pointers "pointer_list = init_ptr();") 
-          (setf pointers (format nil "~a~%~a~%~a" pointers
-                                 "pointer_list->start = pointer_list;"
-                                 "pointer_list->next = (void*)NULL;"))
+          (setf pointers "pointer_list = NULL;") 
           (if (not (is-main-defined-p))
               (setf code (format nil "i32 main () ~%{~%~a~%~%~{~a~}~%"
                                  pointers *code_list*))

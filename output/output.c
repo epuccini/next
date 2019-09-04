@@ -110,11 +110,11 @@ void print_format(const c8* fmt, ...) {
 #define define_println_list(T) \
 void println_list_##T(node_##T* list) {  \
 	node_##T* tmp = list; \
-	while (tmp->next != NULL) { \
+	do { \
 		print_##T(tmp->value); \
 		printf(" "); \
 		tmp = tmp->next; \
-	} \
+	} while (tmp != NULL); \
 	printf("\n"); \
 } \
 
@@ -129,11 +129,11 @@ define_println_list(f64)
 #define define_print_list(T) \
 void print_list_##T(node_##T* list) {  \
 	node_##T* tmp = list; \
-	while (tmp->next != NULL) { \
+	do { \
 		print_##T(tmp->value); \
 		printf(" "); \
 		tmp = tmp->next; \
-	} \
+	} while (tmp != NULL); \
 } \
 
 define_print_list(b8)
@@ -145,9 +145,9 @@ define_print_list(f32)
 define_print_list(f64)
 
 #define define_println_array(T) \
-void println_array_##T(int size, T* array) {  \
+void println_array_##T(int size, const T* array) {  \
 	int cnt = 0; \
-	for (cnt = 0; cnt < size - 2; cnt++) { \
+	for (cnt = 0; cnt < size/sizeof(T); cnt++) { \
 		print_##T(array[cnt]); \
 		printf(" "); \
 	} \
@@ -163,9 +163,9 @@ define_println_array(f32)
 define_println_array(f64)
 
 #define define_print_array(T) \
-void print_array_##T(int size, T* array) {  \
+void print_array_##T(int size, const T* array) {  \
 	int cnt = 0; \
-	for (cnt = 0; cnt < size - 2; cnt++) { \
+	for (cnt = 0; cnt < size/sizeof(T); cnt++) { \
 		print_##T(array[cnt]); \
 		printf(" "); \
 	} \
@@ -247,7 +247,7 @@ void set_pointer_f64(f64* ptr, f64 val) {
     *ptr = val;
 }
 
-void set_pointer_string(c8** ptr, const c8* val) {
+void set_pointer_string(c8** ptr, c8* val) {
 	*ptr = val;
 }
 
@@ -356,9 +356,7 @@ return(2);
 
 i32 main () 
 {
-pointer_list = init_ptr();
-pointer_list->start = pointer_list;
-pointer_list->next = (void*)NULL;
+pointer_list = NULL;
 
 do_0(77);
 
