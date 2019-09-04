@@ -20,6 +20,7 @@
 (defvar *signatures* nil)
 (defvar *function-map* nil)
 (defvar *current-function* nil)
+(defvar *current-module* "")
 (defvar *arguments* 0)
 (defvar *block* 0)
 (defvar *generics-template* "")
@@ -40,8 +41,9 @@
   (let* ((new-expr1 (regex-replace-all "-" expression "_"))
          (new-expr2 (regex-replace-all "\\√" new-expr1 "sqrt"))
          (new-expr3 (regex-replace-all "\\^" new-expr2 "power"))
-         (new-expr4 (regex-replace-all "∑" new-expr3 "for")))
-    new-expr4))
+         (new-expr4 (regex-replace-all "∑" new-expr3 "for"))
+         (new-expr5 (regex-replace-all ">>" new-expr3 "__")))
+    new-expr5))
 
 (defun print-stack ()
   "Use swank to log a stack-trace."
@@ -163,10 +165,44 @@
   (setf (gethash *paranteses* *current-function*) fun))
 
 (defun get-variable-name (name)
-  (format nil "~a_~a" (filter-expression name) *block*))
+  (if (equal *current-module* "")
+      (format nil "~a_~a" (filter-expression name) *block*)
+      (format nil "~a__~a_~a" *current-module* (filter-expression name) *block*)))
 
 (defun get-function-name (name)
-  (format nil "~a_~a" (filter-expression name) *block*))
+  (if (equal *current-module* "")
+      (format nil "~a_~a" (filter-expression name) *block*)
+      (format nil "~a__~a_~a" *current-module* (filter-expression name) *block*)))
+
+(defun get-iter-variable-name-x (name cnt)
+  (let ((hash  ""))
+    (if (>= cnt 0)
+        (progn
+          (setf hash (format nil "~a_~a" (filter-expression name) cnt))
+          (if (gethash hash *variables*)
+              (progn
+                (return-from get-iter-variable-name-x hash))
+              (progn
+                (setf cnt (- cnt 1))
+                (get-iter-variable-name-x name cnt)))))))
+
+(defun get-iter-variable-name (name)
+  (get-iter-variable-name-x name *block*))
+
+(defun get-iter-function-name-x (name cnt)
+  (let ((hash  ""))
+    (if (>= cnt 0)
+        (progn
+          (setf hash (format nil "~a_~a" (filter-expression name) cnt))
+          (if (gethash hash *functions*)
+              (progn
+                (return-from get-iter-function-name-x hash))
+              (progn
+                (setf cnt (- cnt 1))
+                (get-iter-function-name-x name cnt)))))))
+
+(defun get-iter-function-name (name)
+  (get-iter-function-name-x name *block*))
 
 (defun set-signature (name signature)
   (setf (gethash name *signatures*) signature))
@@ -301,36 +337,6 @@
 
 (defun set-function-type (fn-name type)
   (setf (gethash (get-function-name fn-name) *functions*) type))
-
-(defun get-iter-variable-name-x (name cnt)
-  (let ((hash  ""))
-    (if (>= cnt 0)
-        (progn
-          (setf hash (format nil "~a_~a" (filter-expression name) cnt))
-          (if (gethash hash *variables*)
-              (progn
-                (return-from get-iter-variable-name-x hash))
-              (progn
-                (setf cnt (- cnt 1))
-                (get-iter-variable-name-x name cnt)))))))
-
-(defun get-iter-variable-name (name)
-  (get-iter-variable-name-x name *block*))
-
-(defun get-iter-function-name-x (name cnt)
-  (let ((hash  ""))
-    (if (>= cnt 0)
-        (progn
-          (setf hash (format nil "~a_~a" (filter-expression name) cnt))
-          (if (gethash hash *functions*)
-              (progn
-                (return-from get-iter-function-name-x hash))
-              (progn
-                (setf cnt (- cnt 1))
-                (get-iter-function-name-x name cnt)))))))
-
-(defun get-iter-function-name (name)
-  (get-iter-function-name-x name *block*))
 
 (defun parse-argument (expr-list)
   (cond ((find #\: (car expr-list))
@@ -757,7 +763,6 @@
       (progn
         (dbg "parse-block before expression " (car expr-list))
         (setf expr-list (parse-expression expr-list))
-        (dbg "parse-block after expression " expr-list)
         (setf expr-list (parse-block expr-list))))
   (if (not expr-list)
       (return-from parse-block expr-list))
@@ -944,6 +949,13 @@
   (dec-parens)
   (dbg "parse-def-function BLOCK END block " *block* " parens " *paranteses*)
   (dbg "parse-def-function " (car expr-list))
+  expr-list)
+
+(defun parse-module (expr-list)
+  (setf *current-module* (car expr-list))
+  (setf expr-list (cdr expr-list))
+  (setf expr-list (parse-block expr-list))
+  (setf *current-module* "")
   expr-list)
 
   (defun parse-multiline-comment (expr-list)
@@ -1456,6 +1468,11 @@
            (zero-arg)
            (setf expr-list (parse-arguments (cdr expr-list) 2))
            (return-from parse-call expr-list)))
+        ((equal "module" (car expr-list))
+         (store-current-function "module")
+         (zero-arg)
+         (setf expr-list (parse-module (cdr expr-list)))
+         (return-from parse-call expr-list))
         ((or (equal "size" (car expr-list)) (equal "@" (car expr-list)))
          (store-current-function "size")
          (add-code "sizeof")
@@ -1796,7 +1813,8 @@
               (if (or (equal "for" (car expr-list))
                       (equal "if" (car expr-list))
                       (equal "defn" (car expr-list))
-                      (equal "let" (car expr-list)))
+                      (equal "let" (car expr-list))
+                      (equal "module" (car expr-list)))
                   (setf space t))
               (setf expr-list (parse-call expr-list))
               (dbg "parse-expression: CALL END rest " (car expr-list)

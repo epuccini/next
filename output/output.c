@@ -172,6 +172,16 @@ void set_string(c8** ptr, c8* val) {
 }
 
 
+i32 layer__fun1_0()
+{
+println_string("Modulefunctionfun1");
+return(999);
+}
+i32 layer__fun2_0()
+{
+println_string("Modulefunctionfun2");
+return(888);
+}
 f32 mapit_0(f32 op_1)
 {
 print_string("Map");
@@ -192,6 +202,8 @@ i32 do_0(i32 argc_1)
 {
 mapit_0(5.5);
 println_string("RET");
+layer__fun1_0();
+layer__fun2_0();
 {
 f32 float1_2=0.0;
 f32 float2_2=(0.0+0.0);

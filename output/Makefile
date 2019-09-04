@@ -4,7 +4,7 @@ CC      	= /usr/bin/gcc
 ASM             = /usr/bin/nasm
 ASMFLAGS	= -f elf64
 CFLAGS  	= -Wall -g -c -D_REENTRANT -DVERSION=\"$(VERSION)\" 
-LDFLAGS 	= -pthread -lm -Wl,-stack_size,0x100000000
+LDFLAGS 	= -pthread -lm 
 SRCDIR 		= /Users/edward/Documents/Code/common-lisp/projects/next/output 
 
 OBJ		= output.o

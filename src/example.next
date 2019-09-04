@@ -11,6 +11,15 @@ by Edward Puccini |;
 
 ; [1 2 3 4 5 6];
 
+(module layer
+    (defn fun1:i32 []
+      (prnl "Module function fun1")
+      (return 999))
+        
+    (defn fun2:i32 []
+       (prnl "Module function fun2")
+      (return 888)))
+
 (defn mapit:f32 [op:f32]
   (prn "Map ")
   (prnl (+ op op))
@@ -27,6 +36,8 @@ by Edward Puccini |;
 (defn do:i32 [argc:i32]
   (mapit 5.5)
   (prnl "RET")
+  (layer>>fun1)
+  (layer>>fun2)
   (let [float1:f32 0.0
         float2:f32 (+ 0.0 0.0)
         array:i32# [1 2 3 4 5 6]
