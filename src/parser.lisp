@@ -317,13 +317,11 @@
   (cond ((and
           (typep (parse-integer numstr :junk-allowed t) 'integer)
           (not (find #\. numstr))) 'integer)
-        ((typep (parse-float numstr
-                             :junk-allowed t
-                             :type 'double-float) 'double-float)
+        ((search "d0" numstr)
          'double-float)
         ((typep (parse-float numstr
                              :junk-allowed t
-                             :type 'single-float) 'float)
+                             :type 'single-float) 'single-float)
          'single-float)
         ((typep numstr 'string)
          'string)))
@@ -730,20 +728,11 @@
                  (add-code " ")
                  (add-code (get-variable-name (car def)))))
 
-           (let ((split (split "-"
-                               (format nil "~a"
-                                       (gethash (get-variable-name (car def))
-                                                *variables*)))))
-             (cond ((= (length split) 2)
-                    (destructuring-bind (a b) split
-                      (declare (ignore a))
-                      (if (equal b "ARRAY")
-                          (add-code "[]"))))
-                   ((= (length split) 3)
-                    (destructuring-bind (a b c) split
-                      (declare (ignore a b))
-                      (if (equal c "ARRAY") 
-                          (add-code "[]"))))))
+           (let ((fmt (format nil "~a"
+                              (gethash (get-variable-name (car def))
+                                       *variables*))))
+             (if (search "ARRAY" fmt)
+                 (add-code "[]")))
            (add-code "=")
            (dbg "parse-variable: OPEN ARG")
            (if (equal (car expr-list) "]")
@@ -1183,6 +1172,7 @@
            (setf tp-str "f32"))
           ((equal tp 'string)
            (setf tp-str "string"))
+          
           ((equal tp 'char-array)
            (setf tp-str "string"))
           ((equal tp 'boolean-array)
@@ -1197,6 +1187,7 @@
            (setf tp-str "f64"))
           ((equal tp 'single-float-array)
            (setf tp-str "f32"))
+          
           ((equal tp 'char-pointer)
            (setf tp-str "string"))
           ((equal tp 'boolean-pointer)
@@ -1211,6 +1202,21 @@
            (setf tp-str "f64"))
           ((equal tp 'single-float-pointer)
            (setf tp-str "f32"))
+
+          ((equal tp 'char-list)
+           (setf tp-str "list_string"))
+          ((equal tp 'boolean-list)
+           (setf tp-str "list_bool"))
+          ((equal tp 'short-interger-list)
+           (setf tp-str "list_i16"))
+          ((equal tp 'integer-list)
+           (setf tp-str "list_i32"))
+          ((equal tp 'bigint-list)
+           (setf tp-str "list_i64"))
+          ((equal tp 'double-float-list)
+           (setf tp-str "list_f64"))
+          ((equal tp 'single-float-list)
+           (setf tp-str "list_f32"))
           (t
            (setf tp-str "T")
            (error-cant-infer-type)))
@@ -1241,6 +1247,7 @@
            (setf tp-str "f64"))
           ((equal tp 'single-float)
            (setf tp-str "f32"))
+          
           ((equal tp 'short-integer-pointer)
            (setf tp-str "i16"))
           ((equal tp 'integer-pointer)
@@ -1876,7 +1883,7 @@
                   (add-code (format nil ";~%")))
               (return-from parse-expression expr-list)))
         (if (equal "'" (car expr-list))
-            (let ((type (get-type (cdddr expr-list)))
+            (let ((type (get-type (cddr expr-list)))
                   (start (cddr expr-list)))
               (add-code (format nil "create_list_~a" type))
               (add-code "(")
@@ -1885,7 +1892,7 @@
               (add-code "[]")
               (add-code ")")
               (add-code "{")
-              (dbg "parse-expression: parse list " (car expr-list))
+              (dbg "parse-expression: parse list " expr-list)
               (setf expr-list (parse-list (cddr expr-list)))
               (add-code (format nil "}"))
               (add-code ",")

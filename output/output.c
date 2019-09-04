@@ -107,6 +107,43 @@ void print_format(const c8* fmt, ...) {
     printf("\n");
 }
 
+#define define_println_list(T) \
+void println_list_##T(node_##T* list) {  \
+	node_##T* tmp = list; \
+	while (tmp->next != NULL) { \
+		print_##T(tmp->value); \
+		printf(" "); \
+		tmp = tmp->next; \
+	} \
+	printf("\n"); \
+} \
+
+define_println_list(b8)
+define_println_list(c8)
+define_println_list(i16)
+define_println_list(i32)
+define_println_list(i64)
+define_println_list(f32)
+define_println_list(f64)
+
+#define define_print_list(T) \
+void print_list_##T(node_##T* list) {  \
+	node_##T* tmp = list; \
+	while (tmp->next != NULL) { \
+		print_##T(tmp->value); \
+		printf(" "); \
+		tmp = tmp->next; \
+	} \
+} \
+
+define_print_list(b8)
+define_print_list(c8)
+define_print_list(i16)
+define_print_list(i32)
+define_print_list(i64)
+define_print_list(f32)
+define_print_list(f64)
+
 bool* elt_bool(bool* ptr, i32 idx) {
     return (bool*)&ptr[idx];
 }
@@ -212,13 +249,15 @@ i32 array_2[]={1, 2, 3, 4, 5, 6};
 f32 values_2[]={1.0, 2.0, 3.0, 4.0, 5.0, 6.0};
 f32* my_new_array_2=mapn_f32(mapit_0,values_2);
 f32* my_new_floats_2=new_f32(10);
-node_i32* my_list_2=create_list_i32((i32[]){1, 2, 3, 4, 5, 6},6);
+node_f32* my_list_2=create_list_f32((f32[]){1.0, 2.0, 3.0, 4.0, 5.0, 6.0},6);
 const char* string_2="abc";
 const char chars_2[]={'a', 'b', 'c'};
 f32 (*myfun_2)(f32)=mapit_0;
 set_f32((f32*)elt_f32(my_new_array_2,0),888.0);
 print_string("Mynewarray/firstelementis:");
 println_f32((f32)*elt_f32(my_new_array_2,0));
+print_string("Mylist");
+println_list_f32(my_list_2);
 mapit_0(1000.0);
 work_0(mapit_0,100);
 map_f32(mapit_0,values_2);

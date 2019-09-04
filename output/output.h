@@ -275,36 +275,38 @@ T min_##T(T a, T b) { \
 		return b; \
 } \
 
-	define_min(i16)
-	define_min(i32)
-	define_min(i64)
-	define_min(f32)
-	define_min(f64)
+define_min(i16)
+define_min(i32)
+define_min(i64)
+define_min(f32)
+define_min(f64)
 
 #define define_single_fn(T) \
 typedef T (*single_fn_##T)(T); \
 
-	define_single_fn(bool)
-	define_single_fn(c8)
-	define_single_fn(i16)
-	define_single_fn(i32)
-	define_single_fn(i64)
-	define_single_fn(f32)
-	define_single_fn(f64)
+define_single_fn(bool)
+define_single_fn(b8)
+define_single_fn(c8)
+define_single_fn(i16)
+define_single_fn(i32)
+define_single_fn(i64)
+define_single_fn(f32)
+define_single_fn(f64)
 
 #define define_dual_fn(T) \
 typedef T (*dual_fn_##T)(T, T); \
 
-	define_dual_fn(bool)
-	define_dual_fn(c8)
-	define_dual_fn(i16)
-	define_dual_fn(i32)
-	define_dual_fn(i64)
-	define_dual_fn(f32)
-	define_dual_fn(f64)
+define_dual_fn(bool)
+define_dual_fn(b8)
+define_dual_fn(c8)
+define_dual_fn(i16)
+define_dual_fn(i32)
+define_dual_fn(i64)
+define_dual_fn(f32)
+define_dual_fn(f64)
 
 
-	typedef struct node_ptr {
+typedef struct node_ptr {
 	void* value;
 	struct node_ptr* start;
 	struct node_ptr* next;
@@ -364,46 +366,52 @@ static node_ptr_t* pointer_list = NULL;
 typedef struct node_##T { \
 	T value; \
 	struct node_##T * next; \
-	struct node_##T * start; \
 } node_##T;\
 
-	define_node(bool)
-	define_node(c8)
-	define_node(i16)
-	define_node(i32)
-	define_node(i64)
-	define_node(f32)
-	define_node(f64)
+define_node(bool)
+define_node(c8)
+define_node(b8)
+define_node(i16)
+define_node(i32)
+define_node(i64)
+define_node(f32)
+define_node(f64)
 
 #define define_init_node(T) \
-node_##T* init_node_##T() {  \
+node_##T* init_node_##T(T value) {  \
 	node_##T* ret = (node_##T*)malloc(sizeof(node_##T)); \
-	ret->start = ret; \
+	ret->value = value; \
+	ret->next = NULL; \
 	if(pointer_list) \
-		add_ptr(pointer_list, (void*)ret->start);\
+		add_ptr(pointer_list, (void*)ret);\
 	return ret; \
 } \
 
-	define_init_node(bool)
-	define_init_node(c8)
-	define_init_node(i16)
-	define_init_node(i32)
-	define_init_node(i64)
-	define_init_node(f32)
-	define_init_node(f64)
+define_init_node(bool)
+define_init_node(c8)
+define_init_node(b8)
+define_init_node(i16)
+define_init_node(i32)
+define_init_node(i64)
+define_init_node(f32)
+define_init_node(f64)
 
 #define define_add_node(T) \
 node_##T* add_node_##T(node_##T* list, T value) {  \
 	node_##T* start = list; \
-	list->value = value; \
+	while (list->next != NULL) { \
+		list = list->next; \
+	} \
 	list->next = (node_##T*)malloc(sizeof(node_##T)); \
-	list->start = start; \
-	list = list->next; \
+	list->next->next = NULL; \
+	list->next->value = value; \
+	list = start; \
 	return list; \
 } \
 
 define_add_node(bool)
 define_add_node(c8)
+define_add_node(b8)
 define_add_node(i16)
 define_add_node(i32)
 define_add_node(i64)
@@ -412,20 +420,26 @@ define_add_node(f64)
 
 #define define_remove_node(T) \
 node_##T* remove_node_##T(node_##T* list, int pos) { \
+	node_##T* start = list; \
+	node_##T* tmp_before; \
+	node_##T* tmp_after; \
 	int cnt = 0; \
 	do \
 	{ \
 		cnt++; \
-		list = list->next; \
+		tmp_before = list; \
+	list = list->next; \
 	} while (cnt != pos); \
-	node_##T* temp = list->start; \
+	tmp_after = list; \
 	free(list); \
-	list = temp; \
+	tmp_before->next = tmp_after; \
+	list = start; \
 	return list; \
 } \
 
 define_remove_node(bool)
 define_remove_node(c8)
+define_remove_node(b8)
 define_remove_node(i16)
 define_remove_node(i32)
 define_remove_node(i64)
@@ -433,12 +447,13 @@ define_remove_node(f32)
 define_remove_node(f64)
 
 #define define_car(T) \
-node_##T car_##T(node_##T* list) { \
-return *list->start; \
+T car_##T(node_##T* list) { \
+return list->value; \
 } \
 
 define_car(bool)
 define_car(c8)
+define_car(b8)
 define_car(i16)
 define_car(i32)
 define_car(i64)
@@ -447,11 +462,12 @@ define_car(f64)
 
 #define define_cdr(T) \
 node_##T* cdr_##T(node_##T* list) { \
-return list->start->next; \
+return list->next; \
 } \
 
 define_cdr(bool)
 define_cdr(c8)
+define_cdr(b8)
 define_cdr(i16)
 define_cdr(i32)
 define_cdr(i64)
@@ -476,6 +492,7 @@ void destroy_##T(node_##T* e) { \
 
 define_destroy(bool)
 define_destroy(c8)
+define_destroy(b8)
 define_destroy(i16)
 define_destroy(i32)
 define_destroy(i64)
@@ -485,8 +502,10 @@ define_destroy(f64)
 #define define_create_list(T) \
 node_##T* create_list_##T(T list[], int size) {  \
 	int cnt = 0; \
-	node_##T* ret = init_node_##T(); \
-	for (cnt = 0; cnt < size - 1; cnt++) { \
+	node_##T* ret = init_node_##T(list[0]); \
+	if(pointer_list) \
+		add_ptr(pointer_list, (void*)ret);\
+	for (cnt = 1; cnt < size - 1; cnt++) { \
 		ret = add_node_##T(ret, list[cnt]);  \
 	} \
 	return ret; \
@@ -494,6 +513,7 @@ node_##T* create_list_##T(T list[], int size) {  \
 
 define_create_list(bool)
 define_create_list(c8)
+define_create_list(b8)
 define_create_list(i16)
 define_create_list(i32)
 define_create_list(i64)
@@ -510,6 +530,7 @@ T* map_##T(single_fn_##T a, T* b) { \
 }
 
 define_map(bool)
+define_map(b8)
 define_map(c8)
 define_map(i16)
 define_map(i32)
@@ -529,13 +550,14 @@ T* mapn_##T(single_fn_##T a, T* b) { \
     return ptr; \
 }
 
-	define_mapn(bool)
-	define_mapn(c8)
-	define_mapn(i16)
-	define_mapn(i32)
-	define_mapn(i64)
-	define_mapn(f32)
-	define_mapn(f64)
+define_mapn(bool)
+define_mapn(b8)
+define_mapn(c8)
+define_mapn(i16)
+define_mapn(i32)
+define_mapn(i64)
+define_mapn(f32)
+define_mapn(f64)
 
 #define define_reduce(T) \
 T reduce_##T(dual_fn_##T a, T* b) { \
@@ -547,13 +569,13 @@ T reduce_##T(dual_fn_##T a, T* b) { \
     return result; \
 } 
 
-	define_reduce(bool)
-	define_reduce(c8)
-	define_reduce(i16)
-	define_reduce(i32)
-	define_reduce(i64)
-	define_reduce(f32)
-	define_reduce(f64)
+define_reduce(bool)
+define_reduce(c8)
+define_reduce(i16)
+define_reduce(i32)
+define_reduce(i64)
+define_reduce(f32)
+define_reduce(f64)
 
 
 #define define_new(T) \
@@ -564,11 +586,11 @@ T* new_##T(int size) { \
     return mem; \
 }
 
-	define_new(bool)
-	define_new(c8)
-	define_new(i16)
-	define_new(i32)
-	define_new(i64)
-	define_new(f32)
-	define_new(f64)
+define_new(bool)
+define_new(c8)
+define_new(i16)
+define_new(i32)
+define_new(i64)
+define_new(f32)
+define_new(f64)
 

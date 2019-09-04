@@ -107,6 +107,43 @@ void print_format(const c8* fmt, ...) {
     printf("\n");
 }
 
+#define define_println_list(T) \
+void println_list_##T(node_##T* list) {  \
+	node_##T* tmp = list; \
+	while (tmp->next != NULL) { \
+		print_##T(tmp->value); \
+		printf(" "); \
+		tmp = tmp->next; \
+	} \
+	printf("\n"); \
+} \
+
+define_println_list(b8)
+define_println_list(c8)
+define_println_list(i16)
+define_println_list(i32)
+define_println_list(i64)
+define_println_list(f32)
+define_println_list(f64)
+
+#define define_print_list(T) \
+void print_list_##T(node_##T* list) {  \
+	node_##T* tmp = list; \
+	while (tmp->next != NULL) { \
+		print_##T(tmp->value); \
+		printf(" "); \
+		tmp = tmp->next; \
+	} \
+} \
+
+define_print_list(b8)
+define_print_list(c8)
+define_print_list(i16)
+define_print_list(i32)
+define_print_list(i64)
+define_print_list(f32)
+define_print_list(f64)
+
 bool* elt_bool(bool* ptr, i32 idx) {
     return (bool*)&ptr[idx];
 }
