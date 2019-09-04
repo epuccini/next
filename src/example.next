@@ -36,7 +36,7 @@ by Edward Puccini |;
 
 (defn do:i32 [argc:i32]
   (mapit 5.5)
-  (prnl "RET")
+  (prnl "Call module functions ")
   (layer>>fun1)
   (layer>>fun2)
   (let [float1:f32 0.0
@@ -54,6 +54,8 @@ by Edward Puccini |;
     (prnl (f32 (# my-new-array 0)))
     (prn "My list ")
     (prnl my-list)
+    (prn "My values ")
+    (prnl values)
     (myfun 1000.0)
     (work mapit 100)
     (map mapit values)

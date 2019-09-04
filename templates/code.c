@@ -144,68 +144,111 @@ define_print_list(i64)
 define_print_list(f32)
 define_print_list(f64)
 
-bool* elt_bool(bool* ptr, i32 idx) {
+#define define_println_array(T) \
+void println_array_##T(int size, T* array) {  \
+	int cnt = 0; \
+	for (cnt = 0; cnt < size - 2; cnt++) { \
+		print_##T(array[cnt]); \
+		printf(" "); \
+	} \
+	printf("\n"); \
+} \
+
+define_println_array(b8)
+define_println_array(c8)
+define_println_array(i16)
+define_println_array(i32)
+define_println_array(i64)
+define_println_array(f32)
+define_println_array(f64)
+
+#define define_print_array(T) \
+void print_array_##T(int size, T* array) {  \
+	int cnt = 0; \
+	for (cnt = 0; cnt < size - 2; cnt++) { \
+		print_##T(array[cnt]); \
+		printf(" "); \
+	} \
+} \
+
+define_print_array(b8)
+define_print_array(c8)
+define_print_array(i16)
+define_print_array(i32)
+define_print_array(i64)
+define_print_array(f32)
+define_print_array(f64)
+
+bool* elt_array_bool(bool* ptr, i32 idx) {
     return (bool*)&ptr[idx];
 }
 
-c8* elt_b8(c8* ptr, i32 idx) {
-    return (c8*)&ptr[idx];
+b8* elt_array_b8(b8* ptr, i32 idx) {
+	return (c8*)&ptr[idx];
 }
 
-i16* elt_i16(i16* ptr, i32 idx) {
+c8* elt_array_c8(c8* ptr, i32 idx) {
+	return (c8*)&ptr[idx];
+}
+
+i16* elt_array_i16(i16* ptr, i32 idx) {
     return (i16*)&ptr[idx];
 }
 
-i32* elt_i32(i32* ptr, i32 idx) {
+i32* elt_array_i32(i32* ptr, i32 idx) {
     return (i32*)&ptr[idx];
 }
 
-long* elt_i64(long* ptr, i16 idx) {
+long* elt_array_i64(long* ptr, i16 idx) {
     return (long*)&ptr[idx];
 }
 
-f32* elt_f32(f32* ptr, i16 idx) {
+f32* elt_array_f32(f32* ptr, i16 idx) {
     return (f32*)&ptr[idx];
 }
 
-f64* elt_f64(f64* ptr, i32 idx) {
+f64* elt_array_f64(f64* ptr, i32 idx) {
     return (f64*)&ptr[idx];
 }
 
-c8** elt_string(c8** ptr, i32 idx) {
-    return (c8**)&ptr[idx];
+c8** elt_array_string(c8** ptr, i32 idx) {
+	return (c8**)&ptr[idx];
 }
 
-void set_bool(bool* ptr, bool val) {
+void set_pointer_bool(bool* ptr, bool val) {
     *ptr = val;
 }
 
-void set_b8(c8* ptr, c8 val) {
+void set_pointer_b8(c8* ptr, c8 val) {
+	*ptr = val;
+}
+
+void set_pointer_c8(c8* ptr, c8 val) {
+	*ptr = val;
+}
+
+void set_pointer_i16(i16* ptr, i16 val) {
     *ptr= val;
 }
 
-void set_i16(i16* ptr, i16 val) {
-    *ptr= val;
-}
-
-void set_i32(i32* ptr, i32 val) {
+void set_pointer_i32(i32* ptr, i32 val) {
     *ptr = val;
 }
 
-void set_i64(long* ptr, long val) {
+void set_pointer_i64(long* ptr, long val) {
     *ptr = val;
 }
 
-void set_f32(f32* ptr, f32 val) {
+void set_pointer_f32(f32* ptr, f32 val) {
     *ptr = val;
 }
 
-void set_f64(f64* ptr, f64 val) {
+void set_pointer_f64(f64* ptr, f64 val) {
     *ptr = val;
 }
 
-void set_string(c8** ptr, c8* val) {
-    *ptr = val;
+void set_pointer_string(c8** ptr, const c8* val) {
+	*ptr = val;
 }
 
 $(IMPLEMENTATION)

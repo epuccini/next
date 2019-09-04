@@ -144,68 +144,111 @@ define_print_list(i64)
 define_print_list(f32)
 define_print_list(f64)
 
-bool* elt_bool(bool* ptr, i32 idx) {
+#define define_println_array(T) \
+void println_array_##T(int size, T* array) {  \
+	int cnt = 0; \
+	for (cnt = 0; cnt < size - 2; cnt++) { \
+		print_##T(array[cnt]); \
+		printf(" "); \
+	} \
+	printf("\n"); \
+} \
+
+define_println_array(b8)
+define_println_array(c8)
+define_println_array(i16)
+define_println_array(i32)
+define_println_array(i64)
+define_println_array(f32)
+define_println_array(f64)
+
+#define define_print_array(T) \
+void print_array_##T(int size, T* array) {  \
+	int cnt = 0; \
+	for (cnt = 0; cnt < size - 2; cnt++) { \
+		print_##T(array[cnt]); \
+		printf(" "); \
+	} \
+} \
+
+define_print_array(b8)
+define_print_array(c8)
+define_print_array(i16)
+define_print_array(i32)
+define_print_array(i64)
+define_print_array(f32)
+define_print_array(f64)
+
+bool* elt_array_bool(bool* ptr, i32 idx) {
     return (bool*)&ptr[idx];
 }
 
-c8* elt_b8(c8* ptr, i32 idx) {
-    return (c8*)&ptr[idx];
+b8* elt_array_b8(b8* ptr, i32 idx) {
+	return (c8*)&ptr[idx];
 }
 
-i16* elt_i16(i16* ptr, i32 idx) {
+c8* elt_array_c8(c8* ptr, i32 idx) {
+	return (c8*)&ptr[idx];
+}
+
+i16* elt_array_i16(i16* ptr, i32 idx) {
     return (i16*)&ptr[idx];
 }
 
-i32* elt_i32(i32* ptr, i32 idx) {
+i32* elt_array_i32(i32* ptr, i32 idx) {
     return (i32*)&ptr[idx];
 }
 
-long* elt_i64(long* ptr, i16 idx) {
+long* elt_array_i64(long* ptr, i16 idx) {
     return (long*)&ptr[idx];
 }
 
-f32* elt_f32(f32* ptr, i16 idx) {
+f32* elt_array_f32(f32* ptr, i16 idx) {
     return (f32*)&ptr[idx];
 }
 
-f64* elt_f64(f64* ptr, i32 idx) {
+f64* elt_array_f64(f64* ptr, i32 idx) {
     return (f64*)&ptr[idx];
 }
 
-c8** elt_string(c8** ptr, i32 idx) {
-    return (c8**)&ptr[idx];
+c8** elt_array_string(c8** ptr, i32 idx) {
+	return (c8**)&ptr[idx];
 }
 
-void set_bool(bool* ptr, bool val) {
+void set_pointer_bool(bool* ptr, bool val) {
     *ptr = val;
 }
 
-void set_b8(c8* ptr, c8 val) {
+void set_pointer_b8(c8* ptr, c8 val) {
+	*ptr = val;
+}
+
+void set_pointer_c8(c8* ptr, c8 val) {
+	*ptr = val;
+}
+
+void set_pointer_i16(i16* ptr, i16 val) {
     *ptr= val;
 }
 
-void set_i16(i16* ptr, i16 val) {
-    *ptr= val;
-}
-
-void set_i32(i32* ptr, i32 val) {
+void set_pointer_i32(i32* ptr, i32 val) {
     *ptr = val;
 }
 
-void set_i64(long* ptr, long val) {
+void set_pointer_i64(long* ptr, long val) {
     *ptr = val;
 }
 
-void set_f32(f32* ptr, f32 val) {
+void set_pointer_f32(f32* ptr, f32 val) {
     *ptr = val;
 }
 
-void set_f64(f64* ptr, f64 val) {
+void set_pointer_f64(f64* ptr, f64 val) {
     *ptr = val;
 }
 
-void set_string(c8** ptr, c8* val) {
-    *ptr = val;
+void set_pointer_string(c8** ptr, const c8* val) {
+	*ptr = val;
 }
 
 
@@ -239,7 +282,7 @@ print_format("%f",(*f_1)(arg_1));
 i32 do_0(i32 argc_1)
 {
 mapit_0(5.5);
-println_string("RET");
+println_string("Callmodulefunctions");
 layer__fun1_0();
 layer__fun2_0();
 {
@@ -253,11 +296,13 @@ node_f32* my_list_2=create_list_f32((f32[]){1.0, 2.0, 3.0, 4.0, 5.0, 6.0},6);
 const char* string_2="abc";
 const char chars_2[]={'a', 'b', 'c'};
 f32 (*myfun_2)(f32)=mapit_0;
-set_f32((f32*)elt_f32(my_new_array_2,0),888.0);
+set_pointer_f32((f32*)elt_array_f32(my_new_array_2,0),888.0);
 print_string("Mynewarray/firstelementis:");
-println_f32((f32)*elt_f32(my_new_array_2,0));
+println_f32((f32)*elt_array_f32(my_new_array_2,0));
 print_string("Mylist");
 println_list_f32(my_list_2);
+print_string("Myvalues");
+println_array_f32(sizeof(values_2),values_2);
 mapit_0(1000.0);
 work_0(mapit_0,100);
 map_f32(mapit_0,values_2);
@@ -265,21 +310,21 @@ reduce_f32(reduceit_0,values_2);
 print_string("String:");
 println_string(string_2);
 print_string("Chars:");
-println_string(chars_2);
+println_array_c8(sizeof(chars_2),chars_2);
 print_string("sizeof:");
 println_i32(sizeof(string_2));
-set_f32(&float1_2,666.0);
-set_i32(&argc_1,(100+(1000-500)+100+(1000*500)));
+set_pointer_f32(&float1_2,666.0);
+set_pointer_i32(&argc_1,(100+(1000-500)+100+(1000*500)));
 println_i32(argc_1);
-set_i32(&argc_1,(100+(1000-999)));
+set_pointer_i32(&argc_1,(100+(1000-999)));
 println_i32(argc_1);
 i32 cnt_3=0;
 for(cnt_3=0;cnt_3<max_i32(20,10);cnt_3++)
 {
-set_i32(elt_i32(array_2,cnt_3),1000);
+set_pointer_i32(elt_array_i32(array_2,cnt_3),1000);
 print_format("%d",power_i32(2,8));
 print_string("ELT:");
-print_format("%d",*elt_i32(array_2,cnt_3));
+print_format("%d",*elt_array_i32(array_2,cnt_3));
 print_string("CNT:");
 if(cnt_3==max_i32(1,3))
 {
