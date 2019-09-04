@@ -315,15 +315,10 @@ typedef struct node_ptr {
 } node_ptr_t;
 
 node_ptr_t* add_ptr(node_ptr_t* list, void* value) {
-	node_ptr_t* start = list; \
-	while (list->next != NULL) { \
-		list = list->next; \
-	} \
-	list->next = (node_ptr_t*)malloc(sizeof(node_ptr_t)); \
-	list->next->next = NULL; \
-	list->next->value = value; \
-	list = start; \
-	return list; \
+	node_ptr_t* head = (node_ptr_t*)malloc(sizeof(node_ptr_t)); \
+	head->next = list; \
+	head->value = value; \
+	return head; \
 }
 
 node_ptr_t* remove_ptr(node_ptr_t* list, int pos) {
@@ -377,25 +372,6 @@ define_node(i32)
 define_node(i64)
 define_node(f32)
 define_node(f64)
-
-#define define_init_node(T) \
-node_##T* init_node_##T(T value) {  \
-	node_##T* ret = (node_##T*)malloc(sizeof(node_##T)); \
-	ret->value = value; \
-	ret->next = NULL; \
-	if(pointer_list) \
-		add_ptr(pointer_list, (void*)ret);\
-	return ret; \
-} \
-
-define_init_node(bool)
-define_init_node(c8)
-define_init_node(b8)
-define_init_node(i16)
-define_init_node(i32)
-define_init_node(i64)
-define_init_node(f32)
-define_init_node(f64)
 
 #define define_add_node(T) \
 node_##T* add_node_##T(node_##T* list, T value) {  \
@@ -500,10 +476,8 @@ define_destroy(f64)
 #define define_create_list(T) \
 node_##T* create_list_##T(T list[], int size) {  \
 	int cnt = 0; \
-	node_##T* ret = init_node_##T(list[0]); \
-	if(pointer_list) \
-		add_ptr(pointer_list, (void*)ret);\
-	for (cnt = 1; cnt < size; cnt++) { \
+	node_##T* ret = NULL; \
+	for (cnt = 0; cnt < size; cnt++) { \
 		ret = add_node_##T(ret, list[cnt]);  \
 	} \
 	return ret; \
