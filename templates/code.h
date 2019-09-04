@@ -304,6 +304,62 @@ typedef T (*dual_fn_##T)(T, T); \
 	define_dual_fn(f64)
 
 
+	typedef struct node_ptr {
+	void* value;
+	struct node_ptr* start;
+	struct node_ptr* next;
+} node_ptr_t;
+
+node_ptr_t* init_ptr() {
+	node_ptr_t* ret = (node_ptr_t*)malloc(sizeof(node_ptr_t));
+	ret->start = ret;
+	return ret;
+}
+
+node_ptr_t* add_ptr(node_ptr_t* list, void* value) {
+	if (list == list->start) {
+		list->value = value;
+		list->next = NULL;
+	}
+	else {
+		list->next = (node_ptr_t*)malloc(sizeof(node_ptr_t));
+		list->next->next = NULL;
+		list->next->value = value;
+		list = list->next;
+	}
+	return list;
+}
+
+node_ptr_t* remove_ptr(node_ptr_t* list, void* value) {
+	do
+	{
+		list = list->next;
+	} while (list->next != NULL);
+	node_ptr_t* temp = list->start;
+	free(list);
+	list = temp;
+	return list;
+}
+
+void destroy_ptr(node_ptr_t* e) {
+	if (e != NULL) {
+		node_ptr_t* temp = e->next;
+		do
+		{
+			if (e->value)
+				free(e->value);
+			free(e);
+			e = NULL;
+			if (temp) {
+				e = temp;
+				temp = e->next;
+			}
+		} while (e != NULL);
+	}
+}
+
+static node_ptr_t* pointer_list = NULL;
+
 #define define_node(T) \
 typedef struct node_##T { \
 	T value; \
@@ -323,21 +379,25 @@ typedef struct node_##T { \
 node_##T* init_node_##T() {  \
 	node_##T* ret = (node_##T*)malloc(sizeof(node_##T)); \
 	ret->start = ret; \
+	if(pointer_list) \
+		add_ptr(pointer_list, (void*)ret->start);\
 	return ret; \
 } \
 
-define_init_node(bool)
-define_init_node(c8)
-define_init_node(i16)
-define_init_node(i32)
-define_init_node(i64)
-define_init_node(f32)
-define_init_node(f64)
+	define_init_node(bool)
+	define_init_node(c8)
+	define_init_node(i16)
+	define_init_node(i32)
+	define_init_node(i64)
+	define_init_node(f32)
+	define_init_node(f64)
 
 #define define_add_node(T) \
 node_##T* add_node_##T(node_##T* list, T value) {  \
+	node_##T* start = list; \
 	list->value = value; \
 	list->next = (node_##T*)malloc(sizeof(node_##T)); \
+	list->start = start; \
 	list = list->next; \
 	return list; \
 } \
@@ -422,61 +482,23 @@ define_destroy(i64)
 define_destroy(f32)
 define_destroy(f64)
 
-typedef struct node_ptr {
-	void* value;
-	struct node_ptr* start;
-	struct node_ptr* next;
-} node_ptr_t;
+#define define_create_list(T) \
+node_##T* create_list_##T(T list[], int size) {  \
+	int cnt = 0; \
+	node_##T* ret = init_node_##T(); \
+	for (cnt = 0; cnt < size - 1; cnt++) { \
+		ret = add_node_##T(ret, list[cnt]);  \
+	} \
+	return ret; \
+} \
 
-node_ptr_t* init_ptr() {
-	node_ptr_t* ret = (node_ptr_t*)malloc(sizeof(node_ptr_t));
-	ret->start = ret;
-	return ret;
-}
-
-node_ptr_t* add_ptr(node_ptr_t* list, void* value) {
-	if (list == list->start) {
-		list->value = value;
-		list->next = NULL;
-	}
-	else {
-		list->next = (node_ptr_t*)malloc(sizeof(node_ptr_t));
-		list->next->next = NULL;
-		list->next->value = value;
-		list = list->next;
-	}
-	return list;
-}
-
-node_ptr_t* remove_ptr(node_ptr_t* list, void* value) {
-	do
-	{
-		list = list->next;
-	} while (list->next != NULL);
-	node_ptr_t* temp = list->start;
-	free(list);
-	list = temp;
-	return list;
-}
-
-void destroy_ptr(node_ptr_t* e) {
-	if (e != NULL) {
-		node_ptr_t* temp = e->next;
-		do
-		{
-			if (e->value)
-				free(e->value);
-			free(e);
-			e = NULL;
-			if (temp) {
-				e = temp;
-				temp = e->next;
-			}
-		} while (e != NULL);
-	}
-} 
-
-static node_ptr_t* pointer_list = NULL;
+define_create_list(bool)
+define_create_list(c8)
+define_create_list(i16)
+define_create_list(i32)
+define_create_list(i64)
+define_create_list(f32)
+define_create_list(f64)
 
 #define define_map(T) \
 T* map_##T(single_fn_##T a, T* b) { \
