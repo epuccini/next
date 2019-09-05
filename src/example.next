@@ -45,6 +45,7 @@ by Edward Puccini |;
         values:f32# [1.0 2.0 3.0 4.0 5.0 6.0]
         my-new-array:f32> (mapn mapit values)
         my-new-floats:f32> (new_f32 10)
+        my-new-array2:f32> (append values 1000.0)
         my-list:f32' '(1.0 2.0 3.0 4.0 5.0 6.0)
         string:string "abc"
         chars:c8# ['a' 'b' 'c']
@@ -52,6 +53,8 @@ by Edward Puccini |;
     (:: (f32> (# my-new-array 0)) 888.0)
     (prn "My new array / first element is: ")
     (prnl (f32 (# my-new-array 0)))
+    (prn "My new array2: ")
+    (prnl my-new-array2 7)
     (prn "My list ")
     (push my-list 888.0)
     (prnl my-list)
