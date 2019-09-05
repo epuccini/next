@@ -154,13 +154,13 @@ void println_array_##T(int size, const T* array) {  \
 	printf("\n"); \
 } \
 
-define_println_array(b8)
-define_println_array(c8)
-define_println_array(i16)
-define_println_array(i32)
-define_println_array(i64)
-define_println_array(f32)
-define_println_array(f64)
+	define_println_array(b8)
+	define_println_array(c8)
+	define_println_array(i16)
+	define_println_array(i32)
+	define_println_array(i64)
+	define_println_array(f32)
+	define_println_array(f64)
 
 #define define_print_array(T) \
 void print_array_##T(int size, const T* array) {  \
@@ -171,13 +171,48 @@ void print_array_##T(int size, const T* array) {  \
 	} \
 } \
 
-define_print_array(b8)
-define_print_array(c8)
-define_print_array(i16)
-define_print_array(i32)
-define_print_array(i64)
-define_print_array(f32)
-define_print_array(f64)
+	define_print_array(b8)
+	define_print_array(c8)
+	define_print_array(i16)
+	define_print_array(i32)
+	define_print_array(i64)
+	define_print_array(f32)
+	define_print_array(f64)
+
+#define define_elt_list(T) \
+T* elt_list_##T(node_##T* list, i32 idx) { \
+	int cnt; \
+	do { \
+		cnt++; \
+		if (list->next != NULL) { \
+			list = list->next; \
+		} \
+	} while(cnt != idx); \
+	return (T*)&list->value; \
+} \
+
+	define_elt_list(b8)
+	define_elt_list(c8)
+	define_elt_list(i16)
+	define_elt_list(i32)
+	define_elt_list(i64)
+	define_elt_list(f32)
+	define_elt_list(f64)
+
+#define define_set_list(T) \
+void set_list_##T(node_##T* list, T val) { \
+	list->value = val; \
+	return; \
+} \
+
+	define_set_list(b8)
+	define_set_list(c8)
+	define_set_list(i16)
+	define_set_list(i32)
+	define_set_list(i64)
+	define_set_list(f32)
+	define_set_list(f64)
+
 
 bool* elt_array_bool(bool* ptr, i32 idx) {
     return (bool*)&ptr[idx];
