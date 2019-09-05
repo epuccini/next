@@ -149,10 +149,8 @@
               (format nil "~%~{~a~}~%" *implementation_list*)))
     (if *code_list*
         (progn
-          (setf pointers "pointer_list = NULL;") 
           (if (not (is-main-defined-p))
-              (setf code (format nil "i32 main () ~%{~%~a~%~%~{~a~}~%"
-                                 pointers *code_list*))
+              (setf code (format nil "i32 main () ~%{~%~%~{~a~}~%" *code_list*))
               (setf code (format nil "~%~%~{~a~}~%" *code_list*)))))
     (if (not (is-main-defined-p))
         (setf code (format nil "~a~%destroy_ptr(pointer_list);~%return 0;~%}" code)))
@@ -740,7 +738,7 @@
            (setf expr-list (parse-expression expr-list))
            (dbg "parse-variable: append size " expr-list)
            (if (search "#" (cadr def))
-               (add-code (format nil "append_ptr(~a, sizeof(~a)/sizeof(~a));~%"
+               (add-code (format nil "append_ptr(~a, sizeof(~a)/sizeof(~a), ARRAY);~%"
                                  (get-variable-name (car def))
                                  (get-variable-name (car def))
                                  (regex-replace "#" (cadr def) ""))))
@@ -1023,6 +1021,7 @@
   expr-list)
 
 (defun parse-def-function (expr-list)
+  (let ((fn-name (car expr-list)))
   (zero-arg)
   (dbg "parse-def-function: name and type block " *block* " parens " *paranteses*)
   (setf expr-list (parse-function-name-and-type expr-list))
@@ -1035,12 +1034,14 @@
   (add-code ")")
   (add-code (format nil "~%{~%"))
   (setf expr-list (parse-block expr-list))
+  (if (search "main" fn-name)
+      (add-code (format nil "destroy_ptr(pointer_list);~%")))
   (add-code (format nil "}~%"))
   (dec-block)
   (dec-parens)
   (dbg "parse-def-function BLOCK END block " *block* " parens " *paranteses*)
   (dbg "parse-def-function " (car expr-list))
-  expr-list)
+  expr-list))
 
 (defun parse-module (expr-list)
   (setf *current-module* (car expr-list))
@@ -1725,6 +1726,13 @@
         ((equal "break" (car expr-list))
          (add-code "break")
          (add-code (format nil ";~%"))
+         (zero-arg)
+         (setf expr-list (cdr expr-list))
+         (return-from parse-call expr-list))
+        ((equal "destroy" (car expr-list))
+         (add-code "destroy_ptr")
+         (add-code "(")
+         (add-code "pointer_list")
          (zero-arg)
          (setf expr-list (cdr expr-list))
          (return-from parse-call expr-list))

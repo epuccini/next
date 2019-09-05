@@ -34,7 +34,7 @@ by Edward Puccini |;
 (defn work:void [f:fun[f32->f32] arg:i32]
   (prnfmt "%f" (f arg)))
 
-(defn do:i32 [argc:i32]
+(defn arrays-and-lists:i32 [argc:i32]
   (mapit 5.5)
   (prnl "Call module functions ")
   (layer>>fun1)
@@ -113,4 +113,5 @@ by Edward Puccini |;
   (prnl argc)
   (return 2))
 
-  (do 77)
+(defn main:void []
+  (arrays-and-lists 77))

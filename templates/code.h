@@ -55,3 +55,18 @@ void set_pointer_i64(i64* ptr, i64 val);
 void set_pointer_f32(f32* ptr, f32 val);
 void set_pointer_f64(f64* ptr, f64 val);
 void set_pointer_string(c8** ptr, c8* val);
+
+typedef enum PTR_TYPE {
+	ARRAY = 0,
+	POINTER = 1,
+	LIST = 2
+} PTR_TYPE_t;
+
+typedef struct node_ptr {
+	int length;
+	void* value;
+	struct node_ptr* next;
+	PTR_TYPE_t type;
+} node_ptr_t;
+
+static node_ptr_t* pointer_list = NULL;

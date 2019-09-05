@@ -433,21 +433,14 @@ typedef T (*dual_fn_##T)(T, T); \
 	define_dual_fn(f32)
 	define_dual_fn(f64)
 
-typedef struct node_ptr {
-	int length;
-	void* value;
-	struct node_ptr* next;
-} node_ptr_t;
-
-static node_ptr_t* pointer_list = NULL;
-
-node_ptr_t* append_ptr(void* value, int size) {
+node_ptr_t* append_ptr(void* value, int size, PTR_TYPE_t type) {
 	node_ptr_t* head;
 	if (pointer_list == NULL) {
 		pointer_list = (node_ptr_t*)malloc(sizeof(node_ptr_t));
 		pointer_list->next = NULL;
 		pointer_list->value = value;
-		pointer_list->length = size; 
+		pointer_list->type = type;
+		pointer_list->length = size;
 	} 
 	else {
 		head = pointer_list;
@@ -458,6 +451,7 @@ node_ptr_t* append_ptr(void* value, int size) {
 		} while (pointer_list->next != NULL);
 		pointer_list->next = (node_ptr_t*)malloc(sizeof(node_ptr_t));
 		pointer_list->next->value = value;
+		pointer_list->next->type = type;
 		pointer_list = pointer_list->next;
 		pointer_list->length = size; 
 		pointer_list->next = NULL;
@@ -508,21 +502,19 @@ void inc_length(void* pointer) {
 	return;
 }
 
-void destroy_ptr(node_ptr_t* e) {
+int destroy_ptr(node_ptr_t* e) {
 	if (e != NULL) {
 		node_ptr_t* temp = e->next;
 		do
 		{
-			if (e->value)
-				free(e->value);
-			free(e);
+			if(e->type != ARRAY) 
+				free(e);
 			e = NULL;
-			if (temp) {
-				e = temp;
-				temp = e->next;
-			}
-		} while (e != NULL);
+			e = temp;
+			temp = e->next;
+		} while (e->next != NULL);
 	}
+	return 0;
 }
 
 #define define_node(T) \
@@ -697,8 +689,7 @@ node_##T* create_list_##T(T list[], int size) {  \
 	for (cnt = 0; cnt < size; cnt++) { \
 		ret = append_list_##T(ret, list[cnt]);  \
 	} \
-	if(pointer_list != NULL) \
-		append_ptr(list, size); \
+	append_ptr(list, size, LIST); \
 	return ret; \
 } \
 
@@ -732,7 +723,7 @@ T* map_##T(single_fn_##T a, T* b) { \
 #define define_mapn(T) \
 T* mapn_##T(single_fn_##T a, T* b) { \
     T* ptr = (T*) malloc(sizeof(b) * sizeof(T)); \
-	append_ptr((void*)ptr, sizeof(b)-2);\
+	append_ptr((void*)ptr, sizeof(b)-2, ARRAY);\
 	i32 cnt = 0; \
     for (cnt = 0; cnt < sizeof(b)-2; cnt++) { \
         ptr[cnt] = (*a)(b[cnt]); \
@@ -771,7 +762,7 @@ T reduce_##T(dual_fn_##T a, T* b) { \
 #define define_new(T) \
 T* new_##T(int size) { \
 	T* mem = (T*)malloc(size*sizeof(T)); \
-	append_ptr((void*)mem, size); \
+	append_ptr((void*)mem, size, ARRAY);       \
 	int cnt = 0; \
 	for(cnt = 0; cnt < size; cnt++) \
 		mem[cnt] = 0; \
@@ -938,7 +929,7 @@ T* append_array_##T(T* array, T value) {  \
 		new_array[cnt] = array[cnt]; \
 	} \
 	new_array[size] = value; \
-	append_ptr(new_array, size+1); \
+	append_ptr(new_array, size+1, ARRAY);             \
 	return new_array; \
 } 
 
@@ -960,7 +951,7 @@ T* append_pointer_##T(T* array, T value) {  \
 		new_array[cnt] = array[cnt]; \
 	} \
 	new_array[size] = value; \
-	append_ptr(new_array, size+1); \
+	append_ptr(new_array, size+1, ARRAY); \
 	return new_array; \
 } 
 
@@ -1001,7 +992,7 @@ void work_0(f32 (*f_1)(f32),i32 arg_1)
 {
 print_format("%f",(*f_1)(arg_1));
 }
-i32 do_0(i32 argc_1)
+i32 arrays_and_lists_0(i32 argc_1)
 {
 mapit_0(5.5);
 println_string("Callmodulefunctions");
@@ -1011,9 +1002,9 @@ layer__fun2_0();
 f32 float1_2=0.0;
 f32 float2_2=(0.0+0.0);
 i32 array_2[]={1, 2, 3, 4, 5, 6};
-append_ptr(array_2, sizeof(array_2)/sizeof(i32));
+append_ptr(array_2, sizeof(array_2)/sizeof(i32), ARRAY);
 f32 values_2[]={1.0, 2.0, 3.0, 4.0, 5.0, 6.0};
-append_ptr(values_2, sizeof(values_2)/sizeof(f32));
+append_ptr(values_2, sizeof(values_2)/sizeof(f32), ARRAY);
 f32* my_new_array_2=mapn_f32(mapit_0,values_2);
 f32* my_new_floats_2=new_f32(10);
 f32* my_new_array2_2=append_array_f32(values_2,1000.0);
@@ -1021,7 +1012,7 @@ f32* my_new_array3_2=append_pointer_f32(my_new_array2_2,2000.0);
 node_f32* my_list_2=create_list_f32((f32[]){1.0, 2.0, 3.0, 4.0, 5.0, 6.0},6);
 const char* string_2="abc";
 const char chars_2[]={'a', 'b', 'c'};
-append_ptr(chars_2, sizeof(chars_2)/sizeof(c8));
+append_ptr(chars_2, sizeof(chars_2)/sizeof(c8), ARRAY);
 f32 (*myfun_2)(f32)=mapit_0;
 set_pointer_f32((f32*)elt_array_f32(my_new_floats_2,0),888.0);
 print_string("Mynewarray/firstelementis:");
@@ -1099,16 +1090,15 @@ println_string("ENDE");
 println_i32(argc_1);
 return(2);
 }
-
-
-
-i32 main () 
+void main()
 {
-pointer_list = NULL;
-
-do_0(77);
-
-
+arrays_and_lists_0(77);
 destroy_ptr(pointer_list);
-return 0;
 }
+
+
+
+
+
+
+

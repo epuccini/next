@@ -433,21 +433,14 @@ typedef T (*dual_fn_##T)(T, T); \
 	define_dual_fn(f32)
 	define_dual_fn(f64)
 
-typedef struct node_ptr {
-	int length;
-	void* value;
-	struct node_ptr* next;
-} node_ptr_t;
-
-static node_ptr_t* pointer_list = NULL;
-
-node_ptr_t* append_ptr(void* value, int size) {
+node_ptr_t* append_ptr(void* value, int size, PTR_TYPE_t type) {
 	node_ptr_t* head;
 	if (pointer_list == NULL) {
 		pointer_list = (node_ptr_t*)malloc(sizeof(node_ptr_t));
 		pointer_list->next = NULL;
 		pointer_list->value = value;
-		pointer_list->length = size; 
+		pointer_list->type = type;
+		pointer_list->length = size;
 	} 
 	else {
 		head = pointer_list;
@@ -458,6 +451,7 @@ node_ptr_t* append_ptr(void* value, int size) {
 		} while (pointer_list->next != NULL);
 		pointer_list->next = (node_ptr_t*)malloc(sizeof(node_ptr_t));
 		pointer_list->next->value = value;
+		pointer_list->next->type = type;
 		pointer_list = pointer_list->next;
 		pointer_list->length = size; 
 		pointer_list->next = NULL;
@@ -508,21 +502,19 @@ void inc_length(void* pointer) {
 	return;
 }
 
-void destroy_ptr(node_ptr_t* e) {
+int destroy_ptr(node_ptr_t* e) {
 	if (e != NULL) {
 		node_ptr_t* temp = e->next;
 		do
 		{
-			if (e->value)
-				free(e->value);
-			free(e);
+			if(e->type != ARRAY) 
+				free(e);
 			e = NULL;
-			if (temp) {
-				e = temp;
-				temp = e->next;
-			}
-		} while (e != NULL);
+			e = temp;
+			temp = e->next;
+		} while (e->next != NULL);
 	}
+	return 0;
 }
 
 #define define_node(T) \
@@ -697,8 +689,7 @@ node_##T* create_list_##T(T list[], int size) {  \
 	for (cnt = 0; cnt < size; cnt++) { \
 		ret = append_list_##T(ret, list[cnt]);  \
 	} \
-	if(pointer_list != NULL) \
-		append_ptr(list, size); \
+	append_ptr(list, size, LIST); \
 	return ret; \
 } \
 
@@ -732,7 +723,7 @@ T* map_##T(single_fn_##T a, T* b) { \
 #define define_mapn(T) \
 T* mapn_##T(single_fn_##T a, T* b) { \
     T* ptr = (T*) malloc(sizeof(b) * sizeof(T)); \
-	append_ptr((void*)ptr, sizeof(b)-2);\
+	append_ptr((void*)ptr, sizeof(b)-2, ARRAY);\
 	i32 cnt = 0; \
     for (cnt = 0; cnt < sizeof(b)-2; cnt++) { \
         ptr[cnt] = (*a)(b[cnt]); \
@@ -771,7 +762,7 @@ T reduce_##T(dual_fn_##T a, T* b) { \
 #define define_new(T) \
 T* new_##T(int size) { \
 	T* mem = (T*)malloc(size*sizeof(T)); \
-	append_ptr((void*)mem, size); \
+	append_ptr((void*)mem, size, ARRAY);       \
 	int cnt = 0; \
 	for(cnt = 0; cnt < size; cnt++) \
 		mem[cnt] = 0; \
@@ -938,7 +929,7 @@ T* append_array_##T(T* array, T value) {  \
 		new_array[cnt] = array[cnt]; \
 	} \
 	new_array[size] = value; \
-	append_ptr(new_array, size+1); \
+	append_ptr(new_array, size+1, ARRAY);             \
 	return new_array; \
 } 
 
@@ -960,7 +951,7 @@ T* append_pointer_##T(T* array, T value) {  \
 		new_array[cnt] = array[cnt]; \
 	} \
 	new_array[size] = value; \
-	append_ptr(new_array, size+1); \
+	append_ptr(new_array, size+1, ARRAY); \
 	return new_array; \
 } 
 
@@ -974,4 +965,5 @@ T* append_pointer_##T(T* array, T value) {  \
 		define_append_pointer(f64)
 
 $(IMPLEMENTATION)
+
 
