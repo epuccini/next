@@ -448,6 +448,24 @@ define_push_node(i64)
 define_push_node(f32)
 define_push_node(f64)
 
+#define define_pop_node(T) \
+T pop_node_list_##T(node_##T** list) {  \
+	T value = (*list)->value; \
+	if ((*list)->next != NULL) { \
+		*list = (*list)->next; \
+	} \
+	return value; \
+} \
+
+define_pop_node(bool)
+define_pop_node(c8)
+define_pop_node(b8)
+define_pop_node(i16)
+define_pop_node(i32)
+define_pop_node(i64)
+define_pop_node(f32)
+define_pop_node(f64)
+
 #define define_remove_node(T) \
 node_##T* remove_node_list_##T(node_##T* list, int pos) { \
 	node_##T* start = list; \
