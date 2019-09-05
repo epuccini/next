@@ -967,35 +967,35 @@ T* append_pointer_##T(T* array, T value) {  \
 
 i32 layer__fun1_0()
 {
-println_string("Modulefunctionfun1");
+println_string("Module function fun1");
 return(999);
 }
 i32 layer__fun2_0()
 {
 layer__fun1_0();
-println_string("Modulefunctionfun2");
+println_string("Module function fun2");
 return(888);
 }
 f32 mapit_0(f32 op_1)
 {
-print_string("Map");
+print_string("Map ");
 println_f64((op_1+op_1));
 return((op_1+op_1));
 }
 f32 reduceit_0(f32 op1_1,f32 op2_1)
 {
-print_string("Reduce");
+print_string("Reduce ");
 println_f32((f32)(op1_1+op2_1));
 return((op1_1+op2_1));
 }
-void work_0(f32 (*f_1)(f32),i32 arg_1)
+void work_0(f32->f32 (*f_1)(NIL),i32 arg_1)
 {
 print_format("%f",(*f_1)(arg_1));
 }
 i32 arrays_and_lists_0(i32 argc_1)
 {
 mapit_0(5.5);
-println_string("Callmodulefunctions");
+println_string("Call module functions ");
 layer__fun1_0();
 layer__fun2_0();
 {
@@ -1013,44 +1013,44 @@ node_f32* my_list_2=create_list_f32((f32[]){1.0, 2.0, 3.0, 4.0, 5.0, 6.0},6);
 const char* string_2="abc";
 const char chars_2[]={'a', 'b', 'c'};
 append_ptr(chars_2, sizeof(chars_2)/sizeof(c8), ARRAY);
-f32 (*myfun_2)(f32)=mapit_0;
+f32->f32 (*myfun_2)(NIL)=mapit_0;
 set_pointer_f32((f32*)elt_array_f32(my_new_floats_2,0),888.0);
-print_string("Mynewarray/firstelementis:");
+print_string("My new array / first element is: ");
 println_pointer_f32(my_new_floats_2);
-print_string("Mynewarray1:");
+print_string("My new array1: ");
 println_pointer_f32(my_new_array_2);
-print_string("Mynewarray2:");
+print_string("My new array2: ");
 println_pointer_f32(my_new_array2_2);
-print_string("Mynewarray3:");
+print_string("My new array3: ");
 println_pointer_f32(my_new_array3_2);
-print_string("Mylist");
+print_string("My list ");
 push_list_f32(my_list_2,888.0);
 println_list_f32(my_list_2);
-print_string("Mylistcar");
+print_string("My list car ");
 println_f32((f32)car_list_f32(my_list_2));
-print_string("Mylistremove3");
+print_string("My list remove 3 ");
 remove_list_f32(my_list_2,3);
 println_list_f32(my_list_2);
-print_string("Mylistpop");
+print_string("My list pop ");
 println_f32((f32)pop_list_f32(&my_list_2));
-print_string("Mylist");
+print_string("My list ");
 println_list_f32(my_list_2);
-print_string("Mylistelement");
+print_string("My list element ");
 println_i32(*elt_list_f32(my_list_2,3));
 set_pointer_f32((f32*)elt_list_f32(my_list_2,3),100.0);
-print_string("Mylistset");
+print_string("My list set ");
 println_list_f32(my_list_2);
-print_string("Myvalues");
+print_string("My values ");
 println_array_f32(sizeof(values_2),values_2);
 mapit_0(1000.0);
 work_0(mapit_0,100);
 map_f32(mapit_0,values_2);
 reduce_f32(reduceit_0,values_2);
-print_string("String:");
+print_string("String: ");
 println_string(string_2);
-print_string("Chars:");
+print_string("Chars: ");
 println_array_c8(sizeof(chars_2),chars_2);
-print_string("sizeof:");
+print_string("sizeof: ");
 println_i32(sizeof(string_2));
 set_pointer_f32(&float1_2,666.0);
 set_pointer_i32(&argc_1,(100+(1000-500)+100+(1000*500)));
@@ -1062,23 +1062,23 @@ for(cnt_3=0;cnt_3<max_i32(20,10);cnt_3++)
 {
 set_pointer_i32(elt_array_i32(array_2,cnt_3),1000);
 print_format("%d",power_i32(2,8));
-print_string("ELT:");
+print_string("ELT: ");
 print_format("%d",*elt_array_i32(array_2,cnt_3));
-print_string("CNT:");
+print_string("CNT: ");
 if(cnt_3==max_i32(1,3))
 {
 if(cnt_3==4)
 {
-println_string("Notpossible");
+println_string("Not possible");
 }
 else
 {
-println_string("ELSECNT=3!!");
+println_string("ELSE CNT = 3!!");
 }
 }
 else
 {
-println_string("CNT!=3");
+println_string("CNT != 3");
 }
 println_i32(cnt_3);
 }

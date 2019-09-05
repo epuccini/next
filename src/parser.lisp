@@ -117,7 +117,7 @@
 (defun error-type-not-supported ()
   (error-msg "Error type not supported!~%"))
 
-(defun preprocess (expression)
+(defun preprocess-old (expression)
   (let* ((new-expr1 (regex-replace-all "\\(" expression "°(°"))
          (new-expr2 (regex-replace-all "\\)" new-expr1 "°)°"))
          (new-expr3 (regex-replace-all "\"" new-expr2 "°\"°"))
@@ -179,7 +179,15 @@
                   (push (format nil "~a" obj) stack)
                   (push str stack)
                   (return-from upto-symbol stack))
-                 ((equal #\newline obj)
+                 ((equal #\Newline obj)
+                  (push "\n" stack)
+                  (push str stack)
+                  (return-from upto-symbol stack))
+                 ((equal #\Return obj)
+                  (push "\n" stack)
+                  (push str stack)
+                  (return-from upto-symbol stack))
+                 ((equal #\Linefeed obj)
                   (push "\n" stack)
                   (push str stack)
                   (return-from upto-symbol stack))
@@ -196,7 +204,7 @@
             stack)
     l))
 
-(defun preprocess-new (expression)
+(defun preprocess (expression)
   (let ((stack '()))
     (loop for x from 0 to (1- (length expression)) do
          (let ((obj (elt expression x)))
@@ -228,14 +236,20 @@
                   (push "," stack))
                  ((equal #\Space obj)
                   (format nil " "))
-                 ((equal #\newline obj)
+                 ((equal #\Newline obj)
                   (push "\n" stack))
-                 ((equal #\tab obj)
+                 ((equal #\Return obj)
+                  (push "\n" stack))
+                 ((equal #\Linefeed obj)
+                  (push "\n" stack))
+                 ((equal #\Tab obj)
                   (format nil " "))
                  ((equal #\" obj)
                   (let ((str (upto-string expression (1+ x))))
                     (setf x (+ x 1 (length str)))
-                    (push (format nil "\"~a\"" str) stack)))
+                    (push "\"" stack)
+                    (push str stack)
+                    (push "\"" stack)))
                  (t
                   (let ((inner-stack (upto-symbol expression x)))
                     (setf stack (append (reverse inner-stack) stack))
@@ -822,7 +836,7 @@
            (if (and (equal "fun" (cadr def)) (equal "[" (cadr expr-list)))
                (progn
                  (setf expr-list (parse-signature-vector (car def) (cdr expr-list)))
-                 (dbg "parse-argumemt: signature " (gethash (car def) *signatures*))
+                 (dbg "parse-argument: signature " (gethash (car def) *signatures*))
                  (parse-variable-type (car def) (cadr def)
                                       (gethash (car def) *signatures*)))
                (progn
@@ -1162,7 +1176,7 @@
          (dbg "parse-multiline-comment: CLOSE")
          (setf expr-list (parse-expression (cdr expr-list))))
         ((stringp (car expr-list))
-         (dbg "parse-multiline-comment: COMMENT " (car expr-list))
+         (dbg "parse-multiline-comment: COMMENT >" (car expr-list) "<")
          (setf expr-list (parse-multiline-comment (cdr expr-list)))))
   expr-list)
 
@@ -1389,6 +1403,7 @@
     tp-str))
 
 (defun parse-arguments (expr-list max)
+  (dbg "parse-arguments: >" (car expr-list) "<")
   (cond ((equal "(" (car expr-list))
          (progn
            (if (and *paranteses*
@@ -1405,6 +1420,7 @@
                   (not (equal "(" (get-last-code))))
              (add-code ","))
          (add-code "\"")
+         (dbg "parse-arguments: parse-cstr >" (car expr-list) "<")
          (setf expr-list (parse-cstr (cdr expr-list)))
          (setf expr-list (parse-arguments expr-list max)))
         ((equal ")" (car expr-list))
