@@ -456,10 +456,10 @@ node_##T* remove_node_list_##T(node_##T* list, int pos) { \
 	int cnt = 0; \
 	do \
 	{ \
-		cnt++; \
 		tmp_before = list; \
 		list = list->next; \
-	} while (cnt != pos); \
+		cnt++; \
+	} while (cnt != pos-1); \
 	tmp_after = list; \
 	tmp_before->next = tmp_after->next; \
 	free(list); \

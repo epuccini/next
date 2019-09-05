@@ -39,6 +39,7 @@
   (setf (gethash "new_f64" *signatures*) '("pointer" "value"))
   (setf (gethash "push" *signatures*) '("void" "pointer" "value"))
   (setf (gethash "append" *signatures*) '("void" "value" "pointer"))  
+  (setf (gethash "remove" *signatures*) '("pointer" "pointer" "value"))  
   (setf (gethash "car" *signatures*) '("value" "pointer"))
   (setf (gethash "cdr" *signatures*) '("pointer" "pointer"))
   (setf (gethash "bool" *signatures*) '("value" "void"))
