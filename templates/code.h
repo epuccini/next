@@ -314,11 +314,33 @@ typedef struct node_ptr {
 	struct node_ptr* next;
 } node_ptr_t;
 
-node_ptr_t* add_ptr(node_ptr_t* list, void* value) {
-	node_ptr_t* head = (node_ptr_t*)malloc(sizeof(node_ptr_t)); \
-	head->next = list; \
-	head->value = value; \
+node_ptr_t* append_ptr(node_ptr_t* list, void* value) {
+	node_ptr_t* head = list; \
+	if (list == NULL) { \
+		list = (node_ptr_t*)malloc(sizeof(node_ptr_t)); \
+		list->next = NULL; \
+		list->value = value; \
+		head = list; \
+	} \
+	else { \
+		do \
+		{ \
+			if (list->next != NULL) \
+				list = list->next; \
+		} while (list->next != NULL); \
+		list->next = (node_ptr_t*)malloc(sizeof(node_ptr_t)); \
+		list->value = value; \
+		list = list->next; \
+		list->next = NULL; \
+	} \
 	return head; \
+}
+
+node_ptr_t* push_ptr(node_ptr_t* list, void* value) {
+	node_ptr_t* head = (node_ptr_t*)malloc(sizeof(node_ptr_t)); \
+		head->next = list; \
+		head->value = value; \
+		return head; \
 }
 
 node_ptr_t* remove_ptr(node_ptr_t* list, int pos) {
@@ -373,27 +395,61 @@ define_node(i64)
 define_node(f32)
 define_node(f64)
 
-#define define_add_node(T) \
-node_##T* add_node_##T(node_##T* list, T value) {  \
-	node_##T* head = (node_##T*)malloc(sizeof(node_##T)); \
-	if(pointer_list) \
-		add_ptr(pointer_list, (void*)head);\
-	head->next = list; \
-	head->value = value; \
-	return head; \
+#define define_append_node(T) \
+node_##T* append_node_##T(node_##T* list, T value) {  \
+	node_##T* head; \
+	if (list == NULL) { \
+		list = (node_##T*)malloc(sizeof(node_##T)); \
+		list->next = NULL; \
+		list->value = value; \
+	} \
+	else { \
+		head = list; \
+		do \
+		{ \
+			if (list->next != NULL) \
+				list = list->next; \
+		} while (list->next != NULL); \
+		list->next = (node_##T*)malloc(sizeof(node_##T)); \
+		list->next->value = value; \
+		list = list->next; \
+		list->next = NULL; \
+		list = head; \
+	} \
+	return list; \
 } \
 
-define_add_node(bool)
-define_add_node(c8)
-define_add_node(b8)
-define_add_node(i16)
-define_add_node(i32)
-define_add_node(i64)
-define_add_node(f32)
-define_add_node(f64)
+define_append_node(bool)
+define_append_node(c8)
+define_append_node(b8)
+define_append_node(i16)
+define_append_node(i32)
+define_append_node(i64)
+define_append_node(f32)
+define_append_node(f64)
+
+#define define_push_node(T) \
+node_##T* push_node_list_##T(node_##T* list, T value) {  \
+	node_##T* head = (node_##T*)malloc(sizeof(node_##T)); \
+	if(pointer_list) \
+		push_ptr(pointer_list, (void*)head);\
+	head->next = list; \
+	head->value = value; \
+	list = head; \
+	return list; \
+} \
+
+define_push_node(bool)
+define_push_node(c8)
+define_push_node(b8)
+define_push_node(i16)
+define_push_node(i32)
+define_push_node(i64)
+define_push_node(f32)
+define_push_node(f64)
 
 #define define_remove_node(T) \
-node_##T* remove_node_##T(node_##T* list, int pos) { \
+node_##T* remove_node_list_##T(node_##T* list, int pos) { \
 	node_##T* start = list; \
 	node_##T* tmp_before; \
 	node_##T* tmp_after; \
@@ -420,36 +476,36 @@ define_remove_node(i64)
 define_remove_node(f32)
 define_remove_node(f64)
 
-#define define_car(T) \
-T car_##T(node_##T* list) { \
+#define define_car_node(T) \
+T car_node_list_##T(node_##T* list) { \
 return list->value; \
 } \
 
-define_car(bool)
-define_car(c8)
-define_car(b8)
-define_car(i16)
-define_car(i32)
-define_car(i64)
-define_car(f32)
-define_car(f64)
+define_car_node(bool)
+define_car_node(c8)
+define_car_node(b8)
+define_car_node(i16)
+define_car_node(i32)
+define_car_node(i64)
+define_car_node(f32)
+define_car_node(f64)
 
-#define define_cdr(T) \
-node_##T* cdr_##T(node_##T* list) { \
+#define define_cdr_node(T) \
+node_##T* cdr_node_list_##T(node_##T* list) { \
 return list->next; \
 } \
 
-define_cdr(bool)
-define_cdr(c8)
-define_cdr(b8)
-define_cdr(i16)
-define_cdr(i32)
-define_cdr(i64)
-define_cdr(f32)
-define_cdr(f64)
+define_cdr_node(bool)
+define_cdr_node(c8)
+define_cdr_node(b8)
+define_cdr_node(i16)
+define_cdr_node(i32)
+define_cdr_node(i64)
+define_cdr_node(f32)
+define_cdr_node(f64)
 
 #define define_destroy(T) \
-void destroy_##T(node_##T* e) { \
+void destroy_list_##T(node_##T* e) { \
 	if (e != NULL) { \
 		node_##T* temp = e->next; \
 		do \
@@ -478,7 +534,7 @@ node_##T* create_list_##T(T list[], int size) {  \
 	int cnt = 0; \
 	node_##T* ret = NULL; \
 	for (cnt = 0; cnt < size; cnt++) { \
-		ret = add_node_##T(ret, list[cnt]);  \
+		ret = append_node_##T(ret, list[cnt]);  \
 	} \
 	return ret; \
 } \
@@ -514,7 +570,7 @@ define_map(f64)
 T* mapn_##T(single_fn_##T a, T* b) { \
     T* ptr = (T*) malloc(sizeof(b) * sizeof(T)); \
 	if(pointer_list) \
-		add_ptr(pointer_list, (void*)ptr);\
+		append_ptr(pointer_list, (void*)ptr);\
 	i32 cnt = 0; \
     for (cnt = 0; cnt < sizeof(b)-2; cnt++) { \
         ptr[cnt] = (*a)(b[cnt]); \
@@ -554,7 +610,7 @@ define_reduce(f64)
 T* new_##T(int size) { \
 	T* mem = (T*)malloc(size*sizeof(T)); \
 	if (pointer_list) \
-		add_ptr(pointer_list, (void*)mem); \
+		append_ptr(pointer_list, (void*)mem); \
     return mem; \
 }
 
