@@ -888,7 +888,7 @@ void print_pointer_##T(T* pointer) {  \
 
 #define define_elt_list(T) \
 T* elt_list_##T(node_##T* list, i32 idx) { \
-	int cnt; \
+	int cnt = 0; \
 	do { \
 		cnt++; \
 		if (list->next != NULL) { \
@@ -988,7 +988,7 @@ print_string("Reduce ");
 println_f32((f32)(op1_1+op2_1));
 return((op1_1+op2_1));
 }
-void work_0(f32->f32 (*f_1)(NIL),i32 arg_1)
+void work_0(f32 (*f_1)(f32),i32 arg_1)
 {
 print_format("%f",(*f_1)(arg_1));
 }
@@ -1013,7 +1013,7 @@ node_f32* my_list_2=create_list_f32((f32[]){1.0, 2.0, 3.0, 4.0, 5.0, 6.0},6);
 const char* string_2="abc";
 const char chars_2[]={'a', 'b', 'c'};
 append_ptr(chars_2, sizeof(chars_2)/sizeof(c8), ARRAY);
-f32->f32 (*myfun_2)(NIL)=mapit_0;
+f32 (*myfun_2)(f32)=mapit_0;
 set_pointer_f32((f32*)elt_array_f32(my_new_floats_2,0),888.0);
 print_string("My new array / first element is: ");
 println_pointer_f32(my_new_floats_2);

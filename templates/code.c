@@ -888,7 +888,7 @@ void print_pointer_##T(T* pointer) {  \
 
 #define define_elt_list(T) \
 T* elt_list_##T(node_##T* list, i32 idx) { \
-	int cnt; \
+	int cnt = 0; \
 	do { \
 		cnt++; \
 		if (list->next != NULL) { \
