@@ -433,58 +433,79 @@ typedef T (*dual_fn_##T)(T, T); \
 	define_dual_fn(f32)
 	define_dual_fn(f64)
 
-	typedef struct node_ptr {
+typedef struct node_ptr {
+	int length;
 	void* value;
 	struct node_ptr* next;
 } node_ptr_t;
 
-node_ptr_t* append_ptr(node_ptr_t* list, void* value) {
-	node_ptr_t* head = list; \
-		if (list == NULL) {
-			\
-				list = (node_ptr_t*)malloc(sizeof(node_ptr_t)); \
-				list->next = NULL; \
-				list->value = value; \
-				head = list; \
-		} \
-		else {
-				\
-					do \
-					{ \
-						if (list->next != NULL) \
-							list = list->next; \
-					} while (list->next != NULL); \
-							list->next = (node_ptr_t*)malloc(sizeof(node_ptr_t)); \
-							list->value = value; \
-							list = list->next; \
-							list->next = NULL; \
-			} \
-				return head; \
+static node_ptr_t* pointer_list = NULL;
+
+node_ptr_t* append_ptr(void* value, int size) {
+	node_ptr_t* head;
+	if (pointer_list == NULL) {
+		pointer_list = (node_ptr_t*)malloc(sizeof(node_ptr_t));
+		pointer_list->next = NULL;
+		pointer_list->value = value;
+		pointer_list->length = size; 
+	} 
+	else {
+		head = pointer_list;
+		do
+		{
+			if (pointer_list->next != NULL)
+				pointer_list = pointer_list->next;
+		} while (pointer_list->next != NULL);
+		pointer_list->next = (node_ptr_t*)malloc(sizeof(node_ptr_t));
+		pointer_list->next->value = value;
+		pointer_list = pointer_list->next;
+		pointer_list->length = size; 
+		pointer_list->next = NULL;
+		pointer_list = head; 
+	} 
+	return pointer_list; 
 }
 
-node_ptr_t* push_ptr(node_ptr_t* list, void* value) {
-	node_ptr_t* head = (node_ptr_t*)malloc(sizeof(node_ptr_t)); \
-		head->next = list; \
-		head->value = value; \
-		return head; \
+node_ptr_t* remove_ptr(int pos) {
+	node_ptr_t* start = pointer_list; \
+	node_ptr_t* tmp_before; \
+	node_ptr_t* tmp_after; \
+	int cnt = 0; \
+	do \
+	{ \
+		cnt++; \
+		tmp_before = pointer_list; \
+		pointer_list = pointer_list->next; \
+	} while (cnt != pos); \
+	tmp_after = pointer_list; \
+	tmp_before->next = tmp_after->next; \
+	free(pointer_list); \
+	pointer_list = start; \
+	return pointer_list; \
 }
 
-node_ptr_t* remove_ptr(node_ptr_t* list, int pos) {
-	node_ptr_t* start = list; \
-		node_ptr_t* tmp_before; \
-		node_ptr_t* tmp_after; \
-		int cnt = 0; \
-		do \
-		{ \
-			cnt++; \
-			tmp_before = list; \
-			list = list->next; \
-		} while (cnt != pos); \
-			tmp_after = list; \
-			tmp_before->next = tmp_after->next; \
-			free(list); \
-			list = start; \
-			return list; \
+int length(void* pointer) {
+	node_ptr_t* temp = pointer_list;
+	do
+	{
+		if (temp->value == pointer)
+			return temp->length;
+		temp = temp->next;
+	} while (temp != NULL);
+	return 0;
+}
+
+void inc_length(void* pointer) {
+	node_ptr_t* temp = pointer_list;
+	do
+	{
+		if (temp->value == pointer) {
+			temp->length += 1;
+			return;
+		}
+		temp = temp->next;
+	} while (temp != NULL);
+	return;
 }
 
 void destroy_ptr(node_ptr_t* e) {
@@ -503,8 +524,6 @@ void destroy_ptr(node_ptr_t* e) {
 		} while (e != NULL);
 	}
 }
-
-static node_ptr_t* pointer_list = NULL;
 
 #define define_node(T) \
 typedef struct node_##T { \
@@ -557,8 +576,6 @@ define_append_list(f64)
 #define define_push_list(T) \
 node_##T* push_list_##T(node_##T* list, T value) {  \
 	node_##T* head = (node_##T*)malloc(sizeof(node_##T)); \
-	if(pointer_list) \
-		push_ptr(pointer_list, (void*)head);\
 	head->next = list; \
 	head->value = value; \
 	list = head; \
@@ -636,7 +653,7 @@ define_car_list(f64)
 
 #define define_cdr_list(T) \
 node_##T* cdr_list_##T(node_##T* list) { \
-return list->next; \
+	return list->next; \
 } \
 
 define_cdr_list(bool)
@@ -680,6 +697,8 @@ node_##T* create_list_##T(T list[], int size) {  \
 	for (cnt = 0; cnt < size; cnt++) { \
 		ret = append_list_##T(ret, list[cnt]);  \
 	} \
+	if(pointer_list != NULL) \
+		append_ptr(list, size); \
 	return ret; \
 } \
 
@@ -713,8 +732,7 @@ T* map_##T(single_fn_##T a, T* b) { \
 #define define_mapn(T) \
 T* mapn_##T(single_fn_##T a, T* b) { \
     T* ptr = (T*) malloc(sizeof(b) * sizeof(T)); \
-	if(pointer_list) \
-		append_ptr(pointer_list, (void*)ptr);\
+	append_ptr((void*)ptr, sizeof(b)-2);\
 	i32 cnt = 0; \
     for (cnt = 0; cnt < sizeof(b)-2; cnt++) { \
         ptr[cnt] = (*a)(b[cnt]); \
@@ -753,18 +771,20 @@ T reduce_##T(dual_fn_##T a, T* b) { \
 #define define_new(T) \
 T* new_##T(int size) { \
 	T* mem = (T*)malloc(size*sizeof(T)); \
-	if (pointer_list) \
-		append_ptr(pointer_list, (void*)mem); \
+	append_ptr((void*)mem, size); \
+	int cnt = 0; \
+	for(cnt = 0; cnt < size; cnt++) \
+		mem[cnt] = 0; \
     return mem; \
 }
 
-	define_new(bool)
-	define_new(c8)
-	define_new(i16)
-	define_new(i32)
-	define_new(i64)
-	define_new(f32)
-	define_new(f64)
+define_new(bool)
+define_new(c8)
+define_new(i16)
+define_new(i32)
+define_new(i64)
+define_new(f32)
+define_new(f64)
 
 #define define_println_list(T) \
 void println_list_##T(node_##T* list) {  \
@@ -833,13 +853,14 @@ void print_array_##T(int size, const T* array) {  \
 	define_print_array(b8)
 	define_print_array(c8)
 	define_print_array(i16)
-	define_print_array(i32)
-	define_print_array(i64)
-	define_print_array(f32)
-	define_print_array(f64)
+define_print_array(i32)
+define_print_array(i64)
+define_print_array(f32)
+define_print_array(f64)
 
 #define define_println_pointer(T) \
-void println_pointer_##T(const T* pointer, int size) {  \
+void println_pointer_##T(T* pointer) {  \
+	int size = length(pointer); \
 	int cnt = 0; \
 	for (cnt = 0; cnt < size; cnt++) { \
 		print_##T(pointer[cnt]); \
@@ -848,16 +869,17 @@ void println_pointer_##T(const T* pointer, int size) {  \
 	printf("\n"); \
 } \
 
-		define_println_pointer(b8)
-		define_println_pointer(c8)
-		define_println_pointer(i16)
-		define_println_pointer(i32)
-		define_println_pointer(i64)
-		define_println_pointer(f32)
-		define_println_pointer(f64)
+	define_println_pointer(b8)
+	define_println_pointer(c8)
+	define_println_pointer(i16)
+	define_println_pointer(i32)
+	define_println_pointer(i64)
+	define_println_pointer(f32)
+	define_println_pointer(f64)
 
 #define define_print_pointer(T) \
-void print_pointer_##T(const T* pointer, int size) {  \
+void print_pointer_##T(T* pointer) {  \
+	int size = length((void*)pointer); \
 	int cnt = 0; \
 	for (cnt = 0; cnt < size; cnt++) { \
 		print_##T(pointer[cnt]); \
@@ -865,13 +887,13 @@ void print_pointer_##T(const T* pointer, int size) {  \
 	} \
 } \
 
-		define_print_pointer(b8)
-		define_print_pointer(c8)
-		define_print_pointer(i16)
-		define_print_pointer(i32)
-		define_print_pointer(i64)
-		define_print_pointer(f32)
-		define_print_pointer(f64)
+	define_print_pointer(b8)
+	define_print_pointer(c8)
+	define_print_pointer(i16)
+	define_print_pointer(i32)
+	define_print_pointer(i64)
+	define_print_pointer(f32)
+	define_print_pointer(f64)
 
 #define define_elt_list(T) \
 T* elt_list_##T(node_##T* list, i32 idx) { \
@@ -908,33 +930,37 @@ void set_list_##T(node_##T* list, T val) { \
 	define_set_list(f64)
 
 #define define_append_array(T) \
-T* append_array_##T(int size, T* array, T value) {  \
-    T* new_array = (T*) malloc(size+sizeof(T)); \
-	int cnt = 0; \
-	for (cnt = 0; cnt < size/sizeof(T); cnt++) { \
-		new_array[cnt] = array[cnt]; \
-	} \
-	new_array[size/sizeof(T)] = value; \
-	return new_array; \
-} 
-
-		define_append_array(bool)
-		define_append_array(c8)
-		define_append_array(b8)
-		define_append_array(i16)
-		define_append_array(i32)
-		define_append_array(i64)
-		define_append_array(f32)
-		define_append_array(f64)
-
-#define define_append_pointer(T) \
-T* append_pointer_##T(T* array, int size, T value) {  \
+T* append_array_##T(T* array, T value) {  \
+    int size = length(array); \
     T* new_array = (T*) malloc((size+1)*sizeof(T)); \
 	int cnt = 0; \
 	for (cnt = 0; cnt < size; cnt++) { \
 		new_array[cnt] = array[cnt]; \
 	} \
 	new_array[size] = value; \
+	append_ptr(new_array, size+1); \
+	return new_array; \
+} 
+
+	define_append_array(bool)
+	define_append_array(c8)
+	define_append_array(b8)
+	define_append_array(i16)
+	define_append_array(i32)
+	define_append_array(i64)
+	define_append_array(f32)
+	define_append_array(f64)
+
+#define define_append_pointer(T) \
+T* append_pointer_##T(T* array, T value) {  \
+    int size = length(array); \
+    T* new_array = (T*) malloc((size+1)*sizeof(T)); \
+	int cnt = 0; \
+	for (cnt = 0; cnt < size; cnt++) { \
+		new_array[cnt] = array[cnt]; \
+	} \
+	new_array[size] = value; \
+	append_ptr(new_array, size+1); \
 	return new_array; \
 } 
 

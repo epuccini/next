@@ -730,18 +730,20 @@
                (progn
                  (add-code " ")
                  (add-code (get-variable-name (car def)))))
-
-           (let ((fmt (format nil "~a"
-                              (gethash (get-variable-name (car def))
-                                       *variables*))))
-             (if (search "ARRAY" fmt)
-                 (add-code "[]")))
+           (if (search "#" (cadr def))
+               (add-code "[]"))
            (add-code "=")
            (dbg "parse-variable: OPEN ARG")
            (if (equal (car expr-list) "]")
                (error-missing-expression))
            (dbg "parse-variable: next " expr-list)
            (setf expr-list (parse-expression expr-list))
+           (dbg "parse-variable: append size " expr-list)
+           (if (search "#" (cadr def))
+               (add-code (format nil "append_ptr(~a, sizeof(~a)/sizeof(~a));~%"
+                                 (get-variable-name (car def))
+                                 (get-variable-name (car def))
+                                 (regex-replace "#" (cadr def) ""))))
            (dbg "parse-variable: rest " expr-list)))
         ((not (find #\: (car expr-list)))
          (error-syntax-error)))
@@ -1694,15 +1696,8 @@
         ((equal "append" (car expr-list))
          (let ((type (get-type expr-list)))
            (store-current-function "append")
-           (if (search "array" type)
-               (progn
-                 (add-code (format nil "append_~a" type))
-                 (add-code "(")
-                 (add-code (format nil "sizeof(~a)"
-                                   (get-iter-variable-name (cadr expr-list)))))
-               (progn
-                 (add-code (format nil "append_~a" type))
-                 (add-code "(")))
+           (add-code (format nil "append_~a" type))
+           (add-code "(")
            (zero-arg)
            (setf expr-list (parse-arguments (cdr expr-list) 2))
            (return-from parse-call expr-list)))
