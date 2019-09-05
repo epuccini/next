@@ -918,14 +918,34 @@ T* append_array_##T(int size, T* array, T value) {  \
 	return new_array; \
 } 
 
-	define_append_array(bool)
-	define_append_array(c8)
-	define_append_array(b8)
-	define_append_array(i16)
-	define_append_array(i32)
-	define_append_array(i64)
-	define_append_array(f32)
-	define_append_array(f64)
+		define_append_array(bool)
+		define_append_array(c8)
+		define_append_array(b8)
+		define_append_array(i16)
+		define_append_array(i32)
+		define_append_array(i64)
+		define_append_array(f32)
+		define_append_array(f64)
+
+#define define_append_pointer(T) \
+T* append_pointer_##T(T* array, int size, T value) {  \
+    T* new_array = (T*) malloc((size+1)*sizeof(T)); \
+	int cnt = 0; \
+	for (cnt = 0; cnt < size; cnt++) { \
+		new_array[cnt] = array[cnt]; \
+	} \
+	new_array[size] = value; \
+	return new_array; \
+} 
+
+		define_append_pointer(bool)
+		define_append_pointer(c8)
+		define_append_pointer(b8)
+		define_append_pointer(i16)
+		define_append_pointer(i32)
+		define_append_pointer(i64)
+		define_append_pointer(f32)
+		define_append_pointer(f64)
 
 
 i32 layer__fun1_0()
@@ -969,6 +989,7 @@ f32 values_2[]={1.0, 2.0, 3.0, 4.0, 5.0, 6.0};
 f32* my_new_array_2=mapn_f32(mapit_0,values_2);
 f32* my_new_floats_2=new_f32(10);
 f32* my_new_array2_2=append_array_f32(sizeof(values_2),values_2,1000.0);
+f32* my_new_array3_2=append_pointer_f32(my_new_array2_2,7,2000.0);
 node_f32* my_list_2=create_list_f32((f32[]){1.0, 2.0, 3.0, 4.0, 5.0, 6.0},6);
 const char* string_2="abc";
 const char chars_2[]={'a', 'b', 'c'};
@@ -978,6 +999,8 @@ print_string("Mynewarray/firstelementis:");
 println_f32((f32)*elt_array_f32(my_new_array_2,0));
 print_string("Mynewarray2:");
 println_pointer_f32(my_new_array2_2,7);
+print_string("Mynewarray3:");
+println_pointer_f32(my_new_array3_2,8);
 print_string("Mylist");
 push_list_f32(my_list_2,888.0);
 println_list_f32(my_list_2);

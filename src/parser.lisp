@@ -1693,9 +1693,6 @@
            (return-from parse-call expr-list)))
         ((equal "append" (car expr-list))
          (let ((type (get-type expr-list)))
-           (if (and (not (search "list" type))
-                    (not (search "array" type)))
-               (error-type-not-supported))
            (store-current-function "append")
            (if (search "array" type)
                (progn

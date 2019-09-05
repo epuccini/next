@@ -918,14 +918,34 @@ T* append_array_##T(int size, T* array, T value) {  \
 	return new_array; \
 } 
 
-	define_append_array(bool)
-	define_append_array(c8)
-	define_append_array(b8)
-	define_append_array(i16)
-	define_append_array(i32)
-	define_append_array(i64)
-	define_append_array(f32)
-	define_append_array(f64)
+		define_append_array(bool)
+		define_append_array(c8)
+		define_append_array(b8)
+		define_append_array(i16)
+		define_append_array(i32)
+		define_append_array(i64)
+		define_append_array(f32)
+		define_append_array(f64)
+
+#define define_append_pointer(T) \
+T* append_pointer_##T(T* array, int size, T value) {  \
+    T* new_array = (T*) malloc((size+1)*sizeof(T)); \
+	int cnt = 0; \
+	for (cnt = 0; cnt < size; cnt++) { \
+		new_array[cnt] = array[cnt]; \
+	} \
+	new_array[size] = value; \
+	return new_array; \
+} 
+
+		define_append_pointer(bool)
+		define_append_pointer(c8)
+		define_append_pointer(b8)
+		define_append_pointer(i16)
+		define_append_pointer(i32)
+		define_append_pointer(i64)
+		define_append_pointer(f32)
+		define_append_pointer(f64)
 
 $(IMPLEMENTATION)
 
