@@ -460,24 +460,6 @@ node_ptr_t* append_ptr(void* value, int size, PTR_TYPE_t type) {
 	return pointer_list; 
 }
 
-node_ptr_t* remove_ptr(int pos) {
-	node_ptr_t* start = pointer_list; \
-	node_ptr_t* tmp_before; \
-	node_ptr_t* tmp_after; \
-	int cnt = 0; \
-	do \
-	{ \
-		cnt++; \
-		tmp_before = pointer_list; \
-		pointer_list = pointer_list->next; \
-	} while (cnt != pos); \
-	tmp_after = pointer_list; \
-	tmp_before->next = tmp_after->next; \
-	free(pointer_list); \
-	pointer_list = start; \
-	return pointer_list; \
-}
-
 int length(void* pointer) {
 	node_ptr_t* temp = pointer_list;
 	do
@@ -488,6 +470,51 @@ int length(void* pointer) {
 	} while (temp != NULL);
 	return 0;
 }
+i32 length_list(node_ptr_t* list) {
+	
+	int cnt = 0; 
+	if (list != NULL) { 
+		cnt = 1; 
+		node_ptr_t* temp = list->next;
+		do 
+		{ 
+			cnt++; \
+			temp = temp->next; 
+		} while (temp->next != NULL); 
+	} 
+	return cnt; 
+} 
+
+void remove_ptr(void* pointer) {
+	node_ptr_t* temp = pointer_list;
+	node_ptr_t* temp_before = pointer_list;
+	node_ptr_t* temp_after = pointer_list;
+
+	do
+	{	
+		if (temp_before->value == pointer) {
+			pointer_list = temp_before->next;
+			free(temp_before);
+			printf("REMOVE");
+			return;
+		}
+		if (temp_before->next != NULL) {
+			if (temp_before->next->value == pointer) {
+				printf("REMOVE");
+				temp = temp_before->next;
+				if (temp_before->next->next != NULL)
+					temp_after = temp_before->next->next;
+				free(temp);
+				if (temp_before->next->next != NULL)
+					temp_before->next = temp_after;
+				return;
+			}
+		}
+		temp_before = temp_before->next;
+	} while (temp_before != NULL);
+	return;
+}
+
 
 void inc_length(void* pointer) {
 	node_ptr_t* temp = pointer_list;
@@ -565,13 +592,67 @@ define_append_list(i64)
 define_append_list(f32)
 define_append_list(f64)
 
+#define define_length_list(T) \
+i32 length_list_##T(node_##T* list) {  \
+	int cnt = 0; \
+	if (list != NULL) { \
+		cnt = 1; \
+		node_##T* temp = list->next; \
+		do \
+		{ \
+			cnt++; \
+			temp = temp->next; \
+		} while (temp != NULL); \
+	} \
+	return cnt; \
+} \
+
+define_length_list(bool)
+define_length_list(c8)
+define_length_list(b8)
+define_length_list(i16)
+define_length_list(i32)
+define_length_list(i64)
+define_length_list(f32)
+define_length_list(f64)
+
+#define define_length_array(T) \
+i32 length_array_##T(void* array) {  \
+	return length(array); \
+} \
+
+define_length_array(bool)
+define_length_array(c8)
+define_length_array(b8)
+define_length_array(i16)
+define_length_array(i32)
+define_length_array(i64)
+define_length_array(f32)
+define_length_array(f64)
+
+#define define_length_pointer(T) \
+i32 length_pointer_##T(void* pointer) {  \
+	return length(pointer); \
+} \
+
+define_length_pointer(bool)
+define_length_pointer(c8)
+define_length_pointer(b8)
+define_length_pointer(i16)
+define_length_pointer(i32)
+define_length_pointer(i64)
+define_length_pointer(f32)
+define_length_pointer(f64)
+
 #define define_push_list(T) \
-node_##T* push_list_##T(node_##T* list, T value) {  \
+node_##T* push_list_##T(node_##T** list, T value) {  \
 	node_##T* head = (node_##T*)malloc(sizeof(node_##T)); \
-	head->next = list; \
+	head->next = (*list); \
 	head->value = value; \
-	list = head; \
-	return list; \
+	remove_ptr(*list); \
+	append_ptr(head, length(*list)+1, LIST); \
+	*list = head; \
+	return (*list); \
 } \
 
 define_push_list(bool)
@@ -586,9 +667,11 @@ define_push_list(f64)
 #define define_pop_list(T) \
 T pop_list_##T(node_##T** list) {  \
 	T value = (*list)->value; \
+	remove_ptr(*list); \
 	if ((*list)->next != NULL) { \
 		*list = (*list)->next; \
 	} \
+	append_ptr(*list, length(*list)-1, LIST); \
 	return value; \
 } \
 
@@ -631,7 +714,7 @@ define_remove_list(f64)
 
 #define define_car_list(T) \
 T car_list_##T(node_##T* list) { \
-return list->value; \
+	return list->value; \
 } \
 
 define_car_list(bool)
@@ -1019,13 +1102,17 @@ print_string("My new array / first element is: ");
 println_pointer_f32(my_new_floats_2);
 print_string("My new array1: ");
 println_pointer_f32(my_new_array_2);
+print_string("My new array1 length: ");
+println_i32(length_pointer_f32(my_new_array_2));
 print_string("My new array2: ");
 println_pointer_f32(my_new_array2_2);
 print_string("My new array3: ");
 println_pointer_f32(my_new_array3_2);
 print_string("My list ");
-push_list_f32(my_list_2,888.0);
+push_list_f32(&my_list_2,888.0);
 println_list_f32(my_list_2);
+print_string("My list length ");
+println_i32(length_list_f32(my_list_2));
 print_string("My list car ");
 println_f32((f32)car_list_f32(my_list_2));
 print_string("My list remove 3 ");
@@ -1033,6 +1120,8 @@ remove_list_f32(my_list_2,3);
 println_list_f32(my_list_2);
 print_string("My list pop ");
 println_f32((f32)pop_list_f32(&my_list_2));
+print_string("My list length ");
+println_i32(length_list_f32(my_list_2));
 print_string("My list ");
 println_list_f32(my_list_2);
 print_string("My list element ");
