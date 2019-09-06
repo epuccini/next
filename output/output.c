@@ -1083,7 +1083,6 @@ return(999);
 }
 i32 layer__fun2_0()
 {
-layer__fun1_0();
 println_string("Module function fun2");
 return(888);
 }

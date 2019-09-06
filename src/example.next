@@ -17,8 +17,7 @@ by Edward Puccini |;
       (return 999))
         
     (defn fun2:i32 []
-       (fun1)
-       (prnl "Module function fun2")
+      (prnl "Module function fun2")
       (return 888)))
 
 (defn mapit:f32 [op:f32]
