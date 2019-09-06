@@ -639,7 +639,7 @@
                   (add-code fn-name))
                  (t
                   (add-code (get-function-name fn-name)))))))
-  (dbg "parse-function-name-and-type: EXIT Rest. " expr-list)
+  (dbg "parse-function-name-and-type: EXIT Rest. ")
   expr-list)
 
 (defun parse-variable-type (var-name type-name &optional (signature nil))
@@ -830,10 +830,10 @@
            (if (equal (car expr-list) "]")
                (error-missing-expression))
            ;; parse initialisation
-           (dbg "parse-variable: next " expr-list)
+           (dbg "parse-variable: next ")
            (setf expr-list (parse-expression expr-list))
            ;; store poiner
-           (dbg "parse-variable: append size " expr-list)
+           (dbg "parse-variable: append size ")
            (if (search "#" (cadr def))
                (add-code
                 (format nil "append_ptr(~a, sizeof(~a)/sizeof(~a), ARRAY);~%"
@@ -844,7 +844,7 @@
                (add-code
                 (format nil "append_ptr(~a, 1, VARIABLE);~%"
                                  (get-variable-name (car def)))))
-           (dbg "parse-variable: rest " expr-list)))
+           (dbg "parse-variable: rest ")))
         ((not (find #\: (car expr-list)))
          (error-syntax-error)))
   expr-list)
@@ -885,7 +885,7 @@
            (setf expr-list (parse-expression expr-list t))
            (add-code ")")
            (add-code (format nil "~%"))
-           (dbg "parse-condition: rest " expr-list))
+           (dbg "parse-condition: rest "))
           ((equal "\n" (car expr-list))
            (dbg "parse-condition: RET")
            (setf expr-list (parse-condition expr-list))))
@@ -941,7 +941,7 @@
                  (add-code "++"))
              (add-code ")")
              (add-code (format nil "~%"))
-             (dbg "parse-range: rest " expr-list)))
+             (dbg "parse-range: rest ")))
           ((not (find #\: (car expr-list)))
            (error-syntax-error)))
     expr-list))
@@ -960,7 +960,7 @@
         (dbg "parse-expression: STRING block " *block*)
         (add-code "\"")
         (setf expr-list (parse-cstr (cdr expr-list)))
-        (dbg "parse-expression: STRING END " expr-list)
+        (dbg "parse-expression: STRING END ")
         (add-code (format nil ";~%"))
         (return-from parse-block expr-list)))
   (if (equal ";|" (car expr-list))
@@ -1093,7 +1093,7 @@
   (dec-block)
   (add-code (format nil "}~%"))
   (dbg "parse-for BLOCK END  block " *block* " parens " *paranteses*)
-  (dbg "parse-for " expr-list)
+  (dbg "parse-for ")
   expr-list)
 
 (defun parse-let (expr-list)
@@ -1107,7 +1107,7 @@
   (dec-block)
   (add-code (format nil "}~%"))
   (dbg "parse-let BLOCK END  block " *block* " parens " *paranteses*)
-  (dbg "parse-let " expr-list)
+  (dbg "parse-let ")
   expr-list)
 
 (defun parse-def-function (expr-list)
@@ -1383,7 +1383,7 @@
          (setf expr-list (parse-arguments (cdr expr-list) max)))
         ((numberp (parse-integer (car expr-list) :junk-allowed t))
          (progn
-           (dbg "parse-arguments: NUMBERP " expr-list)
+           (dbg "parse-arguments: NUMBERP ")
            (if (not (equal "(" (get-last-code)))
                (add-code ","))
            (progn
@@ -1431,7 +1431,7 @@
   (if (equal ")" (car expr-list))
       (progn
         (dbg "parse-infix: parens ) parens " *paranteses* " block " *block*)
-        (dbg "parse-infix: EXIT " expr-list)
+        (dbg "parse-infix: EXIT ")
         (return-from parse-infix expr-list)))
   (dbg "parse-infix: operand " (car expr-list))
   (setf expr-list (parse-expression expr-list t))
@@ -1533,7 +1533,7 @@
         ((equal "defn" (car expr-list))
          (store-current-function "defn")
          (setf *target* 'implementation)
-         (dbg "parse-call: DEFN INC BLOCK " (cdr expr-list))
+         (dbg "parse-call: DEFN INC BLOCK " (car expr-list))
          (inf "Compile function '" (cadr expr-list) "'")
          (setf expr-list (parse-def-function (cdr expr-list)))
          (setf *target* 'code))
@@ -2005,7 +2005,7 @@
               (setf expr-list (parse-cstr (cdr expr-list)))
               (if (not omit)
                   (add-code (format nil ";~%")))
-              (dbg "parse-expression: STRING END " expr-list)
+              (dbg "parse-expression: STRING END ")
               (return-from parse-expression expr-list)))
         (if (equal ";|" (car expr-list))
             (progn
@@ -2036,7 +2036,7 @@
               (add-code "[]")
               (add-code ")")
               (add-code "{")
-              (dbg "parse-expression: parse list " expr-list)
+              (dbg "parse-expression: parse list ")
               (setf expr-list (parse-list (cddr expr-list)))
               (add-code (format nil "}"))
               (add-code ",")
@@ -2075,7 +2075,7 @@
            (add-code (get-iter-variable-name (car expr-list)))
            (if (not omit)
                (add-code (format nil ";~%")))
-           (dbg "parse-expression: VAR END " (cdr expr-list))
+           (dbg "parse-expression: VAR END " (car expr-list))
            (return-from parse-expression (cdr expr-list))))
         (if (not (or (equal "," (car expr-list))
                      (equal "\n" (car expr-list))
@@ -2141,7 +2141,6 @@
             (progn
               (setf expr-list (cdr expr-list))
               (dbg "parse-expression: caught \n")
-              (setf expr-list (parse-expression expr-list))
               (return-from parse-expression expr-list))))))
   
 (defun parse (expression)
