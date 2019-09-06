@@ -541,6 +541,8 @@ node_##T* push_list_##T(node_##T** list, T value) {  \
 	node_##T* head = (node_##T*)malloc(sizeof(node_##T)); \
 	head->next = (*list); \
 	head->value = value; \
+	append_ptr((void*)head, length(*list)+1, LIST);       \
+	/*remove_ptr((*list)); */      \
 	*list = head; \
 	return (*list); \
 } \
@@ -557,9 +559,11 @@ define_push_list(f64)
 #define define_pop_list(T) \
 T pop_list_##T(node_##T** list) {  \
 	T value = (*list)->value; \
+	remove_ptr(*list);       \
 	if ((*list)->next != NULL) { \
 		*list = (*list)->next; \
 	} \
+	append_ptr((*list), length(*list)-1, LIST);       \
 	return value; \
 } \
 
@@ -810,9 +814,9 @@ void print_array_##T(int size, const T* array) {  \
 	} \
 } \
 
-	define_print_array(b8)
-	define_print_array(c8)
-	define_print_array(i16)
+define_print_array(b8)
+define_print_array(c8)
+define_print_array(i16)
 define_print_array(i32)
 define_print_array(i64)
 define_print_array(f32)
@@ -899,6 +903,7 @@ T* append_array_##T(T* array, T value) {  \
 	} \
 	new_array[size] = value; \
 	append_ptr(new_array, size+1, ARRAY);             \
+	remove_ptr(array);       \
 	return new_array; \
 } 
 
@@ -921,6 +926,7 @@ T* append_pointer_##T(T* array, T value) {  \
 	} \
 	new_array[size] = value; \
 	append_ptr(new_array, size+1, ARRAY); \
+	remove_ptr(array);       \
 	return new_array; \
 } 
 
@@ -1127,6 +1133,8 @@ set_pointer_list_f32(&my_list_2,push_list_f32(&my_list_2,777.0));
 println_list_f32(my_list_2);
 print_string("My list length ");
 println_i32(length_list_f32(my_list_2));
+print_string("My list length after push ");
+println_i32(length_pointer_f32((f32*)push_list_f32(&my_list_2,100.0)));
 print_string("My list car ");
 println_f32((f32)car_list_f32(my_list_2));
 print_string("My list remove 3 ");

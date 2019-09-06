@@ -74,7 +74,7 @@
   (set-function-type "->" 'integer)
   (set-function-type "@" 'integer)
   (set-function-type "bool" 'boolean)
-  (set-function-type "push" 'pointer)
+  (set-function-type "push" 'integer-list)
   (set-function-type "elt_b8" 'char)
   (set-function-type "elt_i16" 'short-integer)
   (set-function-type "elt_i32" 'integer)
