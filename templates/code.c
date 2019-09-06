@@ -180,6 +180,7 @@ void set_pointer_string(c8** ptr, c8* val) {
 	*ptr = val;
 }
 
+
 #define define_lt(T) \
 bool lt_##T(T a, T b){ \
 	return a < b; \
@@ -249,113 +250,6 @@ define_eq(i32)
 define_eq(i64)
 define_eq(f32)
 define_eq(f64)
-
-#define define_add_typed(T) \
-T add_typed_##T(T a, T b){ \
-    return a+b; \
-}
-
-define_add_typed(i16)
-define_add_typed(i32)
-define_add_typed(i64)
-define_add_typed(f32)
-define_add_typed(f64)
-
-#define define_sub_typed(T) \
-T sub_typed_##T(T a, T b){ \
-    return a-b; \
-}
-
-define_sub_typed(i16)
-define_sub_typed(i32)
-define_sub_typed(i64)
-define_sub_typed(f32)
-define_sub_typed(f64)
-
-#define define_mul_typed(T) \
-T mul_typed_##T(T a, T b){ \
-    return a*b; \
-}
-
-define_mul_typed(i16)
-define_mul_typed(i32)
-define_mul_typed(i64)
-define_mul_typed(f32)
-define_mul_typed(f64)
-
-#define define_div_typed(T) \
-T div_typed_##T(T a, T b){ \
-	if (b != 0) \
-		return a/b; \
-	else \
-		return b; \
-}
-
-define_div_typed(i16)
-define_div_typed(i32)
-define_div_typed(i64)
-define_div_typed(f32)
-define_div_typed(f64)
-
-#define define_addn(T) \
-T addn_##T(T* array) { \
-    T result = array[0]; \
-    int cnt = 0; \
-    for (cnt = 1; cnt < sizeof(array)-1; cnt++) { \
-        result += array[cnt]; \
-    } \
-    return result; \
-} \
-
-	define_addn(i32)
-	define_addn(i64)
-	define_addn(f32)
-	define_addn(f64)
-
-#define define_subn(T) \
-T subn_##T(T* array) { \
-    T result = array[0]; \
-    int cnt = 0; \
-    for (cnt = 1; cnt < sizeof(array)-1; cnt++) { \
-        result -= array[cnt]; \
-    } \
-    return result; \
-} \
-
-	define_subn(i32)
-	define_subn(i64)
-	define_subn(f32)
-	define_subn(f64)
-
-#define define_muln(T) \
-T muln_##T(T* array) { \
-    T result = array[0]; \
-    int cnt = 0; \
-    for (cnt = 1; cnt < sizeof(array)-1; cnt++) { \
-        result *= array[cnt]; \
-    } \
-    return result; \
-} \
-
-	define_muln(i32)
-	define_muln(i64)
-	define_muln(f32)
-	define_muln(f64)
-
-#define define_divn(T) \
-T divn_##T(T* array) { \
-    T result = array[0]; \
-    int cnt = 0; \
-    for (cnt = 1; cnt < sizeof(array)-1; cnt++) { \
-        result /= array[cnt]; \
-    } \
-    return result; \
-} \
-
-	define_divn(i32)
-	define_divn(i64)
-	define_divn(f32)
-	define_divn(f64)
 
 #define define_sqrt(T) \
 T sqrt_##T(T a){ \
@@ -1040,6 +934,50 @@ T* append_pointer_##T(T* array, T value) {  \
 		define_append_pointer(i64)
 		define_append_pointer(f32)
 		define_append_pointer(f64)
+
+#define define_set_pointer_list(T) \
+void set_pointer_list_##T(node_##T** ptr, node_##T* val){ \
+	(*ptr) = val; \
+}
+
+		define_set_pointer_list(bool)
+		define_set_pointer_list(c8)
+		define_set_pointer_list(b8)
+		define_set_pointer_list(i16)
+		define_set_pointer_list(i32)
+		define_set_pointer_list(i64)
+		define_set_pointer_list(f32)
+		define_set_pointer_list(f64)
+
+#define define_set_pointer_array(T) \
+void set_pointer_array_##T(T** ptr, T* val){ \
+	(*ptr) = val; \
+}
+
+		define_set_pointer_array(bool)
+		define_set_pointer_array(c8)
+		define_set_pointer_array(b8)
+		define_set_pointer_array(i16)
+		define_set_pointer_array(i32)
+		define_set_pointer_array(i64)
+		define_set_pointer_array(f32)
+		define_set_pointer_array(f64)
+
+#define define_set_pointer_pointer(T) \
+void set_pointer_pointer_##T(T** ptr, T* val){ \
+	(*ptr) = val; \
+}
+
+		define_set_pointer_pointer(bool)
+		define_set_pointer_pointer(c8)
+		define_set_pointer_pointer(b8)
+		define_set_pointer_pointer(i16)
+		define_set_pointer_pointer(i32)
+		define_set_pointer_pointer(i64)
+		define_set_pointer_pointer(f32)
+		define_set_pointer_pointer(f64)
+
+
 
 $(IMPLEMENTATION)
 
