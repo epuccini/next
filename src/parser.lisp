@@ -1992,6 +1992,8 @@
          (setf expr-list (parse-arguments (cdr expr-list) 1))
          (return-from parse-call expr-list))
         ((equal "new" (car expr-list))
+         (if (not (search ">" *current-let-definition*))
+             (error-type-not-supported))
          (let ((type (regex-replace ">" *current-let-definition* "")))
            (store-current-function "new")
            (add-code (format nil "new_~a" type))
