@@ -647,8 +647,6 @@ node_##T* push_list_##T(node_##T** list, T value) {  \
 	node_##T* head = (node_##T*)malloc(sizeof(node_##T)); \
 	head->next = (*list); \
 	head->value = value; \
-	remove_ptr(*list); \
-	append_ptr(head, length(*list)+1, LIST); \
 	*list = head; \
 	return (*list); \
 } \
@@ -665,11 +663,9 @@ define_push_list(f64)
 #define define_pop_list(T) \
 T pop_list_##T(node_##T** list) {  \
 	T value = (*list)->value; \
-	remove_ptr(*list); \
 	if ((*list)->next != NULL) { \
 		*list = (*list)->next; \
 	} \
-	append_ptr(*list, length(*list)-1, LIST); \
 	return value; \
 } \
 
@@ -1106,7 +1102,7 @@ print_string("My new array2: ");
 println_pointer_f32(my_new_array2_2);
 print_string("My new array3: ");
 println_pointer_f32(my_new_array3_2);
-print_string("My list ");
+print_string("My list push ");
 push_list_f32(&my_list_2,888.0);
 println_list_f32(my_list_2);
 print_string("My list length ");
@@ -1120,7 +1116,8 @@ print_string("My list pop ");
 println_f32((f32)pop_list_f32(&my_list_2));
 print_string("My list length ");
 println_i32(length_list_f32(my_list_2));
-print_string("My list ");
+print_string("My list append ");
+append_list_f32(my_list_2,666.0);
 println_list_f32(my_list_2);
 print_string("My list element ");
 println_i32(*elt_list_f32(my_list_2,3));

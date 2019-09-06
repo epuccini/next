@@ -647,8 +647,6 @@ node_##T* push_list_##T(node_##T** list, T value) {  \
 	node_##T* head = (node_##T*)malloc(sizeof(node_##T)); \
 	head->next = (*list); \
 	head->value = value; \
-	remove_ptr(*list); \
-	append_ptr(head, length(*list)+1, LIST); \
 	*list = head; \
 	return (*list); \
 } \
@@ -665,11 +663,9 @@ define_push_list(f64)
 #define define_pop_list(T) \
 T pop_list_##T(node_##T** list) {  \
 	T value = (*list)->value; \
-	remove_ptr(*list); \
 	if ((*list)->next != NULL) { \
 		*list = (*list)->next; \
 	} \
-	append_ptr(*list, length(*list)-1, LIST); \
 	return value; \
 } \
 
