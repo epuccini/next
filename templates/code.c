@@ -426,7 +426,8 @@ int destroy_ptr(node_ptr_t* e) {
 		node_ptr_t* temp = e->next;
 		do
 		{
-            free(e);
+            if (e->type != ARRAY && e->type != VARIABLE)
+                free(e);
 			e = NULL;
 			e = temp;
 			temp = e->next;
@@ -759,7 +760,7 @@ T reduce_##T(dual_fn_##T a, T* b) { \
 #define define_new(T) \
 T* new_##T(int size) { \
 	T* mem = (T*)malloc(size*sizeof(T)); \
-	append_ptr((void*)mem, size, ARRAY);       \
+	append_ptr((void*)mem, size, POINTER);       \
 	int cnt = 0; \
 	for(cnt = 0; cnt < size; cnt++) \
 		mem[cnt] = 0; \
@@ -848,7 +849,7 @@ define_print_array(f64)
 void println_pointer_##T(T* pointer) {  \
 	int size = length(pointer); \
 	int cnt = 0; \
-	for (cnt = 0; cnt < size; cnt++) { \
+    for (cnt = 0; cnt < size; cnt++) { \
 		print_##T(pointer[cnt]); \
 		printf(" "); \
 	} \
@@ -865,9 +866,9 @@ void println_pointer_##T(T* pointer) {  \
 
 #define define_print_pointer(T) \
 void print_pointer_##T(T* pointer) {  \
-	int size = length((void*)pointer); \
+    int size = length((void*)pointer); \
 	int cnt = 0; \
-	for (cnt = 0; cnt < size; cnt++) { \
+    for (cnt = 0; cnt < size; cnt++) { \
 		print_##T(pointer[cnt]); \
 		printf(" "); \
 	} \
@@ -924,7 +925,7 @@ T* append_pointer_##T(T* array, T value) {  \
 		new_array[cnt] = array[cnt]; \
 	} \
 	new_array[size] = value; \
-	append_ptr(new_array, size+1, ARRAY); \
+	append_ptr(new_array, size+1, POINTER); \
 	remove_ptr(array);       \
 	return new_array; \
 } 

@@ -59,7 +59,8 @@ void set_pointer_string(c8** ptr, c8* val);
 typedef enum PTR_TYPE {
 	ARRAY = 0,
 	POINTER = 1,
-	LIST = 2
+	LIST = 2,
+    VARIABLE = 3
 } PTR_TYPE_t;
 
 typedef struct node_ptr {

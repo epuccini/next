@@ -133,5 +133,15 @@ by Edward Puccini |;
   (prnl argc)
   (return 2))
 
+(defn pointers:void []
+  (let [value:i32 1000
+        value_ptr:i32> value]
+    (prn "Value ")
+    (prnl value)
+    (prn "Pointer ")
+    (prnl value_ptr)))
+
 (defn main:i32 []
-  (arrays-and-lists 77))
+  (pointers)
+  (let [ret:i32 (arrays-and-lists 77)]
+    (return ret)))

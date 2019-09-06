@@ -426,7 +426,8 @@ int destroy_ptr(node_ptr_t* e) {
 		node_ptr_t* temp = e->next;
 		do
 		{
-            free(e);
+            if (e->type != ARRAY && e->type != VARIABLE)
+                free(e);
 			e = NULL;
 			e = temp;
 			temp = e->next;
@@ -759,7 +760,7 @@ T reduce_##T(dual_fn_##T a, T* b) { \
 #define define_new(T) \
 T* new_##T(int size) { \
 	T* mem = (T*)malloc(size*sizeof(T)); \
-	append_ptr((void*)mem, size, ARRAY);       \
+	append_ptr((void*)mem, size, POINTER);       \
 	int cnt = 0; \
 	for(cnt = 0; cnt < size; cnt++) \
 		mem[cnt] = 0; \
@@ -848,7 +849,7 @@ define_print_array(f64)
 void println_pointer_##T(T* pointer) {  \
 	int size = length(pointer); \
 	int cnt = 0; \
-	for (cnt = 0; cnt < size; cnt++) { \
+    for (cnt = 0; cnt < size; cnt++) { \
 		print_##T(pointer[cnt]); \
 		printf(" "); \
 	} \
@@ -865,9 +866,9 @@ void println_pointer_##T(T* pointer) {  \
 
 #define define_print_pointer(T) \
 void print_pointer_##T(T* pointer) {  \
-	int size = length((void*)pointer); \
+    int size = length((void*)pointer); \
 	int cnt = 0; \
-	for (cnt = 0; cnt < size; cnt++) { \
+    for (cnt = 0; cnt < size; cnt++) { \
 		print_##T(pointer[cnt]); \
 		printf(" "); \
 	} \
@@ -924,7 +925,7 @@ T* append_pointer_##T(T* array, T value) {  \
 		new_array[cnt] = array[cnt]; \
 	} \
 	new_array[size] = value; \
-	append_ptr(new_array, size+1, ARRAY); \
+	append_ptr(new_array, size+1, POINTER); \
 	remove_ptr(array);       \
 	return new_array; \
 } 
@@ -1096,9 +1097,13 @@ append_ptr(array_2, sizeof(array_2)/sizeof(i32), ARRAY);
 f32 values_2[]={1.0, 2.0, 3.0, 4.0, 5.0, 6.0};
 append_ptr(values_2, sizeof(values_2)/sizeof(f32), ARRAY);
 f32* my_new_array_2=mapn_f32(mapit_0,values_2);
+append_ptr(my_new_array_2, 1, VARIABLE);
 f32* my_new_floats_2=new_f32(10);
+append_ptr(my_new_floats_2, 1, VARIABLE);
 f32* my_new_array2_2=append_array_f32(values_2,1000.0);
+append_ptr(my_new_array2_2, 1, VARIABLE);
 f32* my_new_array3_2=append_pointer_f32(my_new_array2_2,2000.0);
+append_ptr(my_new_array3_2, 1, VARIABLE);
 node_f32* my_list_2=create_list_f32((f32[]){1.0, 2.0, 3.0, 4.0, 5.0, 6.0},6);
 const char* string_2="abcdefg";
 c8 chars_2[]={'a', 'b', 'c', 'd', 'e', 'f', 'g'};
@@ -1201,9 +1206,25 @@ println_string("ENDE");
 println_i32(argc_1);
 return(2);
 }
+void pointers_0()
+{
+{
+i32 value_2=1000;
+i32* value_ptr_2=&value_2;
+append_ptr(value_ptr_2, 1, VARIABLE);
+print_string("Value ");
+println_i32(value_2);
+print_string("Pointer ");
+println_pointer_i32(value_ptr_2);
+}
+}
 i32 main()
 {
-arrays_and_lists_0(77);
+pointers_0();
+{
+i32 ret_2=arrays_and_lists_0(77);
+return(ret_2);
+}
 destroy_ptr(pointer_list);
 }
 

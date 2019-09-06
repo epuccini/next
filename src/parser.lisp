@@ -781,7 +781,7 @@
              (progn
                (add-code "single_fn_f32")
                (setf (gethash (get-variable-name var-name) *variables*) 'function))))
-        ((not type-name)
+        (t
          (error-no-type-def))))
 
 (defun parse-signature-vector (var-name expr-list)
@@ -816,37 +816,53 @@
            (if (or (equal "\n" (cadr expr-list))
                    (equal "]" (cadr expr-list)))
                (error-no-type-def))
+           ;; store current variable
            (setf *current-let-definition* (cadr def))
+           ;; parse signature
            (if (and (equal "fun" (cadr def)) (equal "[" (cadr expr-list)))
                (progn
-                 (setf expr-list (parse-signature-vector (car def) (cdr expr-list)))
-                 (dbg "parse-argument: signature " (gethash (car def) *signatures*))
+                 (setf expr-list (parse-signature-vector
+                                  (car def) (cdr expr-list)))
+                 (dbg "parse-argument: signature "
+                      (gethash (car def) *signatures*))
                  (parse-variable-type (car def) (cadr def)
                                       (gethash (car def) *signatures*)))
                (progn
                  (parse-variable-type (car def) (cadr def))
                  (setf expr-list (cdr expr-list))))
+           ;; if function then register function
            (if (equal (format nil "~a"
-                              (gethash (get-variable-name (car def)) *variables*))
+                              (gethash (get-variable-name
+                                        (car def)) *variables*))
                       "FUNCTION")
                (register-function (car def) (car expr-list))
                (progn
                  (add-code " ")
                  (add-code (get-variable-name (car def)))))
+           ;; if array emit brackezs
            (if (search "#" (cadr def))
                (add-code "[]"))
+           ;; initialisation
            (add-code "=")
            (dbg "parse-variable: OPEN ARG")
            (if (equal (car expr-list) "]")
                (error-missing-expression))
+           ;; parse initialisation
            (dbg "parse-variable: next " expr-list)
            (setf expr-list (parse-expression expr-list))
+           ;; store poiner
            (dbg "parse-variable: append size " expr-list)
            (if (search "#" (cadr def))
-               (add-code (format nil "append_ptr(~a, sizeof(~a)/sizeof(~a), ARRAY);~%"
+               (add-code
+                (format nil "append_ptr(~a, sizeof(~a)/sizeof(~a), ARRAY);~%"
                                  (get-variable-name (car def))
                                  (get-variable-name (car def))
                                  (regex-replace "#" (cadr def) ""))))
+           (if (search ">" (cadr def))
+               (add-code
+                (format nil "append_ptr(~a, 1, VARIABLE);~%"
+                                 (get-variable-name (car def))
+                                 (regex-replace ">" (cadr def) ""))))
            (dbg "parse-variable: rest " expr-list)))
         ((not (find #\: (car expr-list)))
          (error-syntax-error)))
@@ -2144,25 +2160,32 @@
               (return-from parse-expression expr-list)))
         (if (numberp (parse-integer (car expr-list) :junk-allowed t))
             (progn
-              (dbg "parse-expression: NUM block " *block* " number " (car expr-list))
+              (dbg "parse-expression: NUM block " *block*
+                   " number " (car expr-list))
               (add-code (car expr-list))
               (if (not omit)
                   (add-code (format nil ";~%")))
               (return-from parse-expression (cdr expr-list))))
-        (if (remove-if-not #'(lambda (x)
-                            (equal x (get-iter-function-name (car expr-list))))
-                           (hash-table-keys *functions*))
+        (if (remove-if-not
+             #'(lambda (x)
+                 (equal x (get-iter-function-name (car expr-list))))
+             (hash-table-keys *functions*))
             (progn
               (add-code (get-iter-function-name (car expr-list)))
               (zero-arg)
               (if (not omit)
                   (add-code (format nil ";~%")))
-              (dbg "parse-expression: parse function symbol " (car expr-list))))
-        (if (remove-if-not #'(lambda (x)
-                               (equal x (get-iter-variable-name (car expr-list))))
-                           (hash-table-keys *variables*))
+              (dbg "parse-expression: parse function symbol "
+                   (car expr-list))))
+        (if (remove-if-not
+             #'(lambda (x)
+                 (equal x (get-iter-variable-name (car expr-list))))
+             (hash-table-keys *variables*))
          (progn
-           (dbg "parse-expression: VARIABLE " (get-iter-variable-name (car expr-list)))
+           (dbg "parse-expression: VARIABLE "
+                (get-iter-variable-name (car expr-list)))
+           (if (search ">" *current-let-definition*)
+               (add-code "&"))
            (add-code (get-iter-variable-name (car expr-list)))
            (if (not omit)
                (add-code (format nil ";~%")))
