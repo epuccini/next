@@ -974,8 +974,7 @@
   (if (equal "(" (car expr-list))
       (progn
         (dbg "parse-block before expression " (car expr-list))
-        (setf expr-list (parse-expression expr-list))
-        (setf expr-list (parse-block expr-list))))
+        (setf expr-list (parse-expression expr-list))))
   (if (not expr-list)
       (return-from parse-block expr-list))
   (if (equal "\"" (car expr-list))
