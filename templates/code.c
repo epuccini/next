@@ -495,12 +495,10 @@ void remove_ptr(void* pointer) {
 		if (temp_before->value == pointer) {
 			pointer_list = temp_before->next;
 			free(temp_before);
-			printf("REMOVE");
 			return;
 		}
 		if (temp_before->next != NULL) {
 			if (temp_before->next->value == pointer) {
-				printf("REMOVE");
 				temp = temp_before->next;
 				if (temp_before->next->next != NULL)
 					temp_after = temp_before->next->next;
@@ -772,7 +770,7 @@ node_##T* create_list_##T(T list[], int size) {  \
 	for (cnt = 0; cnt < size; cnt++) { \
 		ret = append_list_##T(ret, list[cnt]);  \
 	} \
-	append_ptr(list, size, LIST); \
+	append_ptr(ret, size, LIST); \
 	return ret; \
 } \
 
