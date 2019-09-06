@@ -1193,10 +1193,6 @@ set_pointer_i32(&argc_1,(100+(1000-500)+100+(1000*500)));
 println_i32(argc_1);
 set_pointer_i32(&argc_1,(100+(1000-999)));
 println_i32(argc_1);
-delete_ptr(my_new_array_2);
-delete_ptr(my_new_floats_2);
-delete_ptr(my_new_array2_2);
-delete_ptr(my_new_array3_2);
 i32 cnt_3=0;
 for(cnt_3=0;cnt_3<max_i32(length_array_i32(array_2),1);cnt_3++)
 {
