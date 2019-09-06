@@ -114,8 +114,12 @@ by Edward Puccini |;
     (prnl argc)
     (:: argc (+ 100 (- 1000 999)))
     (prnl argc)
+    (del my-new-array)
+    (del my-new-floats)
+    (del my-new-array2)
+    (del my-new-array3)
     (for [cnt:i32 0 < (max 20 10)]
-      (:: (# array cnt) 1000)
+;      (:: (# array cnt) 1000)
       (prnfmt "%d" (^ 2 8))
       (prn "ELT: ")
       (prnfmt "%d" (# array cnt))
@@ -142,6 +146,6 @@ by Edward Puccini |;
     (prnl value_ptr)))
 
 (defn main:i32 []
-  (pointers)
   (let [ret:i32 (arrays-and-lists 77)]
+    (pointers)
     (return ret)))

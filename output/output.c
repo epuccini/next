@@ -421,6 +421,20 @@ void inc_length(void* pointer) {
 	return;
 }
 
+void delete_ptr(void* pointer) {
+    node_ptr_t* temp = pointer_list;
+    do
+    {
+        if (temp->value == pointer) {
+            if (temp->type != ARRAY && temp->type != VARIABLE)
+                free(pointer);
+            return;
+        }
+        temp = temp->next;
+    } while (temp != NULL);
+    return;
+}
+
 int destroy_ptr(node_ptr_t* e) {
 	if (e != NULL) {
         if (e->next != NULL) {
@@ -1179,10 +1193,13 @@ set_pointer_i32(&argc_1,(100+(1000-500)+100+(1000*500)));
 println_i32(argc_1);
 set_pointer_i32(&argc_1,(100+(1000-999)));
 println_i32(argc_1);
+delete_ptr(my_new_array_2);
+delete_ptr(my_new_floats_2);
+delete_ptr(my_new_array2_2);
+delete_ptr(my_new_array3_2);
 i32 cnt_3=0;
 for(cnt_3=0;cnt_3<max_i32(20,10);cnt_3++)
 {
-set_pointer_i32(elt_array_i32(array_2,cnt_3),1000);
 print_format("%d",power_i32(2,8));
 print_string("ELT: ");
 print_format("%d",*elt_array_i32(array_2,cnt_3));
@@ -1226,9 +1243,9 @@ println_pointer_i32(value_ptr_2);
 }
 i32 main()
 {
-pointers_0();
 {
 i32 ret_2=arrays_and_lists_0(77);
+pointers_0();
 return(ret_2);
 }
 destroy_ptr(pointer_list);

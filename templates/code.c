@@ -421,6 +421,20 @@ void inc_length(void* pointer) {
 	return;
 }
 
+void delete_ptr(void* pointer) {
+    node_ptr_t* temp = pointer_list;
+    do
+    {
+        if (temp->value == pointer) {
+            if (temp->type != ARRAY && temp->type != VARIABLE)
+                free(pointer);
+            return;
+        }
+        temp = temp->next;
+    } while (temp != NULL);
+    return;
+}
+
 int destroy_ptr(node_ptr_t* e) {
 	if (e != NULL) {
         if (e->next != NULL) {
