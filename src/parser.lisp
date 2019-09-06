@@ -386,7 +386,8 @@
   (setf (gethash fn-name *function-map*) value))
 
 (defun is-function-map-p (fn-name)
-  (remove-if-not #'(lambda (fn) (equal fn fn-name)) (hash-table-keys *function-map*)))
+  (remove-if-not #'(lambda (fn) (equal fn fn-name))
+                 (hash-table-keys *function-map*)))
 
 (defun register-function (name content)
   (set-function-map name content)
@@ -394,12 +395,6 @@
   (dbg "register-function: Register function >" name
        "< var >" content "<"))
 
-(defun emit-named-function-call (sym-name fn-name)
-  (add-code (format nil "if(strcmp(~a, \"~a\") == 0)"
-                    (get-iter-variable-name sym-name) fn-name))
-  (add-code fn-name)
-  (add-code "("))
-  
 (defun type-of-number-string (numstr)
   (cond ((and
           (typep (parse-integer numstr :junk-allowed t) 'integer)
@@ -416,15 +411,18 @@
 (defun inspect-function-type (expr-list)
   (dbg "inspect-function-type: next function: " (cadr expr-list))
   (if (equal "(" (car expr-list))
-      (cond ((remove-if-not #'(lambda (x)
-                                (equal x (get-iter-function-name (cadr expr-list))))
-                            (hash-table-keys *functions*))
-             (return-from inspect-function-type (gethash
-                                                 (get-iter-function-name (cadr expr-list))
-                                                 *functions*))))
-        (return-from inspect-function-type (gethash
-                                            (get-iter-function-name (car expr-list))
-                                            *functions*))))
+      (cond ((remove-if-not
+              #'(lambda (x)
+                  (equal x (get-iter-function-name (cadr expr-list))))
+              (hash-table-keys *functions*))
+             (return-from inspect-function-type
+               (gethash
+                (get-iter-function-name (cadr expr-list))
+                *functions*))))
+      (return-from inspect-function-type
+        (gethash
+         (get-iter-function-name (car expr-list))
+         *functions*))))
 
 (defun set-function-type (fn-name type)
   (setf (gethash (get-function-name fn-name) *functions*) type))
@@ -953,7 +951,8 @@
   (if (equal "(" (car expr-list))
       (progn
         (dbg "parse-block before expression " (car expr-list))
-        (setf expr-list (parse-expression expr-list))))
+        (setf expr-list (parse-expression expr-list))
+        (sb-ext:gc)))
   (if (not expr-list)
       (return-from parse-block expr-list))
   (if (equal "\"" (car expr-list))
