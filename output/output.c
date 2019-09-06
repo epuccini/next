@@ -423,15 +423,21 @@ void inc_length(void* pointer) {
 
 int destroy_ptr(node_ptr_t* e) {
 	if (e != NULL) {
-		node_ptr_t* temp = e->next;
-		do
-		{
+        if (e->next != NULL) {
+            node_ptr_t* temp = e->next;
+            do
+            {
+                if (e->type != ARRAY && e->type != VARIABLE)
+                    free(e);
+                e = NULL;
+                e = temp;
+                temp = e->next;
+            } while (e->next != NULL);
+        }
+        else {
             if (e->type != ARRAY && e->type != VARIABLE)
                 free(e);
-			e = NULL;
-			e = temp;
-			temp = e->next;
-		} while (e->next != NULL);
+        }
 	}
 	return 0;
 }
