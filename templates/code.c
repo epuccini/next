@@ -426,8 +426,7 @@ int destroy_ptr(node_ptr_t* e) {
 		node_ptr_t* temp = e->next;
 		do
 		{
-			if(e->type != ARRAY) 
-				free(e);
+            free(e);
 			e = NULL;
 			e = temp;
 			temp = e->next;
@@ -483,6 +482,29 @@ define_append_list(i32)
 define_append_list(i64)
 define_append_list(f32)
 define_append_list(f64)
+
+#define define_append_array(T) \
+T* append_array_##T(T* array, T value) {  \
+    int size = length(array); \
+    T* new_array = (T*) malloc((size+1)*sizeof(T)); \
+    int cnt = 0; \
+    for (cnt = 0; cnt < size; cnt++) { \
+        new_array[cnt] = array[cnt]; \
+    } \
+    new_array[size] = value; \
+    append_ptr(new_array, size+1, POINTER);             \
+    remove_ptr(array);       \
+    return new_array; \
+}
+
+define_append_array(bool)
+define_append_array(c8)
+define_append_array(b8)
+define_append_array(i16)
+define_append_array(i32)
+define_append_array(i64)
+define_append_array(f32)
+define_append_array(f64)
 
 #define define_length_list(T) \
 i32 length_list_##T(node_##T* list) {  \
@@ -542,7 +564,7 @@ node_##T* push_list_##T(node_##T** list, T value) {  \
 	head->next = (*list); \
 	head->value = value; \
 	append_ptr((void*)head, length(*list)+1, LIST);       \
-	/*remove_ptr((*list)); */      \
+	remove_ptr((*list));       \
 	*list = head; \
 	return (*list); \
 } \
@@ -698,7 +720,7 @@ T* map_##T(single_fn_##T a, T* b) { \
 #define define_mapn(T) \
 T* mapn_##T(single_fn_##T a, T* b) { \
     T* ptr = (T*) malloc(sizeof(b) * sizeof(T)); \
-	append_ptr((void*)ptr, sizeof(b)-2, ARRAY);\
+	append_ptr((void*)ptr, sizeof(b)-2, POINTER);\
 	i32 cnt = 0; \
     for (cnt = 0; cnt < sizeof(b)-2; cnt++) { \
         ptr[cnt] = (*a)(b[cnt]); \
@@ -892,29 +914,6 @@ define_set_list(i32)
 define_set_list(i64)
 define_set_list(f32)
 define_set_list(f64)
-
-#define define_append_array(T) \
-T* append_array_##T(T* array, T value) {  \
-    int size = length(array); \
-    T* new_array = (T*) malloc((size+1)*sizeof(T)); \
-	int cnt = 0; \
-	for (cnt = 0; cnt < size; cnt++) { \
-		new_array[cnt] = array[cnt]; \
-	} \
-	new_array[size] = value; \
-	append_ptr(new_array, size+1, ARRAY);             \
-	remove_ptr(array);       \
-	return new_array; \
-} 
-
-	define_append_array(bool)
-	define_append_array(c8)
-	define_append_array(b8)
-	define_append_array(i16)
-	define_append_array(i32)
-	define_append_array(i64)
-	define_append_array(f32)
-	define_append_array(f64)
 
 #define define_append_pointer(T) \
 T* append_pointer_##T(T* array, T value) {  \
