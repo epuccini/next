@@ -48,8 +48,9 @@ by Edward Puccini |;
         my-new-array2:f32> (append values 1000.0)
         my-new-array3:f32> (append my-new-array2 2000.0)
         my-list:f32' '(1.0 2.0 3.0 4.0 5.0 6.0)
-        string:string "abc"
-        chars:c8# ['a' 'b' 'c']
+        string:string "abcdefg"
+        chars:c8# ['a' 'b' 'c' 'd' 'e' 'f' 'g']
+        new-string:c8# "Edward"
         myfun:fun[f32->f32] mapit]
     (:: (f32> (# my-new-floats 0)) 888.0)
     (prn "my-new-floats set 1. element: ")
@@ -65,6 +66,10 @@ by Edward Puccini |;
     (prn "My new array3 gets array values: ")
     (:: my-new-array3 values)
     (prnl my-new-array3)
+    (prn "string print to string: ")
+    (prnl new-string)
+    (prnstr new-string "EDWARD")
+    (prnl new-string)
     (prn "My list push ")
     (push my-list 888.0)
     (prnl my-list)

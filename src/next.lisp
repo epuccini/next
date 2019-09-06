@@ -14,6 +14,7 @@
   (setf (gethash "#" *signatures*) '("pointer" "pointer" "value"))
   (setf (gethash "::" *signatures*) '("void" "pointer" "value"))
   (setf (gethash "len" *signatures*) '("value" "pointer"))
+  (setf (gethash "prnstr" *signatures*) '("void" "pointer" "value"))
   (setf (gethash "prn" *signatures*) '("void" "value"))
   (setf (gethash "prnl" *signatures*) '("void" "value"))
   (setf (gethash "prnfmt" *signatures*) '("void" "value" "value"))

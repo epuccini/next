@@ -790,7 +790,6 @@ void println_array_##T(int size, const T* array) {  \
 	int cnt = 0; \
 	for (cnt = 0; cnt < size/sizeof(T); cnt++) { \
 		print_##T(array[cnt]); \
-		printf(" "); \
 	} \
 	printf("\n"); \
 } \
@@ -808,7 +807,6 @@ void print_array_##T(int size, const T* array) {  \
 	int cnt = 0; \
 	for (cnt = 0; cnt < size/sizeof(T); cnt++) { \
 		print_##T(array[cnt]); \
-		printf(" "); \
 	} \
 } \
 
@@ -883,13 +881,13 @@ void set_list_##T(node_##T* list, T val) { \
 	return; \
 } \
 
-	define_set_list(b8)
-	define_set_list(c8)
-	define_set_list(i16)
-	define_set_list(i32)
-	define_set_list(i64)
-	define_set_list(f32)
-	define_set_list(f64)
+define_set_list(b8)
+define_set_list(c8)
+define_set_list(i16)
+define_set_list(i32)
+define_set_list(i64)
+define_set_list(f32)
+define_set_list(f64)
 
 #define define_append_array(T) \
 T* append_array_##T(T* array, T value) {  \
@@ -926,56 +924,128 @@ T* append_pointer_##T(T* array, T value) {  \
 	return new_array; \
 } 
 
-		define_append_pointer(bool)
-		define_append_pointer(c8)
-		define_append_pointer(b8)
-		define_append_pointer(i16)
-		define_append_pointer(i32)
-		define_append_pointer(i64)
-		define_append_pointer(f32)
-		define_append_pointer(f64)
+	define_append_pointer(bool)
+	define_append_pointer(c8)
+	define_append_pointer(b8)
+	define_append_pointer(i16)
+	define_append_pointer(i32)
+	define_append_pointer(i64)
+	define_append_pointer(f32)
+	define_append_pointer(f64)
 
 #define define_set_pointer_list(T) \
 void set_pointer_list_##T(node_##T** ptr, node_##T* val){ \
 	(*ptr) = val; \
 }
 
-		define_set_pointer_list(bool)
-		define_set_pointer_list(c8)
-		define_set_pointer_list(b8)
-		define_set_pointer_list(i16)
-		define_set_pointer_list(i32)
-		define_set_pointer_list(i64)
-		define_set_pointer_list(f32)
-		define_set_pointer_list(f64)
+	define_set_pointer_list(bool)
+	define_set_pointer_list(c8)
+	define_set_pointer_list(b8)
+	define_set_pointer_list(i16)
+	define_set_pointer_list(i32)
+	define_set_pointer_list(i64)
+	define_set_pointer_list(f32)
+	define_set_pointer_list(f64)
 
 #define define_set_pointer_array(T) \
 void set_pointer_array_##T(T** ptr, T* val){ \
 	(*ptr) = val; \
 }
 
-		define_set_pointer_array(bool)
-		define_set_pointer_array(c8)
-		define_set_pointer_array(b8)
-		define_set_pointer_array(i16)
-		define_set_pointer_array(i32)
-		define_set_pointer_array(i64)
-		define_set_pointer_array(f32)
-		define_set_pointer_array(f64)
+	define_set_pointer_array(bool)
+	define_set_pointer_array(c8)
+	define_set_pointer_array(b8)
+	define_set_pointer_array(i16)
+	define_set_pointer_array(i32)
+	define_set_pointer_array(i64)
+	define_set_pointer_array(f32)
+	define_set_pointer_array(f64)
 
 #define define_set_pointer_pointer(T) \
 void set_pointer_pointer_##T(T** ptr, T* val){ \
 	(*ptr) = val; \
 }
 
-		define_set_pointer_pointer(bool)
-		define_set_pointer_pointer(c8)
-		define_set_pointer_pointer(b8)
-		define_set_pointer_pointer(i16)
-		define_set_pointer_pointer(i32)
-		define_set_pointer_pointer(i64)
-		define_set_pointer_pointer(f32)
-		define_set_pointer_pointer(f64)
+	define_set_pointer_pointer(bool)
+	define_set_pointer_pointer(c8)
+	define_set_pointer_pointer(b8)
+	define_set_pointer_pointer(i16)
+	define_set_pointer_pointer(i32)
+	define_set_pointer_pointer(i64)
+	define_set_pointer_pointer(f32)
+	define_set_pointer_pointer(f64)
+
+void print_str_pointer_c8(c8* array, c8* value) {
+	sprintf(array, "%s", value);
+}
+
+void print_str_array_c8(c8* array, c8* value) {
+	sprintf(array, "%s", value);
+}
+
+void print_str_string(c8* array, c8* value) {
+	sprintf(array, "%s", value);
+}
+
+void print_str_pointer_i16(c8* pointer, i16* value) {
+	int cnt = 0;
+	for (cnt = 0; cnt < length(pointer); cnt++)
+		sprintf(pointer, "%d", value[cnt]);
+}
+
+void print_str_array_i16(c8* pointer, i16* value) {
+	int cnt = 0;
+	for (cnt = 0; cnt < length(pointer); cnt++)
+		sprintf(pointer, "%d", value[cnt]);
+}
+
+void print_str_pointer_i32(c8* pointer, i32* value) {
+	int cnt = 0;
+	for (cnt = 0; cnt < length(pointer); cnt++)
+		sprintf(pointer, "%d", value[cnt]);
+}
+
+void print_str_array_i32(c8* pointer, i32* value) {
+	int cnt = 0;
+	for (cnt = 0; cnt < length(pointer); cnt++)
+		sprintf(pointer, "%d", value[cnt]);
+}
+
+void print_str_pointer_i64(c8* pointer, i64* value) {
+	int cnt = 0;
+	for (cnt = 0; cnt < length(pointer); cnt++)
+		sprintf(pointer, "%ld", value[cnt]);
+}
+
+void print_str_array_i64(c8* pointer, i64* value) {
+	int cnt = 0;
+	for (cnt = 0; cnt < length(pointer); cnt++)
+		sprintf(pointer, "%ld", value[cnt]);
+}
+
+void print_str_pointer_f32(c8* pointer, f32* value) {
+	int cnt = 0;
+	for (cnt = 0; cnt < length(pointer); cnt++)
+		sprintf(pointer, "%f", value[cnt]);
+}
+
+void print_str_array_f32(c8* pointer, f32* value) {
+	int cnt = 0;
+	for (cnt = 0; cnt < length(pointer); cnt++)
+		sprintf(pointer, "%f", value[cnt]);
+}
+
+void print_str_pointer_f64(c8* pointer, f64* value) {
+	int cnt = 0;
+	for (cnt = 0; cnt < length(pointer); cnt++)
+		sprintf(pointer, "%lf", value[cnt]);
+}
+
+void print_str_array_f64(c8* pointer, f64* value) {
+	int cnt = 0;
+	for (cnt = 0; cnt < length(pointer); cnt++)
+		sprintf(pointer, "%lf", value[cnt]);
+}
 
 
 
