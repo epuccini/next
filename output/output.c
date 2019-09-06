@@ -1200,22 +1200,6 @@ print_format("%d",power_i32(2,8));
 print_string("ELT: ");
 print_format("%d",*elt_array_i32(array_2,cnt_3));
 print_string("CNT: ");
-if(cnt_3==max_i32(1,3))
-{
-if(cnt_3==4)
-{
-println_string("Not possible");
-}
-else
-{
-println_string("ELSE CNT = 3!!");
-}
-}
-else
-{
-println_string("CNT != 3");
-}
-println_i32(cnt_3);
 }
 delete_ptr(array_2);
 println_f32(float1_2);

@@ -122,13 +122,8 @@ by Edward Puccini |;
       (prnfmt "%d" (^ 2 8))
       (prn "ELT: ")
       (prnfmt "%d" (# array cnt))
-      (prn "CNT: ")
-      (if [cnt == (max 1 3)]
-        (if [cnt == 4]
-          (prnl "Not possible")
-          (prnl "ELSE CNT = 3!!"))
-        (prnl "CNT != 3"))
-      (prnl cnt))
+      (prn "CNT: "))
+
     (del array)
     (prnl float1)
     (prnl float2)
@@ -136,6 +131,7 @@ by Edward Puccini |;
     (prnl "ENDE"))
   (prnl argc)
   (return 2))
+
 
 (defn pointers:void []
   (let [value:i32 1000
