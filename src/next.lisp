@@ -31,6 +31,7 @@
   (setf (gethash "mapn" *signatures*) '("pointer" "function" "pointer"))
   (setf (gethash "size" *signatures*) '("void" "pointer"))
   (setf (gethash "@" *signatures*) '("void" "pointer"))
+  (setf (gethash "new" *signatures*) '("pointer" "value"))
   (setf (gethash "new_bool" *signatures*) '("pointer" "value"))
   (setf (gethash "new_b8" *signatures*) '("pointer" "value"))
   (setf (gethash "new_c8" *signatures*) '("pointer" "value"))

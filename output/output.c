@@ -1103,7 +1103,7 @@ node_f32* my_list_2=create_list_f32((f32[]){1.0, 2.0, 3.0, 4.0, 5.0, 6.0},6);
 const char* string_2="abcdefg";
 c8 chars_2[]={'a', 'b', 'c', 'd', 'e', 'f', 'g'};
 append_ptr(chars_2, sizeof(chars_2)/sizeof(c8), ARRAY);
-c8 new_string_2[]="Edward";
+c8 new_string_2[]="Just a string";
 append_ptr(new_string_2, sizeof(new_string_2)/sizeof(c8), ARRAY);
 f32 (*myfun_2)(f32)=mapit_0;
 set_pointer_f32((f32*)elt_array_f32(my_new_floats_2,0),888.0);
