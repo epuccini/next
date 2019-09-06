@@ -118,8 +118,8 @@ by Edward Puccini |;
     (del my-new-floats)
     (del my-new-array2)
     (del my-new-array3)
-    (for [cnt:i32 0 < (max 20 10)]
-;      (:: (# array cnt) 1000)
+    (for [cnt:i32 0 < (max (len array) 1)]
+      (:: (# array cnt) 1000)
       (prnfmt "%d" (^ 2 8))
       (prn "ELT: ")
       (prnfmt "%d" (# array cnt))
@@ -130,6 +130,7 @@ by Edward Puccini |;
           (prnl "ELSE CNT = 3!!"))
         (prnl "CNT != 3"))
       (prnl cnt))
+    (del array)
     (prnl float1)
     (prnl float2)
     (prnl argc)

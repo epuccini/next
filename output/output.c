@@ -1198,8 +1198,9 @@ delete_ptr(my_new_floats_2);
 delete_ptr(my_new_array2_2);
 delete_ptr(my_new_array3_2);
 i32 cnt_3=0;
-for(cnt_3=0;cnt_3<max_i32(20,10);cnt_3++)
+for(cnt_3=0;cnt_3<max_i32(length_array_i32(array_2),1);cnt_3++)
 {
+set_pointer_i32(elt_array_i32(array_2,cnt_3),1000);
 print_format("%d",power_i32(2,8));
 print_string("ELT: ");
 print_format("%d",*elt_array_i32(array_2,cnt_3));
@@ -1221,6 +1222,7 @@ println_string("CNT != 3");
 }
 println_i32(cnt_3);
 }
+delete_ptr(array_2);
 println_f32(float1_2);
 println_f32(float2_2);
 println_i32(argc_1);
