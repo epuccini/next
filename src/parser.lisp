@@ -117,24 +117,6 @@
 (defun error-type-not-supported ()
   (error-msg "Error type not supported!~%"))
 
-(defun preprocess-old (expression)
-  (let* ((new-expr1 (regex-replace-all "\\(" expression "°(°"))
-         (new-expr2 (regex-replace-all "\\)" new-expr1 "°)°"))
-         (new-expr3 (regex-replace-all "\"" new-expr2 "°\"°"))
-         (new-expr4 (regex-replace-all (format nil "~a" #\return) new-expr3
-                                       (format nil "°\n°")))
-         (new-expr5 (regex-replace-all "\\[" new-expr4 "°[°"))
-         (new-expr6 (regex-replace-all "\\]" new-expr5 "°]°"))
-         (new-expr7 (regex-replace-all (format nil "~a" #\newline) new-expr6
-                                       (format nil "°\n°")))
-         (new-expr8 (regex-replace-all (format nil "~a" #\tab) new-expr7
-                                       (format nil " ")))
-         (new-expr9 (regex-replace-all "\\," new-expr8 "°,°"))
-         (new-expr10 (regex-replace-all "->" new-expr9 "°->°"))
-         (new-expr11 (regex-replace-all "â" new-expr10 "°∑°"))
-         (expr-list (split " |°" new-expr11)))
-    (remove-if #'(lambda(x) (= (length x) 0)) expr-list)))
-
 (defun upto-string (expression lower)
   (let ((str ""))
     (loop for x from lower to (1- (length expression)) do
@@ -208,8 +190,9 @@
             stack)
     l))
 
-(defun preprocess (expression)
-  (let ((stack '()))
+(defun preprocess (expr)
+  (let ((stack '())
+        (expression (regex-replace-all "->" expr "$")))
     (loop for x from 0 to (1- (length expression)) do
          (let ((obj (elt expression x)))
            (cond ((or (equal #\( obj)

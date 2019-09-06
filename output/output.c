@@ -1090,7 +1090,7 @@ println_string("ENDE");
 println_i32(argc_1);
 return(2);
 }
-void main()
+i32 main()
 {
 arrays_and_lists_0(77);
 destroy_ptr(pointer_list);
