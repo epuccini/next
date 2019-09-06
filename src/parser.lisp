@@ -2288,9 +2288,5 @@
     (setup-signatures)
     (loop while (and (find "(" expr-list :test #'equal)
                      (> (length expr-list) 0)) do
-         (setf expr-list (parse-expression expr-list))
-         (if (and (car expr-list)
-                  (not (equal ";" (car expr-list)))
-                  (not (equal "\n" (car expr-list))))
-             (add-code (format nil ";~%")))))
+         (setf expr-list (parse-expression expr-list))))
   (emit-code-call))
