@@ -1088,7 +1088,7 @@ f32* my_new_array2_2=append_array_f32(values_2,1000.0);
 f32* my_new_array3_2=append_pointer_f32(my_new_array2_2,2000.0);
 node_f32* my_list_2=create_list_f32((f32[]){1.0, 2.0, 3.0, 4.0, 5.0, 6.0},6);
 const char* string_2="abc";
-const char chars_2[]={'a', 'b', 'c'};
+c8 chars_2[]={'a', 'b', 'c'};
 append_ptr(chars_2, sizeof(chars_2)/sizeof(c8), ARRAY);
 f32 (*myfun_2)(f32)=mapit_0;
 set_pointer_f32((f32*)elt_array_f32(my_new_floats_2,0),888.0);
