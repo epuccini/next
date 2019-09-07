@@ -10,6 +10,9 @@
 (require 'flood)
 (require 'argparse)
 
+(eval-when (:compile-toplevel)
+  (declaim (optimize (speed 1) (safety 1) (space 3) (debug 0))))
+
 (defun main()
     (let ((param
            (argparse:with-arguments-hash-table

@@ -333,11 +333,9 @@
   (setq *paranteses* (1- *paranteses*)))
 
 (defun inc-block ()
-  (setq *block* (+ 1 *block*))
-  (zero-hash-variables))
+  (setq *block* (+ 1 *block*)))
 
 (defun dec-block ()
-  (zero-hash-variables)
   (setq *block* (- *block* 1)))
 
 (defun zero-parens ()
