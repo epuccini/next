@@ -1000,8 +1000,8 @@
 (defun parse-if-vector (expr-list)
   (dbg "parse-if-vector: condition range" (car expr-list))  
   (setf expr-list (parse-condition expr-list))
-  (if (equal "\n" (car expr-list))
-      (setf expr-list (parse-if-vector (cdr expr-list))))
+  (loop while (equal "\n" (car expr-list)) do
+      (setf expr-list (cdr expr-list)))
   (if (equal "]" (car expr-list))
       (return-from parse-if-vector expr-list))
   (if (not (equal "]" (car expr-list)))
@@ -1016,8 +1016,8 @@
   (setf expr-list (parse-range expr-list))
   (if (equal "]" (car expr-list))
       (return-from parse-for-vector expr-list))
-  (if (equal "\n" (car expr-list))
-      (setf expr-list (parse-for-vector (cdr expr-list))))
+  (loop while (equal "\n" (car expr-list)) do
+      (setf expr-list (cdr expr-list)))
   (if (not (equal "]" (car expr-list)))
       (progn
         (dbg "parse-for-vector: next variable")  
@@ -1030,8 +1030,8 @@
   (setf expr-list (parse-variable expr-list))
   (if (equal "]" (car expr-list))
       (return-from parse-let-vector expr-list))
-  (if (equal "\n" (car expr-list))
-      (setf expr-list (parse-let-vector (cdr expr-list))))
+  (loop while (equal "\n" (car expr-list)) do
+      (setf expr-list (cdr expr-list)))
   (if (not (equal "]" (car expr-list)))
       (progn
         (dbg "parse-let-vector: next variable")  
