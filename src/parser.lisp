@@ -42,7 +42,7 @@
          (new-expr2 (regex-replace-all "\\√" new-expr1 "sqrt"))
          (new-expr3 (regex-replace-all "\\^" new-expr2 "power"))
          (new-expr4 (regex-replace-all "∑" new-expr3 "for"))
-         (new-expr5 (regex-replace-all ">>" new-expr3 "__")))
+         (new-expr5 (regex-replace-all ">>" new-expr4 "__")))
     new-expr5))
 
 (defun print-stack ()
