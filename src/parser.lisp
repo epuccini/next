@@ -336,6 +336,7 @@
   (setq *block* (+ 1 *block*)))
 
 (defun dec-block ()
+  (zero-hash-variables)
   (setq *block* (- *block* 1)))
 
 (defun zero-parens ()
@@ -345,9 +346,8 @@
   (setq *block* 0))
 
 (defun zero-hash-variables ()
-  (mapcar #'(lambda (var)
-              (setf (gethash (get-variable-name var) *variables*) nil) var)
-          (hash-table-keys *variables*)))
+  (dolist (var (hash-table-keys *variables*))
+       (remhash (get-variable-name var) *variables*)))
 
 (defun add-code (expression)
   ;(setf expression (filter-expression expression))
