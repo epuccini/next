@@ -113,7 +113,7 @@ bool* elt_array_bool(bool* ptr, i32 idx) {
 }
 
 b8* elt_array_b8(b8* ptr, i32 idx) {
-	return (c8*)&ptr[idx];
+	return (b8*)&ptr[idx];
 }
 
 c8* elt_array_c8(c8* ptr, i32 idx) {

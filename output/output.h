@@ -6,7 +6,7 @@
 #include <string.h>
 #include <memory.h>
 
-typedef char b8;
+typedef unsigned char b8;
 typedef char c8;
 typedef short i16;
 typedef int i32;
