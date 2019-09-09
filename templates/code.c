@@ -21,19 +21,31 @@ void print_c8(c8 val) {
 }
 
 void print_b8(c8 val) {
-    printf("%d", val);
+	printf("%d", val);
 }
 
 void print_i16(i16 val) {
-    printf("%d", val);
+	printf("%d", val);
 }
 
 void print_i32(i32 val) {
-    printf("%d", val);
+	printf("%d", val);
 }
 
 void print_i64(long val) {
-    printf("%ld", val);
+	printf("%ld", val);
+}
+
+void print_ui16(ui16 val) {
+	printf("%d", val);
+}
+
+void print_ui32(ui32 val) {
+	printf("%d", val);
+}
+
+void print_ui64(ui64 val) {
+	printf("%ld", val);
 }
 
 void print_f32(f32 val) {
@@ -57,15 +69,27 @@ void println_c8(c8 val) {
 }
 
 void println_i16(i16 val) {
-    printf("%d\n", val);
+	printf("%d\n", val);
 }
 
 void println_i32(i32 val) {
-    printf("%d \n", val);
+	printf("%d \n", val);
 }
 
 void println_i64(long val) {
-    printf("%ld \n", val);
+	printf("%ld \n", val);
+}
+
+void println_ui16(ui16 val) {
+	printf("%d\n", val);
+}
+
+void println_ui32(ui32 val) {
+	printf("%d \n", val);
+}
+
+void println_ui64(ui64 val) {
+	printf("%ld \n", val);
 }
 
 void println_f32(f32 val) {
@@ -128,8 +152,20 @@ i32* elt_array_i32(i32* ptr, i32 idx) {
 	return (i32*)&ptr[idx];
 }
 
-long* elt_array_i64(long* ptr, i16 idx) {
-	return (long*)&ptr[idx];
+i64* elt_array_i64(i64* ptr, i16 idx) {
+	return (i64*)&ptr[idx];
+}
+
+ui16* elt_array_ui16(ui16* ptr, i32 idx) {
+	return (ui16*)&ptr[idx];
+}
+
+ui32* elt_array_ui32(ui32* ptr, i32 idx) {
+	return (ui32*)&ptr[idx];
+}
+
+ui64* elt_array_ui64(ui64* ptr, i16 idx) {
+	return (ui64*)&ptr[idx];
 }
 
 f32* elt_array_f32(f32* ptr, i16 idx) {
@@ -148,7 +184,7 @@ void set_pointer_bool(bool* ptr, bool val) {
 	*ptr = val;
 }
 
-void set_pointer_b8(c8* ptr, c8 val) {
+void set_pointer_b8(b8* ptr, b8 val) {
 	*ptr = val;
 }
 
@@ -165,6 +201,18 @@ void set_pointer_i32(i32* ptr, i32 val) {
 }
 
 void set_pointer_i64(long* ptr, long val) {
+	*ptr = val;
+}
+
+void set_pointer_ui16(ui16* ptr, ui16 val) {
+	*ptr = val;
+}
+
+void set_pointer_ui32(ui32* ptr, ui32 val) {
+	*ptr = val;
+}
+
+void set_pointer_ui64(ui64* ptr, ui64 val) {
 	*ptr = val;
 }
 
@@ -213,6 +261,9 @@ define_lt(bool)
 define_lt(i16)
 define_lt(i32)
 define_lt(i64)
+define_lt(ui16)
+define_lt(ui32)
+define_lt(ui64)
 define_lt(f32)
 define_lt(f64)
 
@@ -220,6 +271,9 @@ define_leqt(bool)
 define_leqt(i16)
 define_leqt(i32)
 define_leqt(i64)
+define_leqt(ui16)
+define_leqt(ui32)
+define_leqt(ui64)
 define_leqt(f32)
 define_leqt(f64)
 
@@ -227,6 +281,9 @@ define_gt(bool)
 define_gt(i16)
 define_gt(i32)
 define_gt(i64)
+define_gt(ui16)
+define_gt(ui32)
+define_gt(ui64)
 define_gt(f32)
 define_gt(f64)
 
@@ -234,6 +291,9 @@ define_geqt(bool)
 define_geqt(i16)
 define_geqt(i32)
 define_geqt(i64)
+define_geqt(ui16)
+define_geqt(ui32)
+define_geqt(ui64)
 define_geqt(f32)
 define_geqt(f64)
 
@@ -248,6 +308,9 @@ define_eq(bool)
 define_eq(i16)
 define_eq(i32)
 define_eq(i64)
+define_eq(ui16)
+define_eq(ui32)
+define_eq(ui64)
 define_eq(f32)
 define_eq(f64)
 
@@ -256,22 +319,28 @@ T sqrt_##T(T a){ \
 	return (T)sqrt(a); \
 }
 
-	define_sqrt(i16)
-	define_sqrt(i32)
-	define_sqrt(i64)
-	define_sqrt(f32)
-	define_sqrt(f64)
+define_sqrt(i16)
+define_sqrt(i32)
+define_sqrt(i64)
+define_sqrt(ui16)
+define_sqrt(ui32)
+define_sqrt(ui64)
+define_sqrt(f32)
+define_sqrt(f64)
 
 #define define_power(T) \
 T power_##T(T a, T b){ \
 	return (T)pow(a, b) ; \
 } \
 
-	define_power(i16)
-	define_power(i32)
-	define_power(i64)
-	define_power(f32)
-	define_power(f64)
+define_power(i16)
+define_power(i32)
+define_power(i64)
+define_power(ui16)
+define_power(ui32)
+define_power(ui64)
+define_power(f32)
+define_power(f64)
 
 #define define_max(T) \
 T max_##T(T a, T b){ \
@@ -282,11 +351,14 @@ T max_##T(T a, T b){ \
 		return b; \
 } \
 
-	define_max(i16)
-	define_max(i32)
-	define_max(i64)
-	define_max(f32)
-	define_max(f64)
+define_max(i16)
+define_max(i32)
+define_max(i64)
+define_max(ui16)
+define_max(ui32)
+define_max(ui64)
+define_max(f32)
+define_max(f64)
 
 #define define_min(T) \
 T min_##T(T a, T b) { \
@@ -300,8 +372,11 @@ T min_##T(T a, T b) { \
 	define_min(i16)
 	define_min(i32)
 	define_min(i64)
+	define_min(ui16)
+	define_min(ui32)
+	define_min(ui64)
 	define_min(f32)
-	define_min(f64)
+define_min(f64)
 
 #define define_single_fn(T) \
 typedef T (*single_fn_##T)(T); \
@@ -312,6 +387,9 @@ typedef T (*single_fn_##T)(T); \
 	define_single_fn(i16)
 	define_single_fn(i32)
 	define_single_fn(i64)
+	define_single_fn(ui16)
+	define_single_fn(ui32)
+	define_single_fn(ui64)
 	define_single_fn(f32)
 	define_single_fn(f64)
 
@@ -324,6 +402,9 @@ typedef T (*dual_fn_##T)(T, T); \
 	define_dual_fn(i16)
 	define_dual_fn(i32)
 	define_dual_fn(i64)
+	define_dual_fn(ui16)
+	define_dual_fn(ui32)
+	define_dual_fn(ui64)
 	define_dual_fn(f32)
 	define_dual_fn(f64)
 
@@ -468,6 +549,9 @@ define_node(b8)
 define_node(i16)
 define_node(i32)
 define_node(i64)
+define_node(ui16)
+define_node(ui32)
+define_node(ui64)
 define_node(f32)
 define_node(f64)
 
@@ -501,6 +585,9 @@ define_append_list(b8)
 define_append_list(i16)
 define_append_list(i32)
 define_append_list(i64)
+define_append_list(ui16)
+define_append_list(ui32)
+define_append_list(ui64)
 define_append_list(f32)
 define_append_list(f64)
 
@@ -524,6 +611,9 @@ define_append_array(b8)
 define_append_array(i16)
 define_append_array(i32)
 define_append_array(i64)
+define_append_array(ui16)
+define_append_array(ui32)
+define_append_array(ui64)
 define_append_array(f32)
 define_append_array(f64)
 
@@ -548,6 +638,9 @@ define_length_list(b8)
 define_length_list(i16)
 define_length_list(i32)
 define_length_list(i64)
+define_length_list(ui16)
+define_length_list(ui32)
+define_length_list(ui64)
 define_length_list(f32)
 define_length_list(f64)
 
@@ -562,6 +655,9 @@ define_length_array(b8)
 define_length_array(i16)
 define_length_array(i32)
 define_length_array(i64)
+define_length_array(ui16)
+define_length_array(ui32)
+define_length_array(ui64)
 define_length_array(f32)
 define_length_array(f64)
 
@@ -576,6 +672,9 @@ define_length_pointer(b8)
 define_length_pointer(i16)
 define_length_pointer(i32)
 define_length_pointer(i64)
+define_length_pointer(ui16)
+define_length_pointer(ui32)
+define_length_pointer(ui64)
 define_length_pointer(f32)
 define_length_pointer(f64)
 
@@ -596,6 +695,9 @@ define_push_list(b8)
 define_push_list(i16)
 define_push_list(i32)
 define_push_list(i64)
+define_push_list(ui16)
+define_push_list(ui32)
+define_push_list(ui64)
 define_push_list(f32)
 define_push_list(f64)
 
@@ -616,6 +718,9 @@ define_pop_list(b8)
 define_pop_list(i16)
 define_pop_list(i32)
 define_pop_list(i64)
+define_pop_list(ui16)
+define_pop_list(ui32)
+define_pop_list(ui64)
 define_pop_list(f32)
 define_pop_list(f64)
 
@@ -644,6 +749,9 @@ define_remove_list(b8)
 define_remove_list(i16)
 define_remove_list(i32)
 define_remove_list(i64)
+define_remove_list(ui16)
+define_remove_list(ui32)
+define_remove_list(ui64)
 define_remove_list(f32)
 define_remove_list(f64)
 
@@ -658,6 +766,9 @@ define_car_list(b8)
 define_car_list(i16)
 define_car_list(i32)
 define_car_list(i64)
+define_car_list(ui16)
+define_car_list(ui32)
+define_car_list(ui64)
 define_car_list(f32)
 define_car_list(f64)
 
@@ -672,6 +783,9 @@ define_cdr_list(b8)
 define_cdr_list(i16)
 define_cdr_list(i32)
 define_cdr_list(i64)
+define_cdr_list(ui16)
+define_cdr_list(ui32)
+define_cdr_list(ui64)
 define_cdr_list(f32)
 define_cdr_list(f64)
 
@@ -697,6 +811,9 @@ define_destroy(b8)
 define_destroy(i16)
 define_destroy(i32)
 define_destroy(i64)
+define_destroy(ui16)
+define_destroy(ui32)
+define_destroy(ui64)
 define_destroy(f32)
 define_destroy(f64)
 
@@ -717,6 +834,9 @@ node_##T* create_list_##T(T list[], int size) {  \
 	define_create_list(i16)
 	define_create_list(i32)
 	define_create_list(i64)
+	define_create_list(ui16)
+	define_create_list(ui32)
+	define_create_list(ui64)
 	define_create_list(f32)
 	define_create_list(f64)
 
@@ -735,6 +855,9 @@ T* map_##T(single_fn_##T a, T* b) { \
 	define_map(i16)
 	define_map(i32)
 	define_map(i64)
+	define_map(ui16)
+	define_map(ui32)
+	define_map(ui64)
 	define_map(f32)
 	define_map(f64)
 
@@ -755,6 +878,9 @@ T* mapn_##T(single_fn_##T a, T* b) { \
 	define_mapn(i16)
 	define_mapn(i32)
 	define_mapn(i64)
+	define_mapn(ui16)
+	define_mapn(ui32)
+	define_mapn(ui64)
 	define_mapn(f32)
 	define_mapn(f64)
 
@@ -773,6 +899,9 @@ T reduce_##T(dual_fn_##T a, T* b) { \
 	define_reduce(i16)
 	define_reduce(i32)
 	define_reduce(i64)
+	define_reduce(ui16)
+	define_reduce(ui32)
+	define_reduce(ui64)
 	define_reduce(f32)
 	define_reduce(f64)
 
@@ -792,6 +921,9 @@ define_new(c8)
 define_new(i16)
 define_new(i32)
 define_new(i64)
+define_new(ui16)
+define_new(ui32)
+define_new(ui64)
 define_new(f32)
 define_new(f64)
 
@@ -811,6 +943,9 @@ define_println_list(c8)
 define_println_list(i16)
 define_println_list(i32)
 define_println_list(i64)
+define_println_list(ui16)
+define_println_list(ui32)
+define_println_list(ui64)
 define_println_list(f32)
 define_println_list(f64)
 
@@ -829,6 +964,9 @@ define_print_list(c8)
 define_print_list(i16)
 define_print_list(i32)
 define_print_list(i64)
+define_print_list(ui16)
+define_print_list(ui32)
+define_print_list(ui64)
 define_print_list(f32)
 define_print_list(f64)
 
@@ -843,10 +981,13 @@ void println_array_##T(int size, const T* array) {  \
 
 	define_println_array(b8)
 	define_println_array(c8)
-	define_println_array(i16)
-	define_println_array(i32)
-	define_println_array(i64)
-	define_println_array(f32)
+		define_println_array(i16)
+		define_println_array(i32)
+		define_println_array(i64)
+		define_println_array(ui16)
+		define_println_array(ui32)
+		define_println_array(ui64)
+		define_println_array(f32)
 	define_println_array(f64)
 
 #define define_print_array(T) \
@@ -862,6 +1003,9 @@ define_print_array(c8)
 define_print_array(i16)
 define_print_array(i32)
 define_print_array(i64)
+define_print_array(ui16)
+define_print_array(ui32)
+define_print_array(ui64)
 define_print_array(f32)
 define_print_array(f64)
 
@@ -881,6 +1025,9 @@ void println_pointer_##T(T* pointer) {  \
 	define_println_pointer(i16)
 	define_println_pointer(i32)
 	define_println_pointer(i64)
+	define_println_pointer(ui16)
+	define_println_pointer(ui32)
+	define_println_pointer(ui64)
 	define_println_pointer(f32)
 	define_println_pointer(f64)
 
@@ -899,6 +1046,9 @@ void print_pointer_##T(T* pointer) {  \
 	define_print_pointer(i16)
 	define_print_pointer(i32)
 	define_print_pointer(i64)
+	define_print_pointer(ui16)
+	define_print_pointer(ui32)
+	define_print_pointer(ui64)
 	define_print_pointer(f32)
 	define_print_pointer(f64)
 
@@ -919,7 +1069,10 @@ T* elt_list_##T(node_##T* list, i32 idx) { \
 	define_elt_list(i16)
 	define_elt_list(i32)
 	define_elt_list(i64)
-	define_elt_list(f32)
+		define_elt_list(ui16)
+		define_elt_list(ui32)
+		define_elt_list(ui64)
+		define_elt_list(f32)
 	define_elt_list(f64)
 
 #define define_set_list(T) \
@@ -933,6 +1086,9 @@ define_set_list(c8)
 define_set_list(i16)
 define_set_list(i32)
 define_set_list(i64)
+define_set_list(ui16)
+define_set_list(ui32)
+define_set_list(ui64)
 define_set_list(f32)
 define_set_list(f64)
 
@@ -953,10 +1109,13 @@ T* append_pointer_##T(T* array, T value) {  \
 	define_append_pointer(bool)
 	define_append_pointer(c8)
 	define_append_pointer(b8)
-	define_append_pointer(i16)
-	define_append_pointer(i32)
-	define_append_pointer(i64)
-	define_append_pointer(f32)
+		define_append_pointer(i16)
+		define_append_pointer(i32)
+		define_append_pointer(i64)
+		define_append_pointer(ui16)
+		define_append_pointer(ui32)
+		define_append_pointer(ui64)
+		define_append_pointer(f32)
 	define_append_pointer(f64)
 
 #define define_set_pointer_list(T) \
@@ -967,10 +1126,13 @@ void set_pointer_list_##T(node_##T** ptr, node_##T* val){ \
 	define_set_pointer_list(bool)
 	define_set_pointer_list(c8)
 	define_set_pointer_list(b8)
-	define_set_pointer_list(i16)
-	define_set_pointer_list(i32)
-	define_set_pointer_list(i64)
-	define_set_pointer_list(f32)
+		define_set_pointer_list(i16)
+		define_set_pointer_list(i32)
+		define_set_pointer_list(i64)
+		define_set_pointer_list(ui16)
+		define_set_pointer_list(ui32)
+		define_set_pointer_list(ui64)
+		define_set_pointer_list(f32)
 	define_set_pointer_list(f64)
 
 #define define_set_pointer_array(T) \
@@ -981,10 +1143,13 @@ void set_pointer_array_##T(T** ptr, T* val){ \
 	define_set_pointer_array(bool)
 	define_set_pointer_array(c8)
 	define_set_pointer_array(b8)
-	define_set_pointer_array(i16)
-	define_set_pointer_array(i32)
-	define_set_pointer_array(i64)
-	define_set_pointer_array(f32)
+		define_set_pointer_array(i16)
+		define_set_pointer_array(i32)
+		define_set_pointer_array(i64)
+		define_set_pointer_array(ui16)
+		define_set_pointer_array(ui32)
+		define_set_pointer_array(ui64)
+		define_set_pointer_array(f32)
 	define_set_pointer_array(f64)
 
 #define define_set_pointer_pointer(T) \
@@ -995,10 +1160,13 @@ void set_pointer_pointer_##T(T** ptr, T* val){ \
 	define_set_pointer_pointer(bool)
 	define_set_pointer_pointer(c8)
 	define_set_pointer_pointer(b8)
-	define_set_pointer_pointer(i16)
-	define_set_pointer_pointer(i32)
-	define_set_pointer_pointer(i64)
-	define_set_pointer_pointer(f32)
+		define_set_pointer_pointer(i16)
+		define_set_pointer_pointer(i32)
+		define_set_pointer_pointer(i64)
+		define_set_pointer_pointer(ui16)
+		define_set_pointer_pointer(ui32)
+		define_set_pointer_pointer(ui64)
+		define_set_pointer_pointer(f32)
 	define_set_pointer_pointer(f64)
 
 void print_str_pointer_c8(c8* array, c8* value) {
@@ -1044,6 +1212,42 @@ void print_str_pointer_i64(c8* pointer, i64* value) {
 }
 
 void print_str_array_i64(c8* pointer, i64* value) {
+	int cnt = 0;
+	for (cnt = 0; cnt < length(pointer); cnt++)
+		sprintf(pointer, "%ld", value[cnt]);
+}
+
+void print_str_pointer_ui16(c8* pointer, ui16* value) {
+	int cnt = 0;
+	for (cnt = 0; cnt < length(pointer); cnt++)
+		sprintf(pointer, "%d", value[cnt]);
+}
+
+void print_str_array_ui16(c8* pointer, ui16* value) {
+	int cnt = 0;
+	for (cnt = 0; cnt < length(pointer); cnt++)
+		sprintf(pointer, "%d", value[cnt]);
+}
+
+void print_str_pointer_ui32(c8* pointer, ui32* value) {
+	int cnt = 0;
+	for (cnt = 0; cnt < length(pointer); cnt++)
+		sprintf(pointer, "%d", value[cnt]);
+}
+
+void print_str_array_ui32(c8* pointer, ui32* value) {
+	int cnt = 0;
+	for (cnt = 0; cnt < length(pointer); cnt++)
+		sprintf(pointer, "%d", value[cnt]);
+}
+
+void print_str_pointer_ui64(c8* pointer, ui64* value) {
+	int cnt = 0;
+	for (cnt = 0; cnt < length(pointer); cnt++)
+		sprintf(pointer, "%ld", value[cnt]);
+}
+
+void print_str_array_ui64(c8* pointer, ui64* value) {
 	int cnt = 0;
 	for (cnt = 0; cnt < length(pointer); cnt++)
 		sprintf(pointer, "%ld", value[cnt]);
