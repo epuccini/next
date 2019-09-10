@@ -1167,11 +1167,16 @@ define_print_array(f80)
 void println_pointer_##T(T* pointer) {  \
 	int size = length(pointer); \
 	int cnt = 0; \
-    for (cnt = 0; cnt < size; cnt++) { \
-		print_##T(pointer[cnt]); \
-		printf(" "); \
+	if (size <= 1) { \
+		print_##T(*pointer); \
+		printf("\n"); \
+	} else { \
+		for (cnt = 0; cnt < size; cnt++) { \
+			print_##T(pointer[cnt]); \
+			printf(" "); \
+		} \
+		printf("\n"); \
 	} \
-	printf("\n"); \
 } \
 
 define_println_pointer(b8)
@@ -1190,9 +1195,14 @@ define_println_pointer(f80)
 void print_pointer_##T(T* pointer) {  \
     int size = length((void*)pointer); \
 	int cnt = 0; \
-    for (cnt = 0; cnt < size; cnt++) { \
-		print_##T(pointer[cnt]); \
-		printf(" "); \
+	if (size <= 1) { \
+		print_##T(*pointer); \
+		printf("\n"); \
+	} else { \
+		for (cnt = 0; cnt < size; cnt++) { \
+			print_##T(pointer[cnt]); \
+			printf(" "); \
+		} \
 	} \
 } \
 

@@ -135,11 +135,31 @@ by Edward Puccini |;
 
 (defn pointers:void []
   (let [value:i32 1000
-        value_ptr:i32> value]
+        value2:i32 2000
+        value3:i32 3000
+        other:f32 1.0
+        other_ptr:f32> (& other)
+        value_ptr:i32> value
+        value_ptr_ptr:i32>> value_ptr
+        new_value_ptr:i32> value2]
     (prn "Value ")
     (prnl value)
-    (prn "Pointer ")
-    (prnl value_ptr)))
+    (prn "Pointer print ")
+    (prnl value_ptr)
+    (prn "deref Pointer ")
+    (prnl (i32> (? value_ptr_ptr)))
+    (prn "Other value ")
+    (prnl other)
+    (prn "Pointer deeref ")
+    (prnl (f32 (? other_ptr)))
+    (prn "Value 2 ")
+    (:: value2 4000)
+    (prnl new_value_ptr)
+    (prn "New Value Pointer: Value 3 ")
+    (:: new_value_ptr (& value3))
+    (prnl (i32 (? new_value_ptr)))
+    (prn "New Value Pointer: Value 3/alt ")
+    (prnl new_value_ptr)))
 
 (defn main:i32 []
   (let [ret:i32 (arrays-and-lists 77)]

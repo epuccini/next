@@ -1167,11 +1167,16 @@ define_print_array(f80)
 void println_pointer_##T(T* pointer) {  \
 	int size = length(pointer); \
 	int cnt = 0; \
-    for (cnt = 0; cnt < size; cnt++) { \
-		print_##T(pointer[cnt]); \
-		printf(" "); \
+	if (size <= 1) { \
+		print_##T(*pointer); \
+		printf("\n"); \
+	} else { \
+		for (cnt = 0; cnt < size; cnt++) { \
+			print_##T(pointer[cnt]); \
+			printf(" "); \
+		} \
+		printf("\n"); \
 	} \
-	printf("\n"); \
 } \
 
 define_println_pointer(b8)
@@ -1190,9 +1195,14 @@ define_println_pointer(f80)
 void print_pointer_##T(T* pointer) {  \
     int size = length((void*)pointer); \
 	int cnt = 0; \
-    for (cnt = 0; cnt < size; cnt++) { \
-		print_##T(pointer[cnt]); \
-		printf(" "); \
+	if (size <= 1) { \
+		print_##T(*pointer); \
+		printf("\n"); \
+	} else { \
+		for (cnt = 0; cnt < size; cnt++) { \
+			print_##T(pointer[cnt]); \
+			printf(" "); \
+		} \
 	} \
 } \
 
@@ -1592,12 +1602,35 @@ void pointers_0()
 {
 {
 i32 value_2=1000;
+i32 value2_2=2000;
+i32 value3_2=3000;
+f32 other_2=1.0;
+f32* other_ptr_2=(&other_2);
+append_ptr(other_ptr_2, 1, VARIABLE);
 i32* value_ptr_2=&value_2;
 append_ptr(value_ptr_2, 1, VARIABLE);
+i32** value_ptr_ptr_2=&value_ptr_2;
+append_ptr(value_ptr_ptr_2, 1, VARIABLE);
+i32* new_value_ptr_2=&value2_2;
+append_ptr(new_value_ptr_2, 1, VARIABLE);
 print_string("Value ");
 println_i32(value_2);
-print_string("Pointer ");
+print_string("Pointer print ");
 println_pointer_i32(value_ptr_2);
+print_string("deref Pointer ");
+println_pointer_i32((i32*)(*value_ptr_ptr_2));
+print_string("Other value ");
+println_f32(other_2);
+print_string("Pointer deeref ");
+println_f32((f32)(*other_ptr_2));
+print_string("Value 2 ");
+set_pointer_i32(&value2_2,4000);
+println_pointer_i32(new_value_ptr_2);
+print_string("New Value Pointer: Value 3 ");
+set_pointer_pointer_i32(&new_value_ptr_2,(&value3_2));
+println_i32((i32)(*new_value_ptr_2));
+print_string("New Value Pointer: Value 3/alt ");
+println_pointer_i32(new_value_ptr_2);
 }
 }
 i32 main()
