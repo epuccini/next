@@ -53,7 +53,11 @@ void print_f32(f32 val) {
 }
 
 void print_f64(f64 val) {
-    printf("%lf", val);
+	printf("%lf", val);
+}
+
+void print_f80(f80 val) {
+	printf("%Lf", val);
 }
 
 void print_string(const c8* str) {
@@ -97,7 +101,11 @@ void println_f32(f32 val) {
 }
 
 void println_f64(f64 val) {
-    printf("%lf \n", val);
+	printf("%lf \n", val);
+}
+
+void println_f80(f80 val) {
+	printf("%Lf \n", val);
 }
 
 void println_string(const c8* str) {
@@ -176,6 +184,10 @@ f64* elt_array_f64(f64* ptr, i32 idx) {
 	return (f64*)&ptr[idx];
 }
 
+f80* elt_array_f80(f80* ptr, i32 idx) {
+	return (f80*)&ptr[idx];
+}
+
 c8** elt_array_string(c8** ptr, i32 idx) {
 	return (c8**)&ptr[idx];
 }
@@ -224,6 +236,10 @@ void set_pointer_f64(f64* ptr, f64 val) {
 	*ptr = val;
 }
 
+void set_pointer_f80(f80* ptr, f80 val) {
+	*ptr = val;
+}
+
 void set_pointer_string(c8** ptr, c8* val) {
 	*ptr = val;
 }
@@ -266,6 +282,7 @@ define_lt(ui32)
 define_lt(ui64)
 define_lt(f32)
 define_lt(f64)
+define_lt(f80)
 
 define_leqt(bool)
 define_leqt(i16)
@@ -276,6 +293,7 @@ define_leqt(ui32)
 define_leqt(ui64)
 define_leqt(f32)
 define_leqt(f64)
+define_leqt(f80)
 
 define_gt(bool)
 define_gt(i16)
@@ -286,6 +304,7 @@ define_gt(ui32)
 define_gt(ui64)
 define_gt(f32)
 define_gt(f64)
+define_gt(f80)
 
 define_geqt(bool)
 define_geqt(i16)
@@ -296,6 +315,7 @@ define_geqt(ui32)
 define_geqt(ui64)
 define_geqt(f32)
 define_geqt(f64)
+define_geqt(f80)
 
 define_neq(bool)
 define_neq(i16)
@@ -303,6 +323,7 @@ define_neq(i32)
 define_neq(i64)
 define_neq(f32)
 define_neq(f64)
+define_neq(f80)
 
 define_eq(bool)
 define_eq(i16)
@@ -313,6 +334,7 @@ define_eq(ui32)
 define_eq(ui64)
 define_eq(f32)
 define_eq(f64)
+define_eq(f80)
 
 #define define_sqrt(T) \
 T sqrt_##T(T a){ \
@@ -327,6 +349,7 @@ define_sqrt(ui32)
 define_sqrt(ui64)
 define_sqrt(f32)
 define_sqrt(f64)
+define_sqrt(f80)
 
 #define define_power(T) \
 T power_##T(T a, T b){ \
@@ -341,6 +364,7 @@ define_power(ui32)
 define_power(ui64)
 define_power(f32)
 define_power(f64)
+define_power(f80)
 
 #define define_max(T) \
 T max_##T(T a, T b){ \
@@ -359,6 +383,7 @@ define_max(ui32)
 define_max(ui64)
 define_max(f32)
 define_max(f64)
+define_max(f80)
 
 #define define_min(T) \
 T min_##T(T a, T b) { \
@@ -369,44 +394,47 @@ T min_##T(T a, T b) { \
 		return b; \
 } \
 
-	define_min(i16)
-	define_min(i32)
-	define_min(i64)
-	define_min(ui16)
-	define_min(ui32)
-	define_min(ui64)
-	define_min(f32)
+define_min(i16)
+define_min(i32)
+define_min(i64)
+define_min(ui16)
+define_min(ui32)
+define_min(ui64)
+define_min(f32)
 define_min(f64)
+define_min(f80)
 
 #define define_single_fn(T) \
 typedef T (*single_fn_##T)(T); \
 
-	define_single_fn(bool)
-	define_single_fn(b8)
-	define_single_fn(c8)
-	define_single_fn(i16)
-	define_single_fn(i32)
-	define_single_fn(i64)
-	define_single_fn(ui16)
-	define_single_fn(ui32)
-	define_single_fn(ui64)
-	define_single_fn(f32)
-	define_single_fn(f64)
+define_single_fn(bool)
+define_single_fn(b8)
+define_single_fn(c8)
+define_single_fn(i16)
+define_single_fn(i32)
+define_single_fn(i64)
+define_single_fn(ui16)
+define_single_fn(ui32)
+define_single_fn(ui64)
+define_single_fn(f32)
+define_single_fn(f64)
+define_single_fn(f80)
 
 #define define_dual_fn(T) \
 typedef T (*dual_fn_##T)(T, T); \
 
-	define_dual_fn(bool)
-	define_dual_fn(b8)
-	define_dual_fn(c8)
-	define_dual_fn(i16)
-	define_dual_fn(i32)
-	define_dual_fn(i64)
-	define_dual_fn(ui16)
-	define_dual_fn(ui32)
-	define_dual_fn(ui64)
-	define_dual_fn(f32)
-	define_dual_fn(f64)
+define_dual_fn(bool)
+define_dual_fn(b8)
+define_dual_fn(c8)
+define_dual_fn(i16)
+define_dual_fn(i32)
+define_dual_fn(i64)
+define_dual_fn(ui16)
+define_dual_fn(ui32)
+define_dual_fn(ui64)
+define_dual_fn(f32)
+define_dual_fn(f64)
+define_dual_fn(f80)
 
 node_ptr_t* append_ptr(void* value, int size, PTR_TYPE_t type) {
 	node_ptr_t* head;
@@ -554,6 +582,7 @@ define_node(ui32)
 define_node(ui64)
 define_node(f32)
 define_node(f64)
+define_node(f80)
 
 #define define_append_list(T) \
 node_##T* append_list_##T(node_##T* list, T value) {  \
@@ -590,6 +619,7 @@ define_append_list(ui32)
 define_append_list(ui64)
 define_append_list(f32)
 define_append_list(f64)
+define_append_list(f80)
 
 #define define_append_array(T) \
 T* append_array_##T(T* array, T value) {  \
@@ -616,6 +646,7 @@ define_append_array(ui32)
 define_append_array(ui64)
 define_append_array(f32)
 define_append_array(f64)
+define_append_array(f80)
 
 #define define_length_list(T) \
 i32 length_list_##T(node_##T* list) {  \
@@ -643,6 +674,7 @@ define_length_list(ui32)
 define_length_list(ui64)
 define_length_list(f32)
 define_length_list(f64)
+define_length_list(f80)
 
 #define define_length_array(T) \
 i32 length_array_##T(void* array) {  \
@@ -660,6 +692,7 @@ define_length_array(ui32)
 define_length_array(ui64)
 define_length_array(f32)
 define_length_array(f64)
+define_length_array(f80)
 
 #define define_length_pointer(T) \
 i32 length_pointer_##T(void* pointer) {  \
@@ -677,6 +710,7 @@ define_length_pointer(ui32)
 define_length_pointer(ui64)
 define_length_pointer(f32)
 define_length_pointer(f64)
+define_length_pointer(f80)
 
 #define define_push_list(T) \
 node_##T* push_list_##T(node_##T** list, T value) {  \
@@ -700,6 +734,7 @@ define_push_list(ui32)
 define_push_list(ui64)
 define_push_list(f32)
 define_push_list(f64)
+define_push_list(f80)
 
 #define define_pop_list(T) \
 T pop_list_##T(node_##T** list) {  \
@@ -723,6 +758,7 @@ define_pop_list(ui32)
 define_pop_list(ui64)
 define_pop_list(f32)
 define_pop_list(f64)
+define_pop_list(f80)
 
 #define define_remove_list(T) \
 node_##T* remove_list_##T(node_##T* list, int pos) { \
@@ -754,6 +790,7 @@ define_remove_list(ui32)
 define_remove_list(ui64)
 define_remove_list(f32)
 define_remove_list(f64)
+define_remove_list(f80)
 
 #define define_car_list(T) \
 T car_list_##T(node_##T* list) { \
@@ -771,6 +808,7 @@ define_car_list(ui32)
 define_car_list(ui64)
 define_car_list(f32)
 define_car_list(f64)
+define_car_list(f80)
 
 #define define_cdr_list(T) \
 node_##T* cdr_list_##T(node_##T* list) { \
@@ -788,6 +826,7 @@ define_cdr_list(ui32)
 define_cdr_list(ui64)
 define_cdr_list(f32)
 define_cdr_list(f64)
+define_cdr_list(f80)
 
 #define define_destroy(T) \
 void destroy_list_##T(node_##T* e) { \
@@ -816,32 +855,36 @@ define_destroy(ui32)
 define_destroy(ui64)
 define_destroy(f32)
 define_destroy(f64)
+define_destroy(f80)
 
 #define define_create_list(T) \
 node_##T* create_list_##T(T list[], int size) {  \
 	int cnt = 0; \
-	node_##T* ret = NULL; \
+	node_##T* mem = NULL; \
+	node_##T** start = &mem; \
 	for (cnt = 0; cnt < size; cnt++) { \
-		ret = append_list_##T(ret, list[cnt]);  \
+		mem = append_list_##T(mem, list[cnt]);  \
 	} \
-	append_ptr(ret, size, LIST); \
-	return ret; \
+	mem = *start; \
+	append_ptr(mem, size, LIST); \
+	return mem; \
 } \
 
-	define_create_list(bool)
-	define_create_list(c8)
-	define_create_list(b8)
-	define_create_list(i16)
-	define_create_list(i32)
-	define_create_list(i64)
-	define_create_list(ui16)
-	define_create_list(ui32)
-	define_create_list(ui64)
-	define_create_list(f32)
-	define_create_list(f64)
+define_create_list(bool)
+define_create_list(c8)
+define_create_list(b8)
+define_create_list(i16)
+define_create_list(i32)
+define_create_list(i64)
+define_create_list(ui16)
+define_create_list(ui32)
+define_create_list(ui64)
+define_create_list(f32)
+define_create_list(f64)
+define_create_list(f80)
 
-#define define_map(T) \
-T* map_##T(single_fn_##T a, T* b) { \
+#define define_map_array(T) \
+T* map_array_##T(single_fn_##T a, T* b) { \
     i32 cnt = 0; \
     for (cnt = 0; cnt < sizeof(b)-2; cnt++) { \
         b[cnt] = (*a)(b[cnt]); \
@@ -849,20 +892,46 @@ T* map_##T(single_fn_##T a, T* b) { \
     return b; \
 }
 
-	define_map(bool)
-	define_map(b8)
-	define_map(c8)
-	define_map(i16)
-	define_map(i32)
-	define_map(i64)
-	define_map(ui16)
-	define_map(ui32)
-	define_map(ui64)
-	define_map(f32)
-	define_map(f64)
+	define_map_array(bool)
+	define_map_array(b8)
+	define_map_array(c8)
+	define_map_array(i16)
+	define_map_array(i32)
+	define_map_array(i64)
+	define_map_array(ui16)
+	define_map_array(ui32)
+	define_map_array(ui64)
+	define_map_array(f32)
+	define_map_array(f64)
+	define_map_array(f80)
 
-#define define_mapn(T) \
-T* mapn_##T(single_fn_##T a, T* b) { \
+#define define_map_list(T) \
+node_##T* map_list_##T(single_fn_##T a, node_##T* b) { \
+    i32 cnt = 0; \
+	int size = length(b); \
+    for (cnt = 0; cnt < size-1; cnt++) { \
+        b->value = (*a)(b->value); \
+		if(b->next != NULL) \
+			b = b->next; \
+    } \
+    return b; \
+}
+
+define_map_list(bool)
+define_map_list(b8)
+define_map_list(c8)
+define_map_list(i16)
+define_map_list(i32)
+define_map_list(i64)
+define_map_list(ui16)
+define_map_list(ui32)
+define_map_list(ui64)
+define_map_list(f32)
+define_map_list(f64)
+define_map_list(f80)
+
+#define define_mapn_array(T) \
+T* mapn_array_##T(single_fn_##T a, T* b) { \
     T* ptr = (T*) malloc(sizeof(b) * sizeof(T)); \
 	append_ptr((void*)ptr, sizeof(b)-2, POINTER);\
 	i32 cnt = 0; \
@@ -872,20 +941,48 @@ T* mapn_##T(single_fn_##T a, T* b) { \
     return ptr; \
 }
 
-	define_mapn(bool)
-	define_mapn(b8)
-	define_mapn(c8)
-	define_mapn(i16)
-	define_mapn(i32)
-	define_mapn(i64)
-	define_mapn(ui16)
-	define_mapn(ui32)
-	define_mapn(ui64)
-	define_mapn(f32)
-	define_mapn(f64)
+	define_mapn_array(bool)
+	define_mapn_array(b8)
+	define_mapn_array(c8)
+	define_mapn_array(i16)
+	define_mapn_array(i32)
+	define_mapn_array(i64)
+	define_mapn_array(ui16)
+	define_mapn_array(ui32)
+	define_mapn_array(ui64)
+	define_mapn_array(f32)
+	define_mapn_array(f64)
+	define_mapn_array(f80)
 
-#define define_reduce(T) \
-T reduce_##T(dual_fn_##T a, T* b) { \
+#define define_mapn_list(T) \
+node_##T* mapn_list_##T(single_fn_##T a, node_##T* b) { \
+    node_##T* ptr = (node_##T*) malloc(sizeof(node_##T)); \
+	int size = length(b); \
+	i32 cnt = 0; \
+    for (cnt = 0; cnt < sizeof(b)-2; cnt++) { \
+        ptr->value = (*a)(b->value); \
+		ptr->next = (node_##T*) malloc(sizeof(node_##T)); \
+		ptr = ptr->next; \
+    } \
+	append_ptr((void*)ptr, size-1, POINTER); \
+    return ptr; \
+}
+
+	define_mapn_list(bool)
+	define_mapn_list(b8)
+	define_mapn_list(c8)
+	define_mapn_list(i16)
+	define_mapn_list(i32)
+	define_mapn_list(i64)
+	define_mapn_list(ui16)
+	define_mapn_list(ui32)
+	define_mapn_list(ui64)
+	define_mapn_list(f32)
+	define_mapn_list(f64)
+	define_mapn_list(f80)
+
+#define define_reduce_array(T) \
+T reduce_array_##T(dual_fn_##T a, T* b) { \
     i32 cnt = 0; \
     T result = b[0]; \
     for (cnt = 1; cnt < sizeof(b)-2; cnt++) { \
@@ -894,16 +991,44 @@ T reduce_##T(dual_fn_##T a, T* b) { \
     return result; \
 } 
 
-	define_reduce(bool)
-	define_reduce(c8)
-	define_reduce(i16)
-	define_reduce(i32)
-	define_reduce(i64)
-	define_reduce(ui16)
-	define_reduce(ui32)
-	define_reduce(ui64)
-	define_reduce(f32)
-	define_reduce(f64)
+	define_reduce_array(bool)
+	define_reduce_array(c8)
+	define_reduce_array(i16)
+	define_reduce_array(i32)
+	define_reduce_array(i64)
+	define_reduce_array(ui16)
+	define_reduce_array(ui32)
+	define_reduce_array(ui64)
+	define_reduce_array(f32)
+	define_reduce_array(f64)
+	define_reduce_array(f80)
+
+#define define_reduce_list(T) \
+T reduce_list_##T(dual_fn_##T a, node_##T* b) { \
+    i32 cnt = 0; \
+    T result = b->value; \
+	int size = length(b); \
+	if (b->next != NULL) \
+		b = b->next; \
+    for (cnt = 1; cnt < size-1; cnt++) { \
+		result = (*a)(result, b->value);           \
+		if(b->next != NULL) \
+			b = b->next; \
+    } \
+    return result; \
+} 
+
+	define_reduce_list(bool)
+	define_reduce_list(c8)
+	define_reduce_list(i16)
+	define_reduce_list(i32)
+	define_reduce_list(i64)
+	define_reduce_list(ui16)
+	define_reduce_list(ui32)
+	define_reduce_list(ui64)
+	define_reduce_list(f32)
+	define_reduce_list(f64)
+	define_reduce_list(f80)
 
 
 #define define_new(T) \
@@ -916,16 +1041,17 @@ T* new_##T(int size) { \
     return mem; \
 }
 
-define_new(bool)
-define_new(c8)
-define_new(i16)
-define_new(i32)
-define_new(i64)
-define_new(ui16)
-define_new(ui32)
-define_new(ui64)
-define_new(f32)
-define_new(f64)
+	define_new(bool)
+	define_new(c8)
+	define_new(i16)
+	define_new(i32)
+	define_new(i64)
+	define_new(ui16)
+	define_new(ui32)
+	define_new(ui64)
+	define_new(f32)
+	define_new(f64)
+	define_new(f80)
 
 #define define_println_list(T) \
 void println_list_##T(node_##T* list) {  \
@@ -948,6 +1074,7 @@ define_println_list(ui32)
 define_println_list(ui64)
 define_println_list(f32)
 define_println_list(f64)
+define_println_list(f80)
 
 #define define_print_list(T) \
 void print_list_##T(node_##T* list) {  \
@@ -969,6 +1096,7 @@ define_print_list(ui32)
 define_print_list(ui64)
 define_print_list(f32)
 define_print_list(f64)
+define_print_list(f80)
 
 #define define_println_array(T) \
 void println_array_##T(int size, const T* array) {  \
@@ -979,16 +1107,17 @@ void println_array_##T(int size, const T* array) {  \
 	printf("\n"); \
 } \
 
-	define_println_array(b8)
-	define_println_array(c8)
-		define_println_array(i16)
-		define_println_array(i32)
-		define_println_array(i64)
-		define_println_array(ui16)
-		define_println_array(ui32)
-		define_println_array(ui64)
-		define_println_array(f32)
-	define_println_array(f64)
+define_println_array(b8)
+define_println_array(c8)
+define_println_array(i16)
+define_println_array(i32)
+define_println_array(i64)
+define_println_array(ui16)
+define_println_array(ui32)
+define_println_array(ui64)
+define_println_array(f32)
+define_println_array(f64)
+define_println_array(f80)
 
 #define define_print_array(T) \
 void print_array_##T(int size, const T* array) {  \
@@ -1008,6 +1137,7 @@ define_print_array(ui32)
 define_print_array(ui64)
 define_print_array(f32)
 define_print_array(f64)
+define_print_array(f80)
 
 #define define_println_pointer(T) \
 void println_pointer_##T(T* pointer) {  \
@@ -1020,16 +1150,17 @@ void println_pointer_##T(T* pointer) {  \
 	printf("\n"); \
 } \
 
-	define_println_pointer(b8)
-	define_println_pointer(c8)
-	define_println_pointer(i16)
-	define_println_pointer(i32)
-	define_println_pointer(i64)
-	define_println_pointer(ui16)
-	define_println_pointer(ui32)
-	define_println_pointer(ui64)
-	define_println_pointer(f32)
-	define_println_pointer(f64)
+define_println_pointer(b8)
+define_println_pointer(c8)
+define_println_pointer(i16)
+define_println_pointer(i32)
+define_println_pointer(i64)
+define_println_pointer(ui16)
+define_println_pointer(ui32)
+define_println_pointer(ui64)
+define_println_pointer(f32)
+define_println_pointer(f64)
+define_println_pointer(f80)
 
 #define define_print_pointer(T) \
 void print_pointer_##T(T* pointer) {  \
@@ -1041,16 +1172,17 @@ void print_pointer_##T(T* pointer) {  \
 	} \
 } \
 
-	define_print_pointer(b8)
-	define_print_pointer(c8)
-	define_print_pointer(i16)
-	define_print_pointer(i32)
-	define_print_pointer(i64)
-	define_print_pointer(ui16)
-	define_print_pointer(ui32)
-	define_print_pointer(ui64)
-	define_print_pointer(f32)
-	define_print_pointer(f64)
+define_print_pointer(b8)
+define_print_pointer(c8)
+define_print_pointer(i16)
+define_print_pointer(i32)
+define_print_pointer(i64)
+define_print_pointer(ui16)
+define_print_pointer(ui32)
+define_print_pointer(ui64)
+define_print_pointer(f32)
+define_print_pointer(f64)
+define_print_pointer(f80)
 
 #define define_elt_list(T) \
 T* elt_list_##T(node_##T* list, i32 idx) { \
@@ -1064,16 +1196,17 @@ T* elt_list_##T(node_##T* list, i32 idx) { \
 	return (T*)&list->value; \
 } \
 
-	define_elt_list(b8)
-	define_elt_list(c8)
-	define_elt_list(i16)
-	define_elt_list(i32)
-	define_elt_list(i64)
-		define_elt_list(ui16)
-		define_elt_list(ui32)
-		define_elt_list(ui64)
-		define_elt_list(f32)
-	define_elt_list(f64)
+define_elt_list(b8)
+define_elt_list(c8)
+define_elt_list(i16)
+define_elt_list(i32)
+define_elt_list(i64)
+define_elt_list(ui16)
+define_elt_list(ui32)
+define_elt_list(ui64)
+define_elt_list(f32)
+define_elt_list(f64)
+define_elt_list(f80)
 
 #define define_set_list(T) \
 void set_list_##T(node_##T* list, T val) { \
@@ -1091,6 +1224,7 @@ define_set_list(ui32)
 define_set_list(ui64)
 define_set_list(f32)
 define_set_list(f64)
+define_set_list(f80)
 
 #define define_append_pointer(T) \
 T* append_pointer_##T(T* array, T value) {  \
@@ -1106,68 +1240,72 @@ T* append_pointer_##T(T* array, T value) {  \
 	return new_array; \
 } 
 
-	define_append_pointer(bool)
-	define_append_pointer(c8)
-	define_append_pointer(b8)
-		define_append_pointer(i16)
-		define_append_pointer(i32)
-		define_append_pointer(i64)
-		define_append_pointer(ui16)
-		define_append_pointer(ui32)
-		define_append_pointer(ui64)
-		define_append_pointer(f32)
-	define_append_pointer(f64)
+define_append_pointer(bool)
+define_append_pointer(c8)
+define_append_pointer(b8)
+define_append_pointer(i16)
+define_append_pointer(i32)
+define_append_pointer(i64)
+define_append_pointer(ui16)
+define_append_pointer(ui32)
+define_append_pointer(ui64)
+define_append_pointer(f32)
+define_append_pointer(f64)
+define_append_pointer(f80)
 
 #define define_set_pointer_list(T) \
 void set_pointer_list_##T(node_##T** ptr, node_##T* val){ \
 	(*ptr) = val; \
 }
 
-	define_set_pointer_list(bool)
-	define_set_pointer_list(c8)
-	define_set_pointer_list(b8)
-		define_set_pointer_list(i16)
-		define_set_pointer_list(i32)
-		define_set_pointer_list(i64)
-		define_set_pointer_list(ui16)
-		define_set_pointer_list(ui32)
-		define_set_pointer_list(ui64)
-		define_set_pointer_list(f32)
-	define_set_pointer_list(f64)
+define_set_pointer_list(bool)
+define_set_pointer_list(c8)
+define_set_pointer_list(b8)
+define_set_pointer_list(i16)
+define_set_pointer_list(i32)
+define_set_pointer_list(i64)
+define_set_pointer_list(ui16)
+define_set_pointer_list(ui32)
+define_set_pointer_list(ui64)
+define_set_pointer_list(f32)
+define_set_pointer_list(f64)
+define_set_pointer_list(f80)
 
 #define define_set_pointer_array(T) \
 void set_pointer_array_##T(T** ptr, T* val){ \
 	(*ptr) = val; \
 }
 
-	define_set_pointer_array(bool)
-	define_set_pointer_array(c8)
-	define_set_pointer_array(b8)
-		define_set_pointer_array(i16)
-		define_set_pointer_array(i32)
-		define_set_pointer_array(i64)
-		define_set_pointer_array(ui16)
-		define_set_pointer_array(ui32)
-		define_set_pointer_array(ui64)
-		define_set_pointer_array(f32)
-	define_set_pointer_array(f64)
+define_set_pointer_array(bool)
+define_set_pointer_array(c8)
+define_set_pointer_array(b8)
+define_set_pointer_array(i16)
+define_set_pointer_array(i32)
+define_set_pointer_array(i64)
+define_set_pointer_array(ui16)
+define_set_pointer_array(ui32)
+define_set_pointer_array(ui64)
+define_set_pointer_array(f32)
+define_set_pointer_array(f64)
+define_set_pointer_array(f80)
 
 #define define_set_pointer_pointer(T) \
 void set_pointer_pointer_##T(T** ptr, T* val){ \
 	(*ptr) = val; \
 }
 
-	define_set_pointer_pointer(bool)
-	define_set_pointer_pointer(c8)
-	define_set_pointer_pointer(b8)
-		define_set_pointer_pointer(i16)
-		define_set_pointer_pointer(i32)
-		define_set_pointer_pointer(i64)
-		define_set_pointer_pointer(ui16)
-		define_set_pointer_pointer(ui32)
-		define_set_pointer_pointer(ui64)
-		define_set_pointer_pointer(f32)
-	define_set_pointer_pointer(f64)
+define_set_pointer_pointer(bool)
+define_set_pointer_pointer(c8)
+define_set_pointer_pointer(b8)
+define_set_pointer_pointer(i16)
+define_set_pointer_pointer(i32)
+define_set_pointer_pointer(i64)
+define_set_pointer_pointer(ui16)
+define_set_pointer_pointer(ui32)
+define_set_pointer_pointer(ui64)
+define_set_pointer_pointer(f32)
+define_set_pointer_pointer(f64)
+define_set_pointer_pointer(f80)
 
 void print_str_pointer_c8(c8* array, c8* value) {
 	sprintf(array, "%s", value);
@@ -1277,6 +1415,18 @@ void print_str_array_f64(c8* pointer, f64* value) {
 		sprintf(pointer, "%lf", value[cnt]);
 }
 
+void print_str_pointer_f80(c8* pointer, f80* value) {
+	int cnt = 0;
+	for (cnt = 0; cnt < length(pointer); cnt++)
+		sprintf(pointer, "%Lf", value[cnt]);
+}
+
+void print_str_array_f80(c8* pointer, f80* value) {
+	int cnt = 0;
+	for (cnt = 0; cnt < length(pointer); cnt++)
+		sprintf(pointer, "%Lf", value[cnt]);
+}
+
 
 
 
@@ -1319,7 +1469,7 @@ i32 array_2[]={1, 2, 3, 4, 5, 6};
 append_ptr(array_2, sizeof(array_2)/sizeof(i32), ARRAY);
 f32 values_2[]={1.0, 2.0, 3.0, 4.0, 5.0, 6.0};
 append_ptr(values_2, sizeof(values_2)/sizeof(f32), ARRAY);
-f32* my_new_array_2=mapn_f32(mapit_0,values_2);
+f32* my_new_array_2=mapn_array_f32(mapit_0,values_2);
 append_ptr(my_new_array_2, 1, VARIABLE);
 f32* my_new_floats_2=new_f32(10);
 append_ptr(my_new_floats_2, 1, VARIABLE);
@@ -1383,8 +1533,8 @@ print_string("My values ");
 println_array_f32(sizeof(values_2),values_2);
 mapit_0(1000.0);
 work_0(mapit_0,100);
-map_f32(mapit_0,values_2);
-reduce_f32(reduceit_0,values_2);
+map_array_f32(mapit_0,values_2);
+reduce_array_f32(reduceit_0,values_2);
 print_string("String: ");
 println_string(string_2);
 print_string("Chars: ");

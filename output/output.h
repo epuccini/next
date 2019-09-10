@@ -16,6 +16,7 @@ typedef unsigned int ui32;
 typedef unsigned long ui64;
 typedef float f32;
 typedef double f64;
+typedef long double f80;
 
 i32 mod(i32 a, i32 b);
 i32 i32_mod_i32(i32 a, i32 b);
@@ -31,6 +32,7 @@ void print_ui32(ui32 val);
 void print_ui64(ui64 val);
 void print_f32(f32 val);
 void print_f64(f64 val);
+void print_f80(f80 val);
 void print_string(const c8* str);
 void println_b8(c8 val);
 void println_c8(c8 val);
@@ -42,6 +44,7 @@ void println_ui32(ui32 val);
 void println_ui64(ui64 val);
 void println_f32(f32 val);
 void println_f64(f64 val);
+void println_f80(f80 val);
 void println_string(const c8* str);
 void print_format(const c8* fmt, ...);
 
@@ -56,6 +59,7 @@ ui32* elt_array_ui32(ui32* ptr, i32 idx);
 ui64* elt_array_ui64(ui64* ptr, i16 idx);
 f32* elt_array_f32(f32* ptr, i16 idx);
 f64* elt_array_f64(f64* ptr, i32 idx);
+f80* elt_array_f80(f80* ptr, i32 idx);
 c8** elt_array_string(c8** ptr, i32 idx);
 
 void set_pointer_bool(bool* ptr, bool val);
@@ -69,6 +73,7 @@ void set_pointer_ui32(ui32* ptr, ui32 val);
 void set_pointer_ui64(ui64* ptr, ui64 val);
 void set_pointer_f32(f32* ptr, f32 val);
 void set_pointer_f64(f64* ptr, f64 val);
+void set_pointer_f80(f80* ptr, f80 val);
 void set_pointer_string(c8** ptr, c8* val);
 
 typedef enum PTR_TYPE {
