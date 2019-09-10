@@ -554,7 +554,8 @@ int destroy_ptr(node_ptr_t* e) {
             node_ptr_t* temp = e->next;
             do
             {
-                if (e->type != ARRAY && e->type != VARIABLE)
+                if (e->type != ARRAY && e->type != VARIABLE && e->type != INTERMEDIATE_ARRAY 
+					&& e->type != INTERMEDIATE_LIST && e->type != INTERMEDIATE_POINTER)
                     free(e);
                 e = NULL;
                 e = temp;
@@ -562,7 +563,8 @@ int destroy_ptr(node_ptr_t* e) {
             } while (e->next != NULL);
         }
         else {
-            if (e->type != ARRAY && e->type != VARIABLE)
+            if (e->type != ARRAY && e->type != VARIABLE && e->type != INTERMEDIATE_ARRAY 
+				&& e->type != INTERMEDIATE_LIST && e->type != INTERMEDIATE_POINTER)
                 free(e);
         }
 	}
@@ -834,6 +836,68 @@ define_car_array(f80)
 
 #define define_cdr_list(T) \
 node_##T* cdr_list_##T(node_##T* list) { \
+	int size = length_list_##T(list)-1; \
+	append_ptr(&(list->next), size, INTERMEDIATE_LIST); \
+	if(list->next != NULL) \
+		return list->next; \
+	return NULL; \
+} \
+
+define_cdr_list(bool)
+define_cdr_list(c8)
+define_cdr_list(b8)
+define_cdr_list(i16)
+define_cdr_list(i32)
+define_cdr_list(i64)
+define_cdr_list(ui16)
+define_cdr_list(ui32)
+define_cdr_list(ui64)
+define_cdr_list(f32)
+define_cdr_list(f64)
+define_cdr_list(f80)
+
+#define define_cdr_array(T) \
+T* cdr_array_##T(T* array) { \
+	int size = length(array)-1; \
+	append_ptr(&array[1], size, INTERMEDIATE_ARRAY); \
+	return &array[1]; \
+} \
+
+define_cdr_array(bool)
+define_cdr_array(c8)
+define_cdr_array(b8)
+define_cdr_array(i16)
+define_cdr_array(i32)
+define_cdr_array(i64)
+define_cdr_array(ui16)
+define_cdr_array(ui32)
+define_cdr_array(ui64)
+define_cdr_array(f32)
+define_cdr_array(f64)
+define_cdr_array(f80)
+
+#define define_cdr_pointer(T) \
+T* cdr_pointer_##T(T* pointer) { \
+	int size = length(pointer)-1; \
+	append_ptr(&pointer[1], size, INTERMEDIATE_POINTER); \
+	return &pointer[1]; \
+} \
+
+	define_cdr_pointer(bool)
+	define_cdr_pointer(c8)
+	define_cdr_pointer(b8)
+	define_cdr_pointer(i16)
+	define_cdr_pointer(i32)
+	define_cdr_pointer(i64)
+	define_cdr_pointer(ui16)
+	define_cdr_pointer(ui32)
+	define_cdr_pointer(ui64)
+	define_cdr_pointer(f32)
+	define_cdr_pointer(f64)
+	define_cdr_pointer(f80)
+
+#define define_cdrn_list(T) \
+node_##T* cdrn_list_##T(node_##T* list) { \
 	node_##T* start = NULL; \
 	node_##T* copy = NULL; \
 	int size = length((void*)list); \
@@ -858,21 +922,21 @@ node_##T* cdr_list_##T(node_##T* list) { \
 	return copy; \
 } \
 
-define_cdr_list(bool)
-define_cdr_list(c8)
-define_cdr_list(b8)
-define_cdr_list(i16)
-define_cdr_list(i32)
-define_cdr_list(i64)
-define_cdr_list(ui16)
-define_cdr_list(ui32)
-define_cdr_list(ui64)
-define_cdr_list(f32)
-define_cdr_list(f64)
-define_cdr_list(f80)
+	define_cdrn_list(bool)
+	define_cdrn_list(c8)
+	define_cdrn_list(b8)
+	define_cdrn_list(i16)
+	define_cdrn_list(i32)
+	define_cdrn_list(i64)
+	define_cdrn_list(ui16)
+	define_cdrn_list(ui32)
+	define_cdrn_list(ui64)
+	define_cdrn_list(f32)
+	define_cdrn_list(f64)
+	define_cdrn_list(f80)
 
-#define define_cdr_array(T) \
-T* cdr_array_##T(T* array) { \
+#define define_cdrn_array(T) \
+T* cdrn_array_##T(T* array) { \
 	int size = length(array); \
 	T* new_array = malloc(sizeof(T)*(size-1)); \
 	int cnt = 0; \
@@ -882,21 +946,21 @@ T* cdr_array_##T(T* array) { \
 	return new_array; \
 } \
 
-	define_cdr_array(bool)
-	define_cdr_array(c8)
-	define_cdr_array(b8)
-	define_cdr_array(i16)
-	define_cdr_array(i32)
-	define_cdr_array(i64)
-	define_cdr_array(ui16)
-	define_cdr_array(ui32)
-	define_cdr_array(ui64)
-	define_cdr_array(f32)
-	define_cdr_array(f64)
-	define_cdr_array(f80)
+	define_cdrn_array(bool)
+	define_cdrn_array(c8)
+	define_cdrn_array(b8)
+	define_cdrn_array(i16)
+	define_cdrn_array(i32)
+	define_cdrn_array(i64)
+	define_cdrn_array(ui16)
+	define_cdrn_array(ui32)
+	define_cdrn_array(ui64)
+	define_cdrn_array(f32)
+	define_cdrn_array(f64)
+	define_cdrn_array(f80)
 
-#define define_cdr_pointer(T) \
-T* cdr_pointer_##T(T* pointer) { \
+#define define_cdrn_pointer(T) \
+T* cdrn_pointer_##T(T* pointer) { \
 	int size = length(pointer); \
 	T* new_pointer = malloc(sizeof(T)*(size-1)); \
 	int cnt = 0; \
@@ -906,18 +970,18 @@ T* cdr_pointer_##T(T* pointer) { \
 	return new_pointer; \
 } \
 
-	define_cdr_pointer(bool)
-	define_cdr_pointer(c8)
-	define_cdr_pointer(b8)
-	define_cdr_pointer(i16)
-	define_cdr_pointer(i32)
-	define_cdr_pointer(i64)
-	define_cdr_pointer(ui16)
-	define_cdr_pointer(ui32)
-	define_cdr_pointer(ui64)
-	define_cdr_pointer(f32)
-	define_cdr_pointer(f64)
-	define_cdr_pointer(f80)
+	define_cdrn_pointer(bool)
+	define_cdrn_pointer(c8)
+	define_cdrn_pointer(b8)
+	define_cdrn_pointer(i16)
+	define_cdrn_pointer(i32)
+	define_cdrn_pointer(i64)
+	define_cdrn_pointer(ui16)
+	define_cdrn_pointer(ui32)
+	define_cdrn_pointer(ui64)
+	define_cdrn_pointer(f32)
+	define_cdrn_pointer(f64)
+	define_cdrn_pointer(f80)
 
 #define define_destroy(T) \
 void destroy_list_##T(node_##T* e) { \
