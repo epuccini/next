@@ -718,6 +718,136 @@ T* append_array_##T(T* array, T value) {  \
 	define_append_array(f64)
 	define_append_array(f80)
 
+#define define_append_pointer(T) \
+T* append_pointer_##T(T* pointer, T value) {  \
+    int size = length_pointer_##T(pointer); \
+    T* new_pointer = (T*) malloc((size+1)*sizeof(T)); \
+    int cnt = 0; \
+    for (cnt = 0; cnt < size; cnt++) { \
+        new_pointer[cnt] = pointer[cnt]; \
+    } \
+    new_pointer[size] = value; \
+    append_ptr(new_pointer, size+1, POINTER);             \
+    remove_ptr(pointer);       \
+    return new_pointer; \
+}
+
+	define_append_pointer(bool)
+	define_append_pointer(c8)
+	define_append_pointer(b8)
+	define_append_pointer(i16)
+	define_append_pointer(i32)
+	define_append_pointer(i64)
+	define_append_pointer(ui16)
+	define_append_pointer(ui32)
+	define_append_pointer(ui64)
+	define_append_pointer(f32)
+	define_append_pointer(f64)
+	define_append_pointer(f80)
+
+#define define_append_list_list(T) \
+node_##T* append_list_list_##T(node_##T* lista, node_##T* listb) {  \
+	node_##T* new_list = (node_##T*)malloc(sizeof(node_##T)); \
+	node_##T* start = new_list; \
+	int sizea = length_list_##T(lista); \
+	int sizeb = length_list_##T(listb); \
+	int new_size = sizea + sizeb; \
+	do { \
+		new_list->value = lista->value; \
+		new_list->next = (node_##T*)malloc(sizeof(node_##T)); \
+		new_list = new_list->next; \
+		lista = lista->next; \
+	} while (lista != NULL); \
+	if (new_list == NULL) new_list = (node_##T*)malloc(sizeof(node_##T)); \
+	do { \
+		new_list->value = listb->value; \
+		if(listb->next != NULL) { \
+			new_list->next = (node_##T*)malloc(sizeof(node_##T)); \
+			new_list = new_list->next; \
+		} \
+		listb = listb->next; \
+	} while (listb != NULL); \
+	new_list->next = NULL; \
+	new_list = NULL; \
+	append_ptr(start, new_size, LIST); \
+	return start; \
+} \
+
+	define_append_list_list(bool)
+	define_append_list_list(c8)
+	define_append_list_list(b8)
+	define_append_list_list(i16)
+	define_append_list_list(i32)
+	define_append_list_list(i64)
+	define_append_list_list(ui16)
+	define_append_list_list(ui32)
+	define_append_list_list(ui64)
+	define_append_list_list(f32)
+	define_append_list_list(f64)
+	define_append_list_list(f80)
+
+#define define_append_array_array(T) \
+T* append_array_array_##T(T* arraya, T* arrayb) {  \
+	int sizea = length(arraya); \
+	int sizeb = length(arrayb); \
+	int new_size = sizea + sizeb; \
+	T* new_array = malloc(new_size*sizeof(T));  \
+	int cnt = 0; \
+	for(cnt = 0; cnt < sizea; cnt++) { \
+		new_array[cnt] = arraya[cnt]; \
+	} \
+	cnt = 0; \
+	for(cnt = 0; cnt < sizeb; cnt++) { \
+		new_array[sizea+cnt] = arrayb[cnt]; \
+	} \
+    append_ptr(new_array, new_size, POINTER); \
+    return new_array; \
+}
+
+	define_append_array_array(bool)
+	define_append_array_array(c8)
+	define_append_array_array(b8)
+	define_append_array_array(i16)
+	define_append_array_array(i32)
+	define_append_array_array(i64)
+	define_append_array_array(ui16)
+	define_append_array_array(ui32)
+	define_append_array_array(ui64)
+	define_append_array_array(f32)
+	define_append_array_array(f64)
+	define_append_array_array(f80)
+
+#define define_append_pointer_pointer(T) \
+T* append_pointer_pointer_##T(T* pointera, T* pointerb) {  \
+	int sizea = length(pointera); \
+	int sizeb = length(pointerb); \
+	int new_size = sizea + sizeb; \
+	T* new_pointer = malloc(new_size*sizeof(T));  \
+	int cnt = 0; \
+	for(cnt = 0; cnt < sizea; cnt++) { \
+		new_pointer[cnt] = pointera[cnt]; \
+	} \
+	cnt = 0; \
+	for(cnt = 0; cnt < sizeb; cnt++) { \
+		new_pointer[sizea+cnt] = pointerb[cnt]; \
+	} \
+    append_ptr(new_pointer, new_size, POINTER); \
+    return new_pointer; \
+}
+
+	define_append_pointer_pointer(bool)
+	define_append_pointer_pointer(c8)
+	define_append_pointer_pointer(b8)
+	define_append_pointer_pointer(i16)
+	define_append_pointer_pointer(i32)
+	define_append_pointer_pointer(i64)
+	define_append_pointer_pointer(ui16)
+	define_append_pointer_pointer(ui32)
+	define_append_pointer_pointer(ui64)
+	define_append_pointer_pointer(f32)
+	define_append_pointer_pointer(f64)
+	define_append_pointer_pointer(f80)
+
 #define define_push_list(T) \
 node_##T* push_list_##T(node_##T** list, T value) {  \
 	node_##T* head = (node_##T*)malloc(sizeof(node_##T)); \
@@ -1415,33 +1545,6 @@ define_set_list(f32)
 define_set_list(f64)
 define_set_list(f80)
 
-#define define_append_pointer(T) \
-T* append_pointer_##T(T* array, T value) {  \
-    int size = length(array); \
-    T* new_array = (T*) malloc((size+1)*sizeof(T)); \
-	int cnt = 0; \
-	for (cnt = 0; cnt < size; cnt++) { \
-		new_array[cnt] = array[cnt]; \
-	} \
-	new_array[size] = value; \
-	append_ptr(new_array, size+1, POINTER); \
-	remove_ptr(array);       \
-	return new_array; \
-} 
-
-define_append_pointer(bool)
-define_append_pointer(c8)
-define_append_pointer(b8)
-define_append_pointer(i16)
-define_append_pointer(i32)
-define_append_pointer(i64)
-define_append_pointer(ui16)
-define_append_pointer(ui32)
-define_append_pointer(ui64)
-define_append_pointer(f32)
-define_append_pointer(f64)
-define_append_pointer(f80)
-
 #define define_set_pointer_list(T) \
 void set_pointer_list_##T(node_##T** ptr, node_##T* val){ \
 	(*ptr) = val; \
@@ -1656,6 +1759,10 @@ f32 float1_2=0.0;
 f32 float2_2=(0.0+0.0);
 i32 array_2[]={1, 2, 3, 4, 5, 6};
 append_ptr(array_2, sizeof(array_2)/sizeof(i32), ARRAY);
+i32 arrayb_2[]={9, 8, 7, 6, 5, 4, 3, 2, 1};
+append_ptr(arrayb_2, sizeof(arrayb_2)/sizeof(i32), ARRAY);
+i32* append_array_2=append_array_array_i32(array_2,arrayb_2);
+append_ptr(append_array_2, 1, VARIABLE);
 i32* cdr_array_2=cdr_array_i32(array_2);
 append_ptr(cdr_array_2, 1, VARIABLE);
 f32 values_2[]={1.0, 2.0, 3.0, 4.0, 5.0, 6.0};
@@ -1669,6 +1776,8 @@ append_ptr(my_new_array2_2, 1, VARIABLE);
 f32* my_new_array3_2=append_pointer_f32(my_new_array2_2,2000.0);
 append_ptr(my_new_array3_2, 1, VARIABLE);
 node_f32* my_list_2=create_list_f32((f32[]){1.0, 2.0, 3.0, 4.0, 5.0, 6.0},6);
+node_f32* my_listb_2=create_list_f32((f32[]){7.0, 8.0, 9.0, 10.0, 11.0, 12.0, 13.0, 14.0},8);
+node_f32* append_my_list_2=append_list_list_f32(my_list_2,my_listb_2);
 node_f32* cdr_my_list_2=cdr_list_f32(my_list_2);
 const char* string_2="abcdefg";
 c8 chars_2[]={'a', 'b', 'c', 'd', 'e', 'f', 'g'};
@@ -1683,10 +1792,14 @@ print_string("array: ");
 println_array_i32(sizeof(array_2),array_2);
 print_string("cdr-array: ");
 println_pointer_i32(cdr_array_2);
+print_string("append-array: ");
+println_pointer_i32(append_array_2);
 print_string("my-list: ");
 println_list_f32(my_list_2);
 print_string("cdr-my-list: ");
 println_list_f32(cdr_my_list_2);
+print_string("append-my-list: ");
+println_list_f32(append_my_list_2);
 print_string("My new array1: ");
 println_pointer_f32(my_new_array_2);
 print_string("My new array1 length: ");
