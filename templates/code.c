@@ -883,6 +883,30 @@ define_create_list(f32)
 define_create_list(f64)
 define_create_list(f80)
 
+#define define_create_array(T) \
+T* create_array_##T(T list[], int size) {  \
+	int cnt = 0; \
+	T* mem = NULL; \
+	for (cnt = 0; cnt < size-1; cnt++) { \
+		mem[cnt] = list[cnt];  \
+	} \
+	append_ptr(mem, size, POINTER); \
+	return mem; \
+} \
+
+define_create_array(bool)
+define_create_array(c8)
+define_create_array(b8)
+define_create_array(i16)
+define_create_array(i32)
+define_create_array(i64)
+define_create_array(ui16)
+define_create_array(ui32)
+define_create_array(ui64)
+define_create_array(f32)
+define_create_array(f64)
+define_create_array(f80)
+
 #define define_map_array(T) \
 T* map_array_##T(single_fn_##T a, T* b) { \
     i32 cnt = 0; \

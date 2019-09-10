@@ -883,6 +883,30 @@ define_create_list(f32)
 define_create_list(f64)
 define_create_list(f80)
 
+#define define_create_array(T) \
+T* create_array_##T(T list[], int size) {  \
+	int cnt = 0; \
+	T* mem = NULL; \
+	for (cnt = 0; cnt < size-1; cnt++) { \
+		mem[cnt] = list[cnt];  \
+	} \
+	append_ptr(mem, size, POINTER); \
+	return mem; \
+} \
+
+define_create_array(bool)
+define_create_array(c8)
+define_create_array(b8)
+define_create_array(i16)
+define_create_array(i32)
+define_create_array(i64)
+define_create_array(ui16)
+define_create_array(ui32)
+define_create_array(ui64)
+define_create_array(f32)
+define_create_array(f64)
+define_create_array(f80)
+
 #define define_map_array(T) \
 T* map_array_##T(single_fn_##T a, T* b) { \
     i32 cnt = 0; \
@@ -1490,7 +1514,7 @@ println_pointer_f32(my_new_floats_2);
 print_string("My new array1: ");
 println_pointer_f32(my_new_array_2);
 print_string("My new array1 length: ");
-println_i32(length_pointer_f32(my_new_array_2));
+println_i32(length(my_new_array_2));
 print_string("My new array2: ");
 println_pointer_f32(my_new_array2_2);
 print_string("My new array3: ");
@@ -1509,9 +1533,9 @@ print_string("My list set/push ");
 set_pointer_list_f32(&my_list_2,push_list_f32(&my_list_2,777.0));
 println_list_f32(my_list_2);
 print_string("My list length ");
-println_i32(length_list_f32(my_list_2));
+println_i32(length(my_list_2));
 print_string("My list length after push ");
-println_i32(length_pointer_f32((f32*)push_list_f32(&my_list_2,100.0)));
+println_i32(length((f32*)push_list_f32(&my_list_2,100.0)));
 print_string("My list car ");
 println_f32((f32)car_list_f32(my_list_2));
 print_string("My list remove 3 ");
@@ -1520,7 +1544,7 @@ println_list_f32(my_list_2);
 print_string("My list pop ");
 println_f32((f32)pop_list_f32(&my_list_2));
 print_string("My list length ");
-println_i32(length_list_f32(my_list_2));
+println_i32(length(my_list_2));
 print_string("My list append ");
 append_list_f32(my_list_2,666.0);
 println_list_f32(my_list_2);
@@ -1547,7 +1571,7 @@ println_i32(argc_1);
 set_pointer_i32(&argc_1,(100+(1000-999)));
 println_i32(argc_1);
 i32 cnt_3=0;
-for(cnt_3=0;cnt_3<max_i32(length_array_i32(array_2),1);cnt_3++)
+for(cnt_3=0;cnt_3<max_i32(length(array_2),1);cnt_3++)
 {
 set_pointer_i32(elt_array_i32(array_2,cnt_3),1000);
 print_format("%d",power_i32(2,8));
