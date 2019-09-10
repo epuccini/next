@@ -505,9 +505,13 @@ void remove_ptr(void* pointer) {
 				temp = temp_before->next;
 				if (temp_before->next->next != NULL)
 					temp_after = temp_before->next->next;
+				else
+					temp_after = NULL;
 				free(temp);
 				if (temp_before->next->next != NULL)
 					temp_before->next = temp_after;
+				else
+					temp_before->next = NULL;
 				return;
 			}
 		}
@@ -810,9 +814,48 @@ define_car_list(f32)
 define_car_list(f64)
 define_car_list(f80)
 
+#define define_car_array(T) \
+T car_array_##T(T* array) { \
+	return array[0]; \
+} \
+
+define_car_array(bool)
+define_car_array(c8)
+define_car_array(b8)
+define_car_array(i16)
+define_car_array(i32)
+define_car_array(i64)
+define_car_array(ui16)
+define_car_array(ui32)
+define_car_array(ui64)
+define_car_array(f32)
+define_car_array(f64)
+define_car_array(f80)
+
 #define define_cdr_list(T) \
 node_##T* cdr_list_##T(node_##T* list) { \
-	return list->next; \
+	node_##T* start = NULL; \
+	node_##T* copy = NULL; \
+	int size = length((void*)list); \
+	if (list->next != NULL) \
+	{ \
+		list = list->next; \
+		copy = (node_##T*)malloc(sizeof(node_##T)); \
+		start = copy; \
+		do \
+		{  \
+			copy->value = list->value; \
+			if (list->next != NULL) \
+				copy->next = (node_##T*)malloc(sizeof(node_##T)); \
+			else \
+				copy->next = NULL; \
+			list = list->next; \
+			copy = copy->next; \
+		} while (list != NULL); \
+	} \
+	copy = start; \
+	append_ptr(copy, size-1, POINTER); \
+	return copy; \
 } \
 
 define_cdr_list(bool)
@@ -827,6 +870,54 @@ define_cdr_list(ui64)
 define_cdr_list(f32)
 define_cdr_list(f64)
 define_cdr_list(f80)
+
+#define define_cdr_array(T) \
+T* cdr_array_##T(T* array) { \
+	int size = length(array); \
+	T* new_array = malloc(sizeof(T)*(size-1)); \
+	int cnt = 0; \
+	for(cnt = 1; cnt <= size-1; cnt++) \
+		new_array[cnt-1] = array[cnt]; \
+	append_ptr((void*)new_array, size-1, POINTER); \
+	return new_array; \
+} \
+
+	define_cdr_array(bool)
+	define_cdr_array(c8)
+	define_cdr_array(b8)
+	define_cdr_array(i16)
+	define_cdr_array(i32)
+	define_cdr_array(i64)
+	define_cdr_array(ui16)
+	define_cdr_array(ui32)
+	define_cdr_array(ui64)
+	define_cdr_array(f32)
+	define_cdr_array(f64)
+	define_cdr_array(f80)
+
+#define define_cdr_pointer(T) \
+T* cdr_pointer_##T(T* pointer) { \
+	int size = length(pointer); \
+	T* new_pointer = malloc(sizeof(T)*(size-1)); \
+	int cnt = 0; \
+	for(cnt = 1; cnt < size-1; cnt++) \
+		new_pointer[cnt-1] = pointer[cnt]; \
+	append_ptr((void*)new_pointer, size-1, POINTER); \
+	return new_pointer; \
+} \
+
+	define_cdr_pointer(bool)
+	define_cdr_pointer(c8)
+	define_cdr_pointer(b8)
+	define_cdr_pointer(i16)
+	define_cdr_pointer(i32)
+	define_cdr_pointer(i64)
+	define_cdr_pointer(ui16)
+	define_cdr_pointer(ui32)
+	define_cdr_pointer(ui64)
+	define_cdr_pointer(f32)
+	define_cdr_pointer(f64)
+	define_cdr_pointer(f80)
 
 #define define_destroy(T) \
 void destroy_list_##T(node_##T* e) { \
@@ -1501,6 +1592,8 @@ f32 float1_2=0.0;
 f32 float2_2=(0.0+0.0);
 i32 array_2[]={1, 2, 3, 4, 5, 6};
 append_ptr(array_2, sizeof(array_2)/sizeof(i32), ARRAY);
+i32* cdr_array_2=cdr_array_i32(array_2);
+append_ptr(cdr_array_2, 1, VARIABLE);
 f32 values_2[]={1.0, 2.0, 3.0, 4.0, 5.0, 6.0};
 append_ptr(values_2, sizeof(values_2)/sizeof(f32), ARRAY);
 f32* my_new_array_2=mapn_array_f32(mapit_0,values_2);
@@ -1512,6 +1605,7 @@ append_ptr(my_new_array2_2, 1, VARIABLE);
 f32* my_new_array3_2=append_pointer_f32(my_new_array2_2,2000.0);
 append_ptr(my_new_array3_2, 1, VARIABLE);
 node_f32* my_list_2=create_list_f32((f32[]){1.0, 2.0, 3.0, 4.0, 5.0, 6.0},6);
+node_f32* cdr_my_list_2=cdr_list_f32(my_list_2);
 const char* string_2="abcdefg";
 c8 chars_2[]={'a', 'b', 'c', 'd', 'e', 'f', 'g'};
 append_ptr(chars_2, sizeof(chars_2)/sizeof(c8), ARRAY);
@@ -1521,6 +1615,14 @@ f32 (*myfun_2)(f32)=mapit_0;
 set_pointer_f32((f32*)elt_array_f32(my_new_floats_2,0),888.0);
 print_string("my-new-floats set 1. element: ");
 println_pointer_f32(my_new_floats_2);
+print_string("array: ");
+println_array_i32(sizeof(array_2),array_2);
+print_string("cdr-array: ");
+println_pointer_i32(cdr_array_2);
+print_string("my-list: ");
+println_list_f32(my_list_2);
+print_string("cdr-my-list: ");
+println_list_f32(cdr_my_list_2);
 print_string("My new array1: ");
 println_pointer_f32(my_new_array_2);
 print_string("My new array1 length: ");

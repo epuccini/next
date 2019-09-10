@@ -41,12 +41,14 @@ by Edward Puccini |;
   (let [float1:f32 0.0
         float2:f32 (+ 0.0 0.0)
         array:i32# [1 2 3 4 5 6]
+        cdr-array:i32> (cdr array)
         values:f32# [1.0 2.0 3.0 4.0 5.0 6.0]
         my-new-array:f32> (mapn mapit values)
         my-new-floats:f32> (new 10)
         my-new-array2:f32> (append values 1000.0)
         my-new-array3:f32> (append my-new-array2 2000.0)
         my-list:f32' '(1.0 2.0 3.0 4.0 5.0 6.0)
+        cdr-my-list:f32' (cdr my-list)
         string:string "abcdefg"
         chars:c8# ['a' 'b' 'c' 'd' 'e' 'f' 'g']
         new-string:c8# "Just a string"
@@ -54,6 +56,14 @@ by Edward Puccini |;
     (:: (f32> (# my-new-floats 0)) 888.0)
     (prn "my-new-floats set 1. element: ")
     (prnl my-new-floats)
+    (prn "array: ")
+    (prnl array)
+    (prn "cdr-array: ")
+    (prnl cdr-array)
+    (prn "my-list: ")
+    (prnl my-list)
+    (prn "cdr-my-list: ")
+    (prnl cdr-my-list)
     (prn "My new array1: ")
     (prnl my-new-array)
     (prn "My new array1 length: ")
