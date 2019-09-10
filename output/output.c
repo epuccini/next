@@ -1862,8 +1862,8 @@ println_i32(argc_1);
 i32 cnt_3=0;
 for(cnt_3=0;cnt_3<max_i32(length_array_i32(array_2),1);cnt_3++)
 {
-set_pointer_i32(elt_array_i32(array_2,cnt_3),1000);
-print_format("%d",power_i32(2,8));
+set_pointer_i32(elt_array_i32(array_2,cnt_3),(cnt_3*1000));
+print_format("%d",power_i32(2,cnt_3));
 print_string("ELT: ");
 print_format("%d",*elt_array_i32(array_2,cnt_3));
 print_string("CNT: ");

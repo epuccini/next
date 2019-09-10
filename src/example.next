@@ -136,8 +136,8 @@ by Edward Puccini |;
     ;(del my-new-array2)
     ;(del my-new-array3)
     (for [cnt:i32 0 < (max (len array) 1)]
-      (:: (# array cnt) 1000)
-      (prnfmt "%d" (^ 2 8))
+      (:: (# array cnt) (* cnt 1000))
+      (prnfmt "%d" (^ 2 cnt))
       (prn "ELT: ")
       (prnfmt "%d" (# array cnt))
       (prn "CNT: "))
