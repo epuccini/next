@@ -1167,7 +1167,7 @@ define_print_array(f80)
 void println_pointer_##T(T* pointer) {  \
 	int size = length(pointer); \
 	int cnt = 0; \
-	if (size <= 1) { \
+	if (size == 0) { \
 		print_##T(*pointer); \
 		printf("\n"); \
 	} else { \
@@ -1195,7 +1195,7 @@ define_println_pointer(f80)
 void print_pointer_##T(T* pointer) {  \
     int size = length((void*)pointer); \
 	int cnt = 0; \
-	if (size <= 1) { \
+	if (size == 0) { \
 		print_##T(*pointer); \
 		printf("\n"); \
 	} else { \
