@@ -584,6 +584,70 @@ define_node(f32)
 define_node(f64)
 define_node(f80)
 
+#define define_length_list(T) \
+i32 length_list_##T(node_##T* list) {  \
+	int cnt = 0; \
+	if (list != NULL) { \
+		cnt = 1; \
+		node_##T* temp = list->next; \
+		do \
+		{ \
+			cnt++; \
+			temp = temp->next; \
+		} while (temp != NULL); \
+	} \
+	return cnt; \
+} \
+
+define_length_list(bool)
+define_length_list(c8)
+define_length_list(b8)
+define_length_list(i16)
+define_length_list(i32)
+define_length_list(i64)
+define_length_list(ui16)
+define_length_list(ui32)
+define_length_list(ui64)
+define_length_list(f32)
+define_length_list(f64)
+define_length_list(f80)
+
+#define define_length_array(T) \
+i32 length_array_##T(T* array) {  \
+	return length(array); \
+} \
+
+define_length_array(bool)
+define_length_array(c8)
+define_length_array(b8)
+define_length_array(i16)
+define_length_array(i32)
+define_length_array(i64)
+define_length_array(ui16)
+define_length_array(ui32)
+define_length_array(ui64)
+define_length_array(f32)
+define_length_array(f64)
+define_length_array(f80)
+
+#define define_length_pointer(T) \
+i32 length_pointer_##T(T* pointer) {  \
+	return length(pointer); \
+} \
+
+define_length_pointer(bool)
+define_length_pointer(c8)
+define_length_pointer(b8)
+define_length_pointer(i16)
+define_length_pointer(i32)
+define_length_pointer(i64)
+define_length_pointer(ui16)
+define_length_pointer(ui32)
+define_length_pointer(ui64)
+define_length_pointer(f32)
+define_length_pointer(f64)
+define_length_pointer(f80)
+
 #define define_append_list(T) \
 node_##T* append_list_##T(node_##T* list, T value) {  \
 	node_##T* head; \
@@ -623,7 +687,7 @@ define_append_list(f80)
 
 #define define_append_array(T) \
 T* append_array_##T(T* array, T value) {  \
-    int size = length(array); \
+    int size = length_array_##T(array); \
     T* new_array = (T*) malloc((size+1)*sizeof(T)); \
     int cnt = 0; \
     for (cnt = 0; cnt < size; cnt++) { \
@@ -635,89 +699,25 @@ T* append_array_##T(T* array, T value) {  \
     return new_array; \
 }
 
-define_append_array(bool)
-define_append_array(c8)
-define_append_array(b8)
-define_append_array(i16)
-define_append_array(i32)
-define_append_array(i64)
-define_append_array(ui16)
-define_append_array(ui32)
-define_append_array(ui64)
-define_append_array(f32)
-define_append_array(f64)
-define_append_array(f80)
-
-#define define_length_list(T) \
-i32 length_list_##T(node_##T* list) {  \
-	int cnt = 0; \
-	if (list != NULL) { \
-		cnt = 1; \
-		node_##T* temp = list->next; \
-		do \
-		{ \
-			cnt++; \
-			temp = temp->next; \
-		} while (temp != NULL); \
-	} \
-	return cnt; \
-} \
-
-define_length_list(bool)
-define_length_list(c8)
-define_length_list(b8)
-define_length_list(i16)
-define_length_list(i32)
-define_length_list(i64)
-define_length_list(ui16)
-define_length_list(ui32)
-define_length_list(ui64)
-define_length_list(f32)
-define_length_list(f64)
-define_length_list(f80)
-
-#define define_length_array(T) \
-i32 length_array_##T(void* array) {  \
-	return length(array); \
-} \
-
-define_length_array(bool)
-define_length_array(c8)
-define_length_array(b8)
-define_length_array(i16)
-define_length_array(i32)
-define_length_array(i64)
-define_length_array(ui16)
-define_length_array(ui32)
-define_length_array(ui64)
-define_length_array(f32)
-define_length_array(f64)
-define_length_array(f80)
-
-#define define_length_pointer(T) \
-i32 length_pointer_##T(void* pointer) {  \
-	return length(pointer); \
-} \
-
-define_length_pointer(bool)
-define_length_pointer(c8)
-define_length_pointer(b8)
-define_length_pointer(i16)
-define_length_pointer(i32)
-define_length_pointer(i64)
-define_length_pointer(ui16)
-define_length_pointer(ui32)
-define_length_pointer(ui64)
-define_length_pointer(f32)
-define_length_pointer(f64)
-define_length_pointer(f80)
+	define_append_array(bool)
+	define_append_array(c8)
+	define_append_array(b8)
+	define_append_array(i16)
+	define_append_array(i32)
+	define_append_array(i64)
+	define_append_array(ui16)
+	define_append_array(ui32)
+	define_append_array(ui64)
+	define_append_array(f32)
+	define_append_array(f64)
+	define_append_array(f80)
 
 #define define_push_list(T) \
 node_##T* push_list_##T(node_##T** list, T value) {  \
 	node_##T* head = (node_##T*)malloc(sizeof(node_##T)); \
 	head->next = (*list); \
 	head->value = value; \
-	append_ptr((void*)head, length(*list)+1, LIST);       \
+	append_ptr((void*)head, length_list_##T(*list)+1, LIST);       \
 	remove_ptr((*list));       \
 	*list = head; \
 	return (*list); \
@@ -743,7 +743,7 @@ T pop_list_##T(node_##T** list) {  \
 	if ((*list)->next != NULL) { \
 		*list = (*list)->next; \
 	} \
-	append_ptr((*list), length(*list)-1, LIST);       \
+	append_ptr((*list), length_list_##T(*list)-1, LIST);       \
 	return value; \
 } \
 
@@ -932,7 +932,7 @@ T* map_array_##T(single_fn_##T a, T* b) { \
 #define define_map_list(T) \
 node_##T* map_list_##T(single_fn_##T a, node_##T* b) { \
     i32 cnt = 0; \
-	int size = length(b); \
+	int size = length_list_##T(b); \
     for (cnt = 0; cnt < size-1; cnt++) { \
         b->value = (*a)(b->value); \
 		if(b->next != NULL) \
@@ -981,7 +981,7 @@ T* mapn_array_##T(single_fn_##T a, T* b) { \
 #define define_mapn_list(T) \
 node_##T* mapn_list_##T(single_fn_##T a, node_##T* b) { \
     node_##T* ptr = (node_##T*) malloc(sizeof(node_##T)); \
-	int size = length(b); \
+	int size = length_list_##T(b); \
 	i32 cnt = 0; \
     for (cnt = 0; cnt < sizeof(b)-2; cnt++) { \
         ptr->value = (*a)(b->value); \
@@ -1031,7 +1031,7 @@ T reduce_array_##T(dual_fn_##T a, T* b) { \
 T reduce_list_##T(dual_fn_##T a, node_##T* b) { \
     i32 cnt = 0; \
     T result = b->value; \
-	int size = length(b); \
+	int size = length_list_##T(b); \
 	if (b->next != NULL) \
 		b = b->next; \
     for (cnt = 1; cnt < size-1; cnt++) { \

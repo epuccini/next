@@ -92,7 +92,7 @@ by Edward Puccini |;
     (append my-list 666.0)
     (prnl my-list)
     (prn "My list element ")
-    (prnl (# my-list 3))
+    (prnl (f32 (# my-list 3)))
     (:: (f32> (# my-list 3)) 100.0)
     (prn "My list set ")
     (prnl my-list)

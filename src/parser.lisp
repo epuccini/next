@@ -1975,7 +1975,7 @@
            (if (or (search "array" type)
                    (search "list" type)
                    (search "pointer" type))
-               (add-code "length")
+               (add-code (format nil "length_~a" type))
                (if (search "string" type)
                    (add-code "sizeof")
                    (error-type-not-supported)))
