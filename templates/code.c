@@ -773,18 +773,18 @@ node_##T* append_list_list_##T(node_##T* lista, node_##T* listb) {  \
 	return start; \
 } \
 
-	define_append_list_list(bool)
-	define_append_list_list(c8)
-	define_append_list_list(b8)
-	define_append_list_list(i16)
-	define_append_list_list(i32)
-	define_append_list_list(i64)
-	define_append_list_list(ui16)
-	define_append_list_list(ui32)
-	define_append_list_list(ui64)
-	define_append_list_list(f32)
-	define_append_list_list(f64)
-	define_append_list_list(f80)
+define_append_list_list(bool)
+define_append_list_list(c8)
+define_append_list_list(b8)
+define_append_list_list(i16)
+define_append_list_list(i32)
+define_append_list_list(i64)
+define_append_list_list(ui16)
+define_append_list_list(ui32)
+define_append_list_list(ui64)
+define_append_list_list(f32)
+define_append_list_list(f64)
+define_append_list_list(f80)
 
 #define define_append_array_array(T) \
 T* append_array_array_##T(T* arraya, T* arrayb) {  \
@@ -847,6 +847,100 @@ T* append_pointer_pointer_##T(T* pointera, T* pointerb) {  \
 	define_append_pointer_pointer(f32)
 	define_append_pointer_pointer(f64)
 	define_append_pointer_pointer(f80)
+
+#define define_reverse_list(T) \
+node_##T* reverse_list_##T(node_##T* head) {  \
+	/* copy list */ \
+	node_##T* new_list = (node_##T*)malloc(sizeof(node_##T)); \
+	node_##T* start = new_list; \
+	node_##T* list = head; \
+	int size = length(head); \
+	while (list != NULL) { \
+		new_list->value = list->value; \
+		if (list->next != NULL) { \
+			new_list->next = (node_##T*)malloc(sizeof(node_##T)); \
+			new_list = new_list->next; \
+		} \
+		else \
+			new_list->next = NULL; \
+		list = list->next; \
+	} \
+	/* reverse list */ \
+	node_##T* current = start; \
+	node_##T *prev = NULL, *next = NULL; \
+	while (current != NULL) { \
+		next = current->next; \
+		current->next = prev; \
+		prev = current; \
+		current = next; \
+	} \
+	start = prev; \
+	append_ptr(start, size, POINTER); \
+	return start; \
+} \
+
+	define_reverse_list(bool)
+	define_reverse_list(c8)
+	define_reverse_list(b8)
+	define_reverse_list(i16)
+	define_reverse_list(i32)
+	define_reverse_list(i64)
+	define_reverse_list(ui16)
+	define_reverse_list(ui32)
+	define_reverse_list(ui64)
+	define_reverse_list(f32)
+	define_reverse_list(f64)
+	define_reverse_list(f80)
+
+#define define_reverse_array(T) \
+T* reverse_array_##T(T* array) {  \
+	int size = length(array); \
+	T* new_array = (T*)malloc(sizeof(T)*size); \
+	int cnt = 0; \
+	for (cnt = 0; cnt < size; cnt++) { \
+		new_array[cnt] = array[size-cnt-1]; \
+	} \
+	append_ptr(new_array, size, POINTER); \
+	return new_array; \
+} \
+
+define_reverse_array(bool)
+define_reverse_array(c8)
+define_reverse_array(b8)
+define_reverse_array(i16)
+define_reverse_array(i32)
+define_reverse_array(i64)
+define_reverse_array(ui16)
+define_reverse_array(ui32)
+define_reverse_array(ui64)
+define_reverse_array(f32)
+define_reverse_array(f64)
+define_reverse_array(f80)
+
+#define define_reverse_pointer(T) \
+T* reverse_pointer_##T(T* pointer) {  \
+	int size = length(pointer); \
+	T* new_pointer = (T*)malloc(sizeof(T)*size); \
+	int cnt = 0; \
+	for (cnt = 0; cnt < size; cnt++) { \
+		new_pointer[cnt] = pointer[size-cnt-1]; \
+	} \
+	append_ptr(new_pointer, size, POINTER); \
+	return new_pointer; \
+} \
+
+define_reverse_pointer(bool)
+define_reverse_pointer(c8)
+define_reverse_pointer(b8)
+define_reverse_pointer(i16)
+define_reverse_pointer(i32)
+define_reverse_pointer(i64)
+define_reverse_pointer(ui16)
+define_reverse_pointer(ui32)
+define_reverse_pointer(ui64)
+define_reverse_pointer(f32)
+define_reverse_pointer(f64)
+define_reverse_pointer(f80)
 
 #define define_push_list(T) \
 node_##T* push_list_##T(node_##T** list, T value) {  \

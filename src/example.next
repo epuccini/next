@@ -43,6 +43,7 @@ by Edward Puccini |;
         array:i32# [1 2 3 4 5 6]
         arrayb:i32# [9 8 7 6 5 4 3 2 1]
         append-array:i32> (append array arrayb)
+        rev-array:i32> (rev append-array)
         cdr-array:i32> (cdr array)
         values:f32# [1.0 2.0 3.0 4.0 5.0 6.0]
         my-new-array:f32> (mapn mapit values)
@@ -52,6 +53,7 @@ by Edward Puccini |;
         my-list:f32' '(1.0 2.0 3.0 4.0 5.0 6.0)
         my-listb:f32' '(7.0 8.0 9.0 10.0 11.0 12.0 13.0 14.0)
         append-my-list:f32' (append my-list my-listb)
+        rev-list:f32' (rev append-my-list)
         cdr-my-list:f32' (cdr my-list)
         string:string "abcdefg"
         chars:c8# ['a' 'b' 'c' 'd' 'e' 'f' 'g']
@@ -66,12 +68,16 @@ by Edward Puccini |;
     (prnl cdr-array)
     (prn "append-array: ")
     (prnl append-array)
+    (prn "rev-array: ")
+    (prnl rev-array)
     (prn "my-list: ")
     (prnl my-list)
     (prn "cdr-my-list: ")
     (prnl cdr-my-list)
     (prn "append-my-list: ")
     (prnl append-my-list)
+    (prn "rev-list: ")
+    (prnl rev-list)
     (prn "My new array1: ")
     (prnl my-new-array)
     (prn "My new array1 length: ")
