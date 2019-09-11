@@ -20,6 +20,11 @@ by Edward Puccini |;
       (prnl "Module function fun2")
       (return 888)))
 
+(compose monolith
+        [string:string
+         a:i32
+         b:f32])
+
 (defn mapit:f32 [op:f32]
   (prn "Map ")
   (prnl (+ op op))
@@ -197,8 +202,14 @@ by Edward Puccini |;
     (prn "sin(b) = ")
     (prnl (sin b))))
 
+(defn compositions:void []
+  (let [test:monolith {0}]
+    (prnl "Test composition")))
+
+
 (defn main:i32 []
   (let [ret:i32 (arrays-and-lists 77)]
     (pointers)
     (math)
+    (compositions)
     (return ret)))

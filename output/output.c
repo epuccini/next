@@ -2145,6 +2145,13 @@ i32 layer__fun2_0()
 println_string("Module function fun2");
 return(888);
 }
+struct monolith
+{
+char* string_1;
+i32 a_1;
+f32 b_1;
+};
+typedef struct monolith monolith;
 f32 mapit_0(f32 op_1)
 {
 print_string("Map ");
@@ -2195,7 +2202,7 @@ node_f32* my_listb_2=create_list_f32((f32[]){7.0, 8.0, 9.0, 10.0, 11.0, 12.0, 13
 node_f32* append_my_list_2=append_list_list_f32(my_list_2,my_listb_2);
 node_f32* rev_list_2=reverse_list_f32(append_my_list_2);
 node_f32* cdr_my_list_2=cdr_list_f32(my_list_2);
-const char* string_2="abcdefg";
+char* string_2="abcdefg";
 c8 chars_2[]={'a', 'b', 'c', 'd', 'e', 'f', 'g'};
 append_ptr(chars_2, sizeof(chars_2)/sizeof(c8), ARRAY);
 c8 new_string_2[]="Just a string";
@@ -2347,12 +2354,20 @@ print_string("sin(b) = ");
 println_f64(sin_f64(b_2));
 }
 }
+void compositions_0()
+{
+{
+struct monolith test_2={0};
+println_string("Test composition");
+}
+}
 i32 main()
 {
 {
 i32 ret_2=arrays_and_lists_0(77);
 pointers_0();
 math_0();
+compositions_0();
 return(ret_2);
 }
 destroy_ptr(pointer_list);

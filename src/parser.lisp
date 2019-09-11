@@ -17,9 +17,11 @@
 (defvar *paranteses* 0)
 (defvar *variables* nil)
 (defvar *functions* nil)
+(defvar *compositions* nil)
 (defvar *signatures* nil)
 (defvar *function-map* nil)
 (defvar *current-function* nil)
+(defvar *current-composition* nil)
 (defvar *current-let-definition* nil)
 (defvar *current-module* "")
 (defvar *block* 0)
@@ -105,6 +107,9 @@
 (defun error-function-vector-malformed ()
   (error-msg "Error function vector malformed!~%"))
 
+(defun error-composition-vector-malformed ()
+  (error-msg "Error composition vector malformed!~%"))
+
 (defun error-let-vector-malformed ()
   (error-msg "Error let vector malformed!~%"))
 
@@ -146,6 +151,14 @@
                   (push str stack)
                   (return-from upto-symbol stack))
                 ((equal #\) obj)
+                  (push (format nil "~a" obj) stack)
+                  (push str stack)
+                  (return-from upto-symbol stack))
+                ((equal #\{ obj)
+                  (push (format nil "~a" obj) stack)
+                  (push str stack)
+                  (return-from upto-symbol stack))
+                ((equal #\} obj)
                   (push (format nil "~a" obj) stack)
                   (push str stack)
                   (return-from upto-symbol stack))
@@ -203,18 +216,14 @@
                       (equal #\) obj)
                       (equal #\[ obj)
                       (equal #\] obj)
+                      (equal #\{ obj)
+                      (equal #\} obj)
                       (equal #\% obj)
                       (equal #\& obj)
                       (equal #\, obj)
                       (equal #\; obj)
                       (equal #\< obj)
                       (equal #\> obj)
-                      (equal #\( obj)
-                      (equal #\) obj)
-                      (equal #\[ obj)
-                      (equal #\] obj)
-                      (equal #\{ obj)
-                      (equal #\} obj)
                       (equal #\# obj))
                   (push (format nil "~a" obj) stack))
                  ((equal #\∑ obj)
@@ -272,6 +281,12 @@
 
 (defun store-current-function (fun)
   (setf (gethash *paranteses* *current-function*) fun))
+
+(defun get-composition-name (var-name)
+  (format nil "~a>>~a" (gethash var-name *compositions*) (filter-expression var-name)))
+
+(defun store-composition-name (var-name value)
+  (setf (gethash var-name *compositions*) value))
 
 (defun get-variable-name (name)
   (if (equal *current-module* "")
@@ -443,9 +458,39 @@
                  (add-code " ")
                  (add-code (get-variable-name (car def)))))
            (dbg "parse-argument: OPEN ARG")
+           (loop while (equal "\n" (car expr-list)) do
+                (setf expr-list (cdr expr-list)))
            (if (find #\: (car expr-list))
                (add-code ","))
            (setf expr-list (parse-argument expr-list)))))
+  expr-list)
+
+(defun parse-types (expr-list)
+  (cond ((find #\: (car expr-list))
+         (let ((def (split ":" (car expr-list))))
+           (dbg "parse-types: DEFINE " (car expr-list))
+           (if (and (equal "fun" (cadr def)) (equal "[" (cadr expr-list)))
+               (progn
+                 (setf expr-list
+                       (parse-signature-vector (car def) (cdr expr-list)))
+                 (dbg "parse-argumemt: signature "
+                      (gethash (car def) *signatures*))
+                 (parse-variable-type
+                  (car def) (cadr def) (gethash (car def) *signatures*)))
+               (progn
+                 (parse-variable-type (car def) (cadr def))
+                 (setf expr-list (cdr expr-list))
+                 (add-code " ")
+                 (add-code (get-variable-name (car def)))
+                 (dbg "parse-types: store " *current-composition*
+                      " " (get-variable-name (car def)))
+                 (setf (gethash *current-composition* *compositions*)
+                       (get-variable-name (car def)))))
+           (dbg "parse-types: OPEN ARG")
+           (loop while (equal "\n" (car expr-list)) do
+                (setf expr-list (cdr expr-list)))
+           (add-code (format nil ";~%"))
+           (setf expr-list (parse-types expr-list)))))
   expr-list)
 
 (defun parse-function-type (expr-list &optional (signature nil))
@@ -661,6 +706,9 @@
           ((equal "[" type)
            (add-code "void")
            (setf (gethash (get-function-name fn-name) *functions*) 'void))
+          ((remove-if-not #'(lambda (x) (equal x type)) (hash-table-keys *compositions*))
+           (add-code "struct ")
+           (add-code type))
           ((equal "fun" type)
            (if signature
                (progn
@@ -745,7 +793,7 @@
          (add-code "char")
          (setf (gethash (get-variable-name var-name) *variables*) 'char))
         ((equal "string" type-name)
-         (add-code "const char*")         
+         (add-code "char*")         
          (setf (gethash (get-variable-name var-name) *variables*) 'string))
         
         ((equal "bool#" type-name)
@@ -900,7 +948,9 @@
         ((equal "f80'" type-name)
          (add-code "node_f80*")
          (setf (gethash (get-variable-name var-name) *variables*) 'long-double-float-list))
-        
+        ((remove-if-not #'(lambda (x) (equal x type-name)) (hash-table-keys *compositions*))
+         (add-code "struct ")
+         (add-code type-name))
         ((equal "fun" type-name)
          (if signature
              (progn
@@ -919,6 +969,7 @@
                (add-code "single_fn_f32")
                (setf (gethash (get-variable-name var-name) *variables*) 'function))))
         (t
+         (dbg "parse-variable-type: " (hash-table-keys *compositions*) " type " type-name)
          (error-no-type-def))))
 
 (defun parse-signature-vector (var-name expr-list)
@@ -1152,6 +1203,21 @@
               (setf expr-list (cdr expr-list)))
           (setf expr-list (parse-function-vector expr-list))))))
 
+(defun parse-type-vector (expr-list)
+  (let ((temp-list expr-list))
+    (dbg "parse-type-vector: parse variable")  
+    (setf expr-list (parse-types expr-list))
+    (if (equal "]" (car expr-list))
+        (return-from parse-type-vector expr-list))
+    (if (and (not (find #\: (cadr expr-list))) (not (equal "]" (cadr expr-list))))
+        (error-composition-vector-malformed))
+    (if (not (equal "]" (car expr-list)))
+        (progn
+          (dbg "parse-type-vector: next variable " (car expr-list))
+          (if (equal temp-list expr-list)
+              (setf expr-list (cdr expr-list)))
+          (setf expr-list (parse-type-vector expr-list))))))
+
 (defun parse-if-vector (expr-list)
   (dbg "parse-if-vector: condition range" (car expr-list))  
   (setf expr-list (parse-condition expr-list))
@@ -1196,12 +1262,16 @@
 
 (defun parse-open-square-bracket (expr-list)
   (dbg "parse-open-square-bracket")  
+  (loop while (equal "\n" (car expr-list)) do
+      (setf expr-list (cdr expr-list)))
   (if (equal "[" (car expr-list))
       (return-from parse-open-square-bracket (cdr expr-list))
       (error-missing-open-square-bracket)))
 
 (defun parse-close-square-bracket (expr-list)
   (dbg "parse-close-square-bracket")  
+  (loop while (equal "\n" (car expr-list)) do
+      (setf expr-list (cdr expr-list)))
   (if (equal "]" (car expr-list))
       (return-from parse-close-square-bracket (cdr expr-list))
       (error-missing-close-square-bracket)))
@@ -1265,6 +1335,28 @@
   (dbg "parse-let ")
   expr-list)
 
+(defun parse-compose (expr-list)
+  (let ((composition-name (car expr-list)))
+    (setf *current-composition* composition-name)
+    (dbg "parse-compose: name " *current-composition*
+         " and type block " *block*
+         " parens " *paranteses*)
+    (inc-block)
+    (dbg "parse-compose: open square")
+    (add-code (format nil "struct ~a" composition-name))
+    (add-code (format nil "~%{~%"))
+    (setf expr-list (cdr expr-list))
+    (setf expr-list (parse-open-square-bracket expr-list))
+    (setf expr-list (parse-type-vector expr-list))
+    (setf expr-list (parse-close-square-bracket expr-list))
+    (add-code (format nil "};~%"))
+    (add-code (format nil "typedef struct ~a ~a;~%" composition-name composition-name))
+    (dec-block)
+    (dbg "parse-compose BLOCK END block " *block* " parens " *paranteses*)
+    (dbg "parse-compose " (car expr-list))
+    (setf *current-composition* "")
+    expr-list))
+
 (defun parse-def-function (expr-list)
   (let ((fn-name (car expr-list)))
   (dbg "parse-def-function: name and type block " *block* " parens " *paranteses*)
@@ -1307,6 +1399,15 @@
         ((not (equal "\n" (car expr-list)))
          (dbg "parse-singleline-comment: COMMENT " (car expr-list))
          (setf expr-list (parse-single-line-comment (cdr expr-list))))))
+
+(defun parse-null (expr-list)
+  (cond ((equal "}" (car expr-list))
+         (add-code (car expr-list))
+         (return-from parse-null (cdr expr-list)))
+        ((not (equal "}" (car expr-list)))
+         (dbg "parse-null: " (car expr-list))
+         (add-code (car expr-list))
+         (setf expr-list (parse-null (cdr expr-list))))))
 
 (defun parse-cstr (expr-list)
   (cond ((equal "\"" (car expr-list))
@@ -1893,6 +1994,12 @@
          (inf "Compile function '" (cadr expr-list) "'")
          (setf expr-list (parse-def-function (cdr expr-list)))
          (setf *target* 'code))
+        ((equal "compose" (car expr-list))
+         (setf *target* 'implementation)
+         (store-current-function "compose")
+         (dbg "parse-call: COMPOSE INC BLOCK " (car expr-list))
+         (setf expr-list (parse-compose (cdr expr-list)))
+         (setf *target* 'code))
         ((equal "return" (car expr-list))
          (store-current-function "return")
          (add-code "return")
@@ -2036,8 +2143,6 @@
          (parse-math expr-list "log"))
         ((equal "log10" (car expr-list))
          (parse-math expr-list "log10"))
-        ((equal "fabs" (car expr-list))
-         (parse-math expr-list "fabs"))
         ((equal "floor" (car expr-list))
          (parse-math expr-list "floor"))
         ((equal "ceil" (car expr-list))
@@ -2576,7 +2681,6 @@
         )
    expr-list)
 
-
 (defun parse-expression (expr-list &optional (omit nil))
   (if (car expr-list)
       (progn
@@ -2601,6 +2705,13 @@
               (dbg "parse-expression: parse singleiline comment")
               (setf expr-list (parse-single-line-comment expr-list))
               (return-from parse-expression expr-list)))
+        (if (equal "{" (car expr-list))
+            (progn
+              (dbg "parse-expression: parse null")
+              (setf expr-list (parse-null expr-list))
+                (if (not omit)
+                  (add-code (format nil ";~%")))
+            (return-from parse-expression expr-list)))
         (if (equal "[" (car expr-list))
             (progn
               (dbg "parse-expression: parse vector " (car expr-list))
@@ -2688,6 +2799,7 @@
                       (equal "if" (car expr-list))
                       (equal "defn" (car expr-list))
                       (equal "let" (car expr-list))
+                      (equal "compose" (car expr-list))
                       (equal "module" (car expr-list)))
                   (setf space t))
               (setf expr-list (parse-call expr-list))
@@ -2737,6 +2849,7 @@
     (setf *paranteses* 0)
     (setf  *block* 0)
     (setf *variables* (make-hash-table :test 'equal))
+    (setf *compositions* (make-hash-table :test 'equal))
     (setf *functions* (make-hash-table :test 'equal))
     (setf *function-map* (make-hash-table :test 'equal))
     (setf *signatures* (make-hash-table :test 'equal))
