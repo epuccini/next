@@ -204,7 +204,10 @@ by Edward Puccini |;
 
 (defn compositions:void []
   (let [test:monolith {0}]
-    (prnl "Test composition")))
+    (prnl "Test composition")
+    (:: (i32> (ref (of test a))) 1000)
+    (prn "test.a = ")
+    (prnl (i32 (of test a)))))
 
 
 (defn main:i32 []

@@ -500,11 +500,11 @@
                  (parse-variable-type (car def) (cadr def))
                  (setf expr-list (cdr expr-list))
                  (add-code " ")
-                 (add-code (get-variable-name (car def)))
-                 (dbg "parse-types: store " *current-composition*
-                      " " (get-variable-name (car def)))
+                 (add-code (car def))
+                 (dbg "parse-types: store " (get-composition-name *current-composition*)
+                      " " (car def))
                  (setf (gethash (get-composition-name *current-composition*) *compositions*)
-                       (get-variable-name (car def)))))
+                       (car def))))
            (dbg "parse-types: OPEN ARG")
            (loop while (equal "\n" (car expr-list)) do
                 (setf expr-list (cdr expr-list)))
@@ -728,7 +728,8 @@
           ((remove-if-not #'(lambda (x) (equal x (get-iter-composition-name type)))
                           (hash-table-keys *compositions*))
            (add-code (get-iter-composition-name "struct "))
-           (add-code type))
+           (add-code type)
+           (setf (gethash (get-function-name fn-name) *functions*) type))
           ((equal "fun" type)
            (if signature
                (progn
@@ -971,7 +972,8 @@
         ((remove-if-not #'(lambda (x) (equal x (get-iter-composition-name type-name)))
                         (hash-table-keys *compositions*))
          (add-code "struct ")
-         (add-code (get-iter-composition-name type-name)))
+         (add-code (get-iter-composition-name type-name))
+         (setf (gethash (get-variable-name var-name) *variables*) type-name))
         ((equal "fun" type-name)
          (if signature
              (progn
@@ -1885,6 +1887,7 @@
          (progn
            (if (and *paranteses*
                     (not (equal "(" (get-last-code)))
+                    (not (equal "&" (get-last-code)))
                     (not (if-cast-p)))
                (add-code ","))
            (dbg "parse-arguments: parse-expression ( block "
@@ -1931,8 +1934,8 @@
          (let ((type (get-type expr-list)))
            (store-current-function "set")
            (if (remove-if-not #'(lambda (x)
-                                  (equal x (get-iter-variable-name
-                                            (cadr expr-list))))
+                                      (equal x (get-iter-variable-name
+                                                (cadr expr-list))))
                                   (hash-table-keys *variables*))
                (progn
                  (add-code (format nil "set_pointer_~a" type))
@@ -1940,12 +1943,14 @@
                  (add-code "&"))
                (progn
                  (if (or (search "elt" (caddr expr-list)) (search "#" (caddr expr-list)))
-                     (add-code (format nil "set_pointer_~a" type))
-                     (add-code (format nil "set_~a" type)))
-                 (add-code "(")))
-           (progn
-             (dbg "parse-call: set Next arg " (cadr expr-list))
-             (setf expr-list (parse-arguments (cdr expr-list) 2)))))
+                     (progn
+                       (add-code (format nil "set_pointer_~a" type))
+                       (add-code "("))
+                     (progn
+                       (add-code (format nil "set_~a" type))
+                       (add-code "(")))))
+           (dbg "parse-call: set Next arg " (cadr expr-list))
+           (setf expr-list (parse-arguments (cdr expr-list) 2))))
         ((or (equal "elt" (car expr-list)) (equal "#" (car expr-list)))
          (let ((type (get-type expr-list)))
            (store-current-function "elt")
@@ -1996,6 +2001,17 @@
            (add-code (format nil "print_str_~a" type))
            (add-code "(")
            (setf expr-list (parse-arguments (cdr expr-list) 2))))
+        ((equal "of" (car expr-list))
+         (add-code "(")
+         (if (equal "set" (get-current-function))
+             (add-code "&"))
+         (store-current-function "of")
+         (setf expr-list (cdr expr-list))
+         (setf expr-list (parse-expression expr-list t))
+         (add-code ".")
+         (add-code (car expr-list))
+         (setf expr-list (cdr expr-list))
+         (return-from parse-call expr-list))
         ((equal "let" (car expr-list))
          (store-current-function "let")
          (inf "Compile let in block " *block*)

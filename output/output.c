@@ -2147,9 +2147,9 @@ return(888);
 }
 struct monolith_0
 {
-char* string_0;
-i32 a_0;
-f32 b_0;
+char* string;
+i32 a;
+f32 b;
 };
 typedef struct monolith_0 monolith_0;
 f32 mapit_0(f32 op_1)
@@ -2359,6 +2359,9 @@ void compositions_0()
 {
 struct monolith_0 test_2={0};
 println_string("Test composition");
+set_pointer_i32((i32*)(&(test_2.a)),1000);
+print_string("test.a = ");
+println_i32((i32)(test_2.a));
 }
 }
 i32 main()
