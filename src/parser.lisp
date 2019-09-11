@@ -282,11 +282,10 @@
 (defun store-current-function (fun)
   (setf (gethash *paranteses* *current-function*) fun))
 
-(defun get-composition-name (var-name)
-  (format nil "~a>>~a" (gethash var-name *compositions*) (filter-expression var-name)))
-
-(defun store-composition-name (var-name value)
-  (setf (gethash var-name *compositions*) value))
+(defun get-composition-name (name)
+  (if (equal *current-module* "")
+      (format nil "~a_~a" (filter-expression name) *block*)
+      (format nil "~a__~a_~a" *current-module* (filter-expression name) *block*)))
 
 (defun get-variable-name (name)
   (if (equal *current-module* "")
@@ -331,8 +330,28 @@
                 (setf cnt (- cnt 1))
                 (get-iter-function-name-x name cnt)))))))
 
+
 (defun get-iter-function-name (name)
   (get-iter-function-name-x name *block*))
+
+(defun get-iter-composition-name-x (name cnt)
+  (let ((hash  ""))
+    (if (>= cnt 0)
+        (progn
+          (if (equal *current-module* "")
+              (setf hash (format nil "~a_~a" (filter-expression name) cnt))
+              (setf hash (format nil "~a__~a_~a" *current-module*
+                                 (filter-expression name) cnt)))
+          (if (gethash hash *compositions*)
+              (progn
+                (return-from get-iter-composition-name-x hash))
+              (progn
+                (setf cnt (- cnt 1))
+                (get-iter-composition-name-x name cnt)))))))
+
+
+(defun get-iter-composition-name (name)
+  (get-iter-composition-name-x name *block*))
 
 (defun set-signature (name signature)
   (setf (gethash name *signatures*) signature))
@@ -484,7 +503,7 @@
                  (add-code (get-variable-name (car def)))
                  (dbg "parse-types: store " *current-composition*
                       " " (get-variable-name (car def)))
-                 (setf (gethash *current-composition* *compositions*)
+                 (setf (gethash (get-composition-name *current-composition*) *compositions*)
                        (get-variable-name (car def)))))
            (dbg "parse-types: OPEN ARG")
            (loop while (equal "\n" (car expr-list)) do
@@ -706,8 +725,9 @@
           ((equal "[" type)
            (add-code "void")
            (setf (gethash (get-function-name fn-name) *functions*) 'void))
-          ((remove-if-not #'(lambda (x) (equal x type)) (hash-table-keys *compositions*))
-           (add-code "struct ")
+          ((remove-if-not #'(lambda (x) (equal x (get-iter-composition-name type)))
+                          (hash-table-keys *compositions*))
+           (add-code (get-iter-composition-name "struct "))
            (add-code type))
           ((equal "fun" type)
            (if signature
@@ -948,9 +968,10 @@
         ((equal "f80'" type-name)
          (add-code "node_f80*")
          (setf (gethash (get-variable-name var-name) *variables*) 'long-double-float-list))
-        ((remove-if-not #'(lambda (x) (equal x type-name)) (hash-table-keys *compositions*))
+        ((remove-if-not #'(lambda (x) (equal x (get-iter-composition-name type-name)))
+                        (hash-table-keys *compositions*))
          (add-code "struct ")
-         (add-code type-name))
+         (add-code (get-iter-composition-name type-name)))
         ((equal "fun" type-name)
          (if signature
              (progn
@@ -1336,12 +1357,11 @@
   expr-list)
 
 (defun parse-compose (expr-list)
-  (let ((composition-name (car expr-list)))
-    (setf *current-composition* composition-name)
+  (let ((composition-name (get-composition-name (car expr-list))))
+    (setf *current-composition* (car expr-list))
     (dbg "parse-compose: name " *current-composition*
          " and type block " *block*
          " parens " *paranteses*)
-    (inc-block)
     (dbg "parse-compose: open square")
     (add-code (format nil "struct ~a" composition-name))
     (add-code (format nil "~%{~%"))
@@ -1351,7 +1371,6 @@
     (setf expr-list (parse-close-square-bracket expr-list))
     (add-code (format nil "};~%"))
     (add-code (format nil "typedef struct ~a ~a;~%" composition-name composition-name))
-    (dec-block)
     (dbg "parse-compose BLOCK END block " *block* " parens " *paranteses*)
     (dbg "parse-compose " (car expr-list))
     (setf *current-composition* "")

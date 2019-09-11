@@ -2145,13 +2145,13 @@ i32 layer__fun2_0()
 println_string("Module function fun2");
 return(888);
 }
-struct monolith
+struct monolith_0
 {
-char* string_1;
-i32 a_1;
-f32 b_1;
+char* string_0;
+i32 a_0;
+f32 b_0;
 };
-typedef struct monolith monolith;
+typedef struct monolith_0 monolith_0;
 f32 mapit_0(f32 op_1)
 {
 print_string("Map ");
@@ -2357,7 +2357,7 @@ println_f64(sin_f64(b_2));
 void compositions_0()
 {
 {
-struct monolith test_2={0};
+struct monolith_0 test_2={0};
 println_string("Test composition");
 }
 }
