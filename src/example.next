@@ -207,6 +207,9 @@ by Edward Puccini |;
     (prnl "Test composition")
     (:: (i32> (ref (of test a))) 1000)
     (prn "test.a = ")
+    (prnl (i32 (of test a)))
+    (:: (i32> (ref test>>a)) 2000)
+    (prn "test.a = ")
     (prnl (i32 (of test a)))))
 
 
