@@ -185,7 +185,20 @@ by Edward Puccini |;
     (prn "New Value Pointer: Value 3/alt ")
     (prnl new_value_ptr)))
 
+(defn math:void []
+  (let [a:f64 10.0
+        b:f64 20.0
+        c:f64 15.5
+        d:f64 (round c)]
+    (prn "d = round(c) = ")
+    (prnl d)
+    (prn "exp(a) = ")
+    (prnl (exp a))
+    (prn "sin(b) = ")
+    (prnl (sin b))))
+
 (defn main:i32 []
   (let [ret:i32 (arrays-and-lists 77)]
     (pointers)
+    (math)
     (return ret)))

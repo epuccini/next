@@ -1815,7 +1815,7 @@ void print_str_array_f80(c8* pointer, f80* value) {
 
 #define define_floor(T) \
 T floor_##T(T val) { \
-	return floor(val); \
+	return (T)floor(val); \
 } \
 
 define_floor(c8)
@@ -1831,7 +1831,7 @@ define_floor(f80)
 
 #define define_ceil(T) \
 T ceil_##T(T val) { \
-	return ceil(val); \
+	return (T)ceil(val); \
 } \
 
 define_ceil(c8)
@@ -1847,7 +1847,7 @@ define_ceil(f80)
 
 #define define_round(T) \
 T round_##T(T val) { \
-	return round(val); \
+	return (T)round(val); \
 } \
 
 define_round(c8)
@@ -1860,6 +1860,278 @@ define_round(ui64)
 define_round(f32)
 define_round(f64)
 define_round(f80)
+
+#define define_acos(T) \
+T acos_##T(T val) { \
+	return (T)acos(val); \
+} \
+
+define_acos(c8)
+define_acos(i16)
+define_acos(i32)
+define_acos(i64)
+define_acos(ui16)
+define_acos(ui32)
+define_acos(ui64)
+define_acos(f32)
+define_acos(f64)
+define_acos(f80)
+
+#define define_asin(T) \
+T asin_##T(T val) { \
+	return (T)asin(val); \
+} \
+
+define_asin(c8)
+define_asin(i16)
+define_asin(i32)
+define_asin(i64)
+define_asin(ui16)
+define_asin(ui32)
+define_asin(ui64)
+define_asin(f32)
+define_asin(f64)
+define_asin(f80)
+
+#define define_atan(T) \
+T atan_##T(T val) { \
+	return (T)atan(val); \
+} \
+
+define_atan(c8)
+define_atan(i16)
+define_atan(i32)
+define_atan(i64)
+define_atan(ui16)
+define_atan(ui32)
+define_atan(ui64)
+define_atan(f32)
+define_atan(f64)
+define_atan(f80)
+
+#define define_atan2(T) \
+T atan2_##T(T vala, T valb) { \
+	return (T)atan2(vala,valb); \
+} \
+
+define_atan2(c8)
+define_atan2(i16)
+define_atan2(i32)
+define_atan2(i64)
+define_atan2(ui16)
+define_atan2(ui32)
+define_atan2(ui64)
+define_atan2(f32)
+define_atan2(f64)
+define_atan2(f80)
+
+#define define_cos(T) \
+T cos_##T(T val) { \
+	return (T)cos(val); \
+} \
+
+define_cos(c8)
+define_cos(i16)
+define_cos(i32)
+define_cos(i64)
+define_cos(ui16)
+define_cos(ui32)
+define_cos(ui64)
+define_cos(f32)
+define_cos(f64)
+define_cos(f80)
+
+#define define_cosh(T) \
+T cosh_##T(T val) { \
+	return (T)cosh(val); \
+} \
+
+define_cosh(c8)
+define_cosh(i16)
+define_cosh(i32)
+define_cosh(i64)
+define_cosh(ui16)
+define_cosh(ui32)
+define_cosh(ui64)
+define_cosh(f32)
+define_cosh(f64)
+define_cosh(f80)
+
+#define define_sin(T) \
+T sin_##T(T val) { \
+	return (T)sin(val); \
+} \
+
+define_sin(c8)
+define_sin(i16)
+define_sin(i32)
+define_sin(i64)
+define_sin(ui16)
+define_sin(ui32)
+define_sin(ui64)
+define_sin(f32)
+define_sin(f64)
+define_sin(f80)
+
+#define define_sinh(T) \
+T sinh_##T(T val) { \
+	return (T)sinh(val); \
+} \
+
+define_sinh(c8)
+define_sinh(i16)
+define_sinh(i32)
+define_sinh(i64)
+define_sinh(ui16)
+define_sinh(ui32)
+define_sinh(ui64)
+define_sinh(f32)
+define_sinh(f64)
+define_sinh(f80)
+
+#define define_tanh(T) \
+T tanh_##T(T val) { \
+	return (T)tanh(val); \
+} \
+
+define_tanh(c8)
+define_tanh(i16)
+define_tanh(i32)
+define_tanh(i64)
+define_tanh(ui16)
+define_tanh(ui32)
+define_tanh(ui64)
+define_tanh(f32)
+define_tanh(f64)
+define_tanh(f80)
+
+#define define_exp(T) \
+T exp_##T(T val) { \
+	return (T)exp(val); \
+} \
+
+define_exp(c8)
+define_exp(i16)
+define_exp(i32)
+define_exp(i64)
+define_exp(ui16)
+define_exp(ui32)
+define_exp(ui64)
+define_exp(f32)
+define_exp(f64)
+define_exp(f80)
+
+#define define_frexp(T) \
+T frexp_##T(T val, int* ptr) { \
+	return (T)frexp(val, ptr); \
+} \
+
+define_frexp(c8)
+define_frexp(i16)
+define_frexp(i32)
+define_frexp(i64)
+define_frexp(ui16)
+define_frexp(ui32)
+define_frexp(ui64)
+define_frexp(f32)
+define_frexp(f64)
+define_frexp(f80)
+
+#define define_ldexp(T) \
+T ldexp_##T(T val, int b) { \
+	return (T)ldexp(val, b); \
+} \
+
+define_ldexp(c8)
+define_ldexp(i16)
+define_ldexp(i32)
+define_ldexp(i64)
+define_ldexp(ui16)
+define_ldexp(ui32)
+define_ldexp(ui64)
+define_ldexp(f32)
+define_ldexp(f64)
+define_ldexp(f80)
+
+#define define_log(T) \
+T log_##T(T val) { \
+	return (T)log(val); \
+} \
+
+define_log(c8)
+define_log(i16)
+define_log(i32)
+define_log(i64)
+define_log(ui16)
+define_log(ui32)
+define_log(ui64)
+define_log(f32)
+define_log(f64)
+define_log(f80)
+
+#define define_log10(T) \
+T log10_##T(T val) { \
+	return (T)log10(val); \
+} \
+
+define_log10(c8)
+define_log10(i16)
+define_log10(i32)
+define_log10(i64)
+define_log10(ui16)
+define_log10(ui32)
+define_log10(ui64)
+define_log10(f32)
+define_log10(f64)
+define_log10(f80)
+
+#define define_modf(T) \
+T modf_##T(T val, double* ptr) { \
+	return (T)modf(val, ptr); \
+} \
+
+define_modf(c8)
+define_modf(i16)
+define_modf(i32)
+define_modf(i64)
+define_modf(ui16)
+define_modf(ui32)
+define_modf(ui64)
+define_modf(f32)
+define_modf(f64)
+define_modf(f80)
+
+#define define_fabs(T) \
+T fabs_##T(T val) { \
+	return (T)fabs(val); \
+} \
+
+define_fabs(c8)
+define_fabs(i16)
+define_fabs(i32)
+define_fabs(i64)
+define_fabs(ui16)
+define_fabs(ui32)
+define_fabs(ui64)
+define_fabs(f32)
+define_fabs(f64)
+define_fabs(f80)
+
+#define define_fmod(T) \
+T fmod_##T(T vala, T valb) { \
+	return (T)fmod(vala, valb); \
+} \
+
+define_fmod(c8)
+define_fmod(i16)
+define_fmod(i32)
+define_fmod(i64)
+define_fmod(ui16)
+define_fmod(ui32)
+define_fmod(ui64)
+define_fmod(f32)
+define_fmod(f64)
+define_fmod(f80)
 
 
 
@@ -2060,11 +2332,27 @@ print_string("New Value Pointer: Value 3/alt ");
 println_pointer_i32(new_value_ptr_2);
 }
 }
+void math_0()
+{
+{
+f64 a_2=10.0;
+f64 b_2=20.0;
+f64 c_2=15.5;
+f64 d_2=round_f64(c_2);
+print_string("d = round(c) = ");
+println_f64(d_2);
+print_string("exp(a) = ");
+println_f64(exp_f64(a_2));
+print_string("sin(b) = ");
+println_f64(sin_f64(b_2));
+}
+}
 i32 main()
 {
 {
 i32 ret_2=arrays_and_lists_0(77);
 pointers_0();
+math_0();
 return(ret_2);
 }
 destroy_ptr(pointer_list);
