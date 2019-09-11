@@ -1813,6 +1813,53 @@ void print_str_array_f80(c8* pointer, f80* value) {
 		sprintf(pointer, "%Lf", value[cnt]);
 }
 
+#define define_floor(T) \
+T floor_##T(T val) { \
+	return floor(val); \
+} \
+
+define_floor(c8)
+define_floor(i16)
+define_floor(i32)
+define_floor(i64)
+define_floor(ui16)
+define_floor(ui32)
+define_floor(ui64)
+define_floor(f32)
+define_floor(f64)
+define_floor(f80)
+
+#define define_ceil(T) \
+T ceil_##T(T val) { \
+	return ceil(val); \
+} \
+
+define_ceil(c8)
+define_ceil(i16)
+define_ceil(i32)
+define_ceil(i64)
+define_ceil(ui16)
+define_ceil(ui32)
+define_ceil(ui64)
+define_ceil(f32)
+define_ceil(f64)
+define_ceil(f80)
+
+#define define_round(T) \
+T round_##T(T val) { \
+	return round(val); \
+} \
+
+define_round(c8)
+define_round(i16)
+define_round(i32)
+define_round(i64)
+define_round(ui16)
+define_round(ui32)
+define_round(ui64)
+define_round(f32)
+define_round(f64)
+define_round(f80)
 
 
 
