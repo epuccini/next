@@ -417,7 +417,6 @@
     (if (equal (format nil "~a" *block*)
                (subseq (reverse var) 0 1))
         (progn
-          (dbg "zero-hash-variables " *block* " " var)
           (remhash (get-variable-name var) *variables*)))))
 
 (defun zero-hash-functions ()
@@ -425,7 +424,6 @@
     (if (equal (format nil "~a" *block*)
                (subseq (reverse var) 0 1))
         (progn
-          (dbg "zero-hash-function " *block* " " var)
           (remhash (get-function-name var) *functions*)))))
 
 (defun zero-hash-compositions ()
@@ -433,7 +431,6 @@
     (if (equal (format nil "~a" *block*)
                (subseq (reverse var) 0 1))
         (progn
-          (dbg "zero-hash-function " *block* " " var)
           (remhash (get-function-name var) *compositions*)))))
 
 (defun add-code (expression)
