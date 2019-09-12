@@ -216,13 +216,15 @@ by Edward Puccini |;
     (prnl (i32 (of test a)))))
 
 (defn files:void []
-  (let [test-file:file 0
-        mode:string ""
-        ret:ui64 0]
-    (while [ret != 5]
-      (prn "WHILE ")
-      (prnl ret)
-      (:: ret (+ ret 1)))))
+  (let [name:string "output.h"
+        mode:string "r"
+        test-file:file (open name mode)
+        line:string 1]
+    (while [line != 0]
+      (:: line (read-line test-file))
+      (prn "line: ")
+      (prn line))
+    (close test-file)))
     
 (defn main:i32 []
   (let [ret:i32 (arrays-and-lists 77)]

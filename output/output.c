@@ -1551,7 +1551,6 @@ void println_pointer_##T(T* pointer) {  \
 		printf("\n"); \
 	} else { \
 		for (cnt = 0; cnt < size; cnt++) { \
-			print_##T(pointer[cnt]); \
 			printf(" "); \
 		} \
 		printf("\n"); \
@@ -1580,7 +1579,6 @@ void print_pointer_##T(T* pointer) {  \
 	} else { \
 		for (cnt = 0; cnt < size; cnt++) { \
 			print_##T(pointer[cnt]); \
-			printf(" "); \
 		} \
 	} \
 } \
@@ -2144,13 +2142,16 @@ ui64 write_binary(const void *ptr, ui64 size_of_elements, ui64 number_of_element
 	return fwrite(ptr, size_of_elements, number_of_elements, outfile);
 }
 
-void write_line(file outfile, cstring line) {
-	fputs(line, outfile);
+int write_line(file outfile, cstring line) {
+	i32 ret = fputs(line, outfile);
+	return ret;
 }
 
-string read_line(file infile) {
-	char buf[255];
-	return fgets(buf, 255, infile);
+c8* read_line(file infile) {
+	c8* buff = (c8*)malloc(255 * sizeof(c8));
+	append_ptr(buff, 255, POINTER);
+	c8* ret = fgets(buff, 255, infile);
+	return ret;
 }
 
 i32 close(file file) {
@@ -2172,7 +2173,7 @@ return(888);
 }
 struct monolith_0
 {
-char* string;
+string string;
 i32 a;
 f32 b;
 };
@@ -2227,7 +2228,7 @@ node_f32* my_listb_2=create_list_f32((f32[]){7.0, 8.0, 9.0, 10.0, 11.0, 12.0, 13
 node_f32* append_my_list_2=append_list_list_f32(my_list_2,my_listb_2);
 node_f32* rev_list_2=reverse_list_f32(append_my_list_2);
 node_f32* cdr_my_list_2=cdr_list_f32(my_list_2);
-char* string_2="abcdefg";
+string string_2="abcdefg";
 c8 chars_2[]={'a', 'b', 'c', 'd', 'e', 'f', 'g'};
 append_ptr(chars_2, sizeof(chars_2)/sizeof(c8), ARRAY);
 c8 new_string_2[]="Just a string";
@@ -2404,15 +2405,17 @@ println_i32((i32)(test_2.a));
 void files_0()
 {
 {
-file test_file_2=0;
-char* mode_2="";
-ui64 ret_2=0;
-while(ret_2!=5)
+string name_2="output.h";
+string mode_2="r";
+file test_file_2=open(name_2,mode_2);
+string line_2=1;
+while(line_2!=0)
 {
-print_string("WHILE ");
-println_ui64(ret_2);
-set_pointer_ui64(&ret_2,(ret_2+1));
+set_pointer_string(&line_2,read_line(test_file_2));
+print_string("line: ");
+print_string(line_2);
 };
+close(test_file_2);
 }
 }
 i32 main()

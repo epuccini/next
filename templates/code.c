@@ -1551,7 +1551,6 @@ void println_pointer_##T(T* pointer) {  \
 		printf("\n"); \
 	} else { \
 		for (cnt = 0; cnt < size; cnt++) { \
-			print_##T(pointer[cnt]); \
 			printf(" "); \
 		} \
 		printf("\n"); \
@@ -1580,7 +1579,6 @@ void print_pointer_##T(T* pointer) {  \
 	} else { \
 		for (cnt = 0; cnt < size; cnt++) { \
 			print_##T(pointer[cnt]); \
-			printf(" "); \
 		} \
 	} \
 } \
@@ -2144,13 +2142,16 @@ ui64 write_binary(const void *ptr, ui64 size_of_elements, ui64 number_of_element
 	return fwrite(ptr, size_of_elements, number_of_elements, outfile);
 }
 
-void write_line(file outfile, cstring line) {
-	fputs(line, outfile);
+int write_line(file outfile, cstring line) {
+	i32 ret = fputs(line, outfile);
+	return ret;
 }
 
-string read_line(file infile) {
-	char buf[255];
-	return fgets(buf, 255, infile);
+c8* read_line(file infile) {
+	c8* buff = (c8*)malloc(255 * sizeof(c8));
+	append_ptr(buff, 255, POINTER);
+	c8* ret = fgets(buff, 255, infile);
+	return ret;
 }
 
 i32 close(file file) {
