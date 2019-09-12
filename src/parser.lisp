@@ -371,6 +371,8 @@
 
 (defun dec-block ()
   (zero-hash-variables)
+  (zero-hash-functions)
+  (zero-hash-compositions)
   (setq *block* (- *block* 1)))
 
 (defun zero-parens ()
@@ -381,7 +383,27 @@
 
 (defun zero-hash-variables ()
   (dolist (var (hash-table-keys *variables*))
-       (remhash (get-variable-name var) *variables*)))
+    (if (equal (format nil "~a" *block*)
+               (subseq (reverse var) 0 1))
+        (progn
+          (dbg "zero-hash-variables " *block* " " var)
+          (remhash (get-variable-name var) *variables*)))))
+
+(defun zero-hash-functions ()
+  (dolist (var (hash-table-keys *functions*))
+    (if (equal (format nil "~a" *block*)
+               (subseq (reverse var) 0 1))
+        (progn
+          (dbg "zero-hash-function " *block* " " var)
+          (remhash (get-function-name var) *functions*)))))
+
+(defun zero-hash-compositions ()
+  (dolist (var (hash-table-keys *compositions*))
+    (if (equal (format nil "~a" *block*)
+               (subseq (reverse var) 0 1))
+        (progn
+          (dbg "zero-hash-function " *block* " " var)
+          (remhash (get-function-name var) *compositions*)))))
 
 (defun add-code (expression)
   ;(setf expression (filter-expression expression))
