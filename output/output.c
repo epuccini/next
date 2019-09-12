@@ -2416,13 +2416,14 @@ void files_0()
 string name_2="output.h";
 string mode_2="r";
 file test_file_2=open(name_2,mode_2);
-string line_2=1;
+string line_2=(c8*)1;
 println_string("files!!!");
 while(line_2!=0)
 {
 set_pointer_string(&line_2,read_line(test_file_2));
 print_string("line: ");
 print_string(line_2);
+delete_ptr(line_2);
 };
 close(test_file_2);
 println_string("");
