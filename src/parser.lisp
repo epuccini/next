@@ -1415,8 +1415,6 @@
   (setf expr-list (parse-open-square-bracket expr-list))
   (setf expr-list (parse-if-vector expr-list))
   (setf expr-list (parse-close-square-bracket expr-list))
-  (loop while (equal "\n" (car expr-list)) do
-       (setf expr-list (cdr expr-list)))
   (add-code (format nil "{~%"))
   (setf expr-list (parse-expression expr-list))
   (add-code (format nil "}~%"))
@@ -1424,8 +1422,7 @@
       (progn
         (add-code "else")
         (add-code (format nil "~%{~%"))
-        (loop while (equal "\n" (car expr-list)) do
-             (setf expr-list (cdr expr-list)))
+
         (setf expr-list (parse-expression expr-list))
         (add-code (format nil "}~%"))))
   (dec-block)
@@ -2733,6 +2730,8 @@
 (defun parse-expression (expr-list &optional (omit nil))
   (if (car expr-list)
       (progn
+        (loop while (equal "\n" (car expr-list)) do
+             (setf expr-list (cdr expr-list)))
         (if (equal "," (car expr-list))
             (error-syntax-error))        
          (if (equal "\"" (car expr-list))
