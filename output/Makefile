@@ -21,7 +21,7 @@ CFLAGS  	= -Wall -g -c -D_REENTRANT -DVERSION=\"$(VERSION)\" -Wsizeof-array-argu
 LDFLAGS 	= -pthread -lm -lSystem 
 SRCDIR 		= /Users/edward/Documents/Code/common-lisp/projects/next/output 
 
-OBJ		= library.o output.o
+OBJ		= runtime.o output.o
 ASM_OBJ	= 64.o
 
 $(APPLICATION): $(OBJ)

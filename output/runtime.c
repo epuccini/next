@@ -1,4 +1,4 @@
-#include "library.h"
+#include "runtime.h"
 
 i32 mod(i32 a, i32 b) {
 	return a % b;
