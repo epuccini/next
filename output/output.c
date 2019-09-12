@@ -2133,6 +2133,31 @@ define_fmod(f32)
 define_fmod(f64)
 define_fmod(f80)
 
+file open(const c8* filename, const c8* mode) {
+	return fopen(filename,mode);
+} 
+ui64 read_binary(void *ptr, ui64 size_of_elements, ui64 number_of_elements, file infile) {
+	return fread(ptr, size_of_elements, number_of_elements, infile);
+}
+
+ui64 write_binary(const void *ptr, ui64 size_of_elements, ui64 number_of_elements, file outfile) {
+	return fwrite(ptr, size_of_elements, number_of_elements, outfile);
+}
+
+void write_line(file outfile, const c8* line) {
+	fputs(line, outfile);
+}
+
+string read_line(file infile) {
+	char buf[255];
+	return fgets(buf, 255, infile);
+}
+
+i32 close(file file) {
+	return fclose(file);
+}
+
+
 
 
 i32 layer__fun1_0()

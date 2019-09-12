@@ -17,6 +17,9 @@ typedef unsigned long ui64;
 typedef float f32;
 typedef double f64;
 typedef long double f80;
+typedef const char* cstring;
+typedef char* string;
+typedef FILE* file;
 
 i32 mod(i32 a, i32 b);
 i32 i32_mod_i32(i32 a, i32 b);
@@ -94,3 +97,4 @@ typedef struct node_ptr {
 } node_ptr_t;
 
 static node_ptr_t* pointer_list = NULL;
+
