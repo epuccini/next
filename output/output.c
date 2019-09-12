@@ -1813,7 +1813,7 @@ void print_str_array_f80(c8* pointer, f80* value) {
 
 #define define_floor(T) \
 T floor_##T(T val) { \
-	return (T)floor(val); \
+	return floor(val); \
 } \
 
 define_floor(c8)
@@ -1829,7 +1829,7 @@ define_floor(f80)
 
 #define define_ceil(T) \
 T ceil_##T(T val) { \
-	return (T)ceil(val); \
+	return ceil(val); \
 } \
 
 define_ceil(c8)
@@ -1845,7 +1845,7 @@ define_ceil(f80)
 
 #define define_round(T) \
 T round_##T(T val) { \
-	return (T)round(val); \
+	return round(val); \
 } \
 
 define_round(c8)
@@ -1861,7 +1861,7 @@ define_round(f80)
 
 #define define_acos(T) \
 T acos_##T(T val) { \
-	return (T)acos(val); \
+	return acos(val); \
 } \
 
 define_acos(c8)
@@ -1877,7 +1877,7 @@ define_acos(f80)
 
 #define define_asin(T) \
 T asin_##T(T val) { \
-	return (T)asin(val); \
+	return asin(val); \
 } \
 
 define_asin(c8)
@@ -1893,7 +1893,7 @@ define_asin(f80)
 
 #define define_atan(T) \
 T atan_##T(T val) { \
-	return (T)atan(val); \
+	return atan(val); \
 } \
 
 define_atan(c8)
@@ -1909,7 +1909,7 @@ define_atan(f80)
 
 #define define_atan2(T) \
 T atan2_##T(T vala, T valb) { \
-	return (T)atan2(vala,valb); \
+	return atan2(vala,valb); \
 } \
 
 define_atan2(c8)
@@ -1925,7 +1925,7 @@ define_atan2(f80)
 
 #define define_cos(T) \
 T cos_##T(T val) { \
-	return (T)cos(val); \
+	return cos(val); \
 } \
 
 define_cos(c8)
@@ -1941,7 +1941,7 @@ define_cos(f80)
 
 #define define_cosh(T) \
 T cosh_##T(T val) { \
-	return (T)cosh(val); \
+	return cosh(val); \
 } \
 
 define_cosh(c8)
@@ -1957,7 +1957,7 @@ define_cosh(f80)
 
 #define define_sin(T) \
 T sin_##T(T val) { \
-	return (T)sin(val); \
+	return sin(val); \
 } \
 
 define_sin(c8)
@@ -1973,7 +1973,7 @@ define_sin(f80)
 
 #define define_sinh(T) \
 T sinh_##T(T val) { \
-	return (T)sinh(val); \
+	return sinh(val); \
 } \
 
 define_sinh(c8)
@@ -1989,7 +1989,7 @@ define_sinh(f80)
 
 #define define_tanh(T) \
 T tanh_##T(T val) { \
-	return (T)tanh(val); \
+	return tanh(val); \
 } \
 
 define_tanh(c8)
@@ -2005,7 +2005,7 @@ define_tanh(f80)
 
 #define define_exp(T) \
 T exp_##T(T val) { \
-	return (T)exp(val); \
+	return exp(val); \
 } \
 
 define_exp(c8)
@@ -2021,7 +2021,7 @@ define_exp(f80)
 
 #define define_frexp(T) \
 T frexp_##T(T val, int* ptr) { \
-	return (T)frexp(val, ptr); \
+	return frexp(val, ptr); \
 } \
 
 define_frexp(c8)
@@ -2053,7 +2053,7 @@ define_ldexp(f80)
 
 #define define_log(T) \
 T log_##T(T val) { \
-	return (T)log(val); \
+	return log(val); \
 } \
 
 define_log(c8)
@@ -2085,7 +2085,7 @@ define_log10(f80)
 
 #define define_modf(T) \
 T modf_##T(T val, double* ptr) { \
-	return (T)modf(val, ptr); \
+	return modf(val, ptr); \
 } \
 
 define_modf(c8)
@@ -2101,7 +2101,7 @@ define_modf(f80)
 
 #define define_fabs(T) \
 T fabs_##T(T val) { \
-	return (T)fabs(val); \
+	return fabs(val); \
 } \
 
 define_fabs(c8)
@@ -2117,7 +2117,7 @@ define_fabs(f80)
 
 #define define_fmod(T) \
 T fmod_##T(T vala, T valb) { \
-	return (T)fmod(vala, valb); \
+	return fmod(vala, valb); \
 } \
 
 define_fmod(c8)
