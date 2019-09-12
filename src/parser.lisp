@@ -2980,7 +2980,9 @@
   
 (defun parse (expression)
   "Parse expression."
+  (dbg "parse: preprocess")
   (let ((expr-list (preprocess expression)))
+    (dbg "parse: setup hashtables")
     (setf *code_list* '(""))
     (setf *implementation_list* '(""))
     (setf *definition_list* '(""))
@@ -2992,7 +2994,9 @@
     (setf *function-map* (make-hash-table :test 'equal))
     (setf *signatures* (make-hash-table :test 'equal))
     (setf *current-function* (make-hash-table :test 'equal))
+    (dbg "parse: setup-signatures")
     (setup-signatures)
+    (dbg "parse: parse-expressions")
     (loop while (and (find "(" expr-list :test #'equal)
                      (> (length expr-list) 0)) do
          (setf expr-list (parse-expression expr-list))))

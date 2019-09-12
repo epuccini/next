@@ -14,6 +14,7 @@
   (declaim (optimize (speed 1) (safety 1) (space 3) (debug 0))))
 
 (defun main()
+  (flood:dbg "main: setup param")
     (let ((param
            (argparse:with-arguments-hash-table
                "next"
@@ -35,15 +36,17 @@
                :description "Evaluate expression"
                :group "Evaluation"
                :type 'string))))
+      (flood:dbg "main: handle arguments")
       (argparse:handle-unknown-arguments param)
       (argparse:handle-missing-arguments param)
+      (flood:dbg "main: eval arguments")
       (cond ((argparse:get-argument-value param "--repl")
              (next:repl))
             ((argparse:get-argument-value param "--eval")
              (next:evaluate (argparse:get-argument-value param "--eval")))
             ((argparse:get-argument-value param "--compile")
              (next:compile-next (argparse:get-argument-value param "--compile")
-                          (argparse:get-argument-value param "--output"))))))
+                                (argparse:get-argument-value param "--output"))))))
 
 (defun build ()
   "Save executable with necessary options."

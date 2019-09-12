@@ -189,14 +189,17 @@
   (parse expression))
 
 (defun compile-next (infile outfile)
+  (dbg "compile-next: load-binary")
   (let ((infile-data (load-binary-data infile)))
     (load-templates)
+    (dbg "compile-next: begin")
     (multiple-value-bind (code definition implementation) (parse infile-data)
       (let* ((outfile-data (concatenate 'string *impl-template* code))
              (outfilename (pathname-name outfile))
              (outfilepath (directory-namestring outfile))
              (definition-data (concatenate 'string *def-template*
                                            (format nil "~a" definition))))
+        (dbg "compile-next: setupp data")
         (setf outfile-data (regex-replace-all "\\$\\(OUTPUT_H\\)"
                                                  outfile-data
                                                  (concatenate 'string
