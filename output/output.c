@@ -2192,12 +2192,14 @@ return((op1_1+op2_1));
 }
 void work_0(f32 (*f_1)(f32),i32 arg_1)
 {
+println_string("Work!!!");
 print_format("%f",(*f_1)(arg_1));
 }
 i32 arrays_and_lists_0(i32 argc_1)
 {
+println_string("Arrays and lists!!!");
 mapit_0(5.5);
-println_string("Call module functions ");
+println_string("Module functions!!!");
 layer__fun1_0();
 layer__fun2_0();
 {
@@ -2336,6 +2338,7 @@ println_i32(argc_1);
 println_string("ENDE");
 }
 println_i32(argc_1);
+println_string("");
 return(2);
 }
 void pointers_0()
@@ -2353,6 +2356,7 @@ i32** value_ptr_ptr_2=&value_ptr_2;
 append_ptr(value_ptr_ptr_2, 1, VARIABLE);
 i32* new_value_ptr_2=&value2_2;
 append_ptr(new_value_ptr_2, 1, VARIABLE);
+println_string("Pointers!!!");
 print_string("Value ");
 println_i32(value_2);
 print_string("Pointer print ");
@@ -2371,6 +2375,7 @@ set_pointer_pointer_i32(&new_value_ptr_2,(&value3_2));
 println_i32((i32)(*new_value_ptr_2));
 print_string("New Value Pointer: Value 3/alt ");
 println_pointer_i32(new_value_ptr_2);
+println_string("");
 }
 }
 void math_0()
@@ -2380,19 +2385,21 @@ f64 a_2=10.0;
 f64 b_2=20.0;
 f64 c_2=15.5;
 f64 d_2=round_f64(c_2);
+println_string("Math!!!");
 print_string("d = round(c) = ");
 println_f64(d_2);
 print_string("exp(a) = ");
 println_f64(exp_f64(a_2));
 print_string("sin(b) = ");
 println_f64(sin_f64(b_2));
+println_string("");
 }
 }
 void compositions_0()
 {
 {
 struct monolith_0 test_2={0};
-println_string("Test composition");
+println_string("Composition!!!");
 set_pointer_i32((i32*)(&(test_2.a)),1000);
 print_string("test.a = ");
 println_i32((i32)(test_2.a));
@@ -2400,6 +2407,7 @@ set_pointer_i32((i32*)(&test_2.a),2000);
 set_pointer_i32(&test_2.a,3000);
 print_string("test.a = ");
 println_i32((i32)(test_2.a));
+println_string("");
 }
 }
 void files_0()
@@ -2409,6 +2417,7 @@ string name_2="output.h";
 string mode_2="r";
 file test_file_2=open(name_2,mode_2);
 string line_2=1;
+println_string("files!!!");
 while(line_2!=0)
 {
 set_pointer_string(&line_2,read_line(test_file_2));
@@ -2416,6 +2425,7 @@ print_string("line: ");
 print_string(line_2);
 };
 close(test_file_2);
+println_string("");
 }
 }
 i32 main()
@@ -2424,6 +2434,7 @@ i32 main()
 i32 ret_2=arrays_and_lists_0(77);
 layer__fun1_0();
 layer__fun2_0();
+println_string("");
 pointers_0();
 math_0();
 compositions_0();

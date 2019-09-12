@@ -36,11 +36,13 @@ by Edward Puccini |;
   (return (+ op1 op2)))
 
 (defn work:void [f:fun[f32->f32] arg:i32]
+  (prnl "Work!!!")
   (prnfmt "%f" (f arg)))
 
 (defn arrays-and-lists:i32 [argc:i32]
+  (prnl "Arrays and lists!!!")
   (mapit 5.5)
-  (prnl "Call module functions ")
+  (prnl "Module functions!!!")
   (layer>>fun1)
   (layer>>fun2)
   (let [float1:f32 0.0
@@ -161,6 +163,7 @@ by Edward Puccini |;
     (prnl argc)
     (prnl "ENDE"))
   (prnl argc)
+  (prnl "")
   (return 2))
 
 
@@ -173,6 +176,7 @@ by Edward Puccini |;
         value_ptr:i32> value
         value_ptr_ptr:i32>> value_ptr
         new_value_ptr:i32> value2]
+    (prnl "Pointers!!!")
     (prn "Value ")
     (prnl value)
     (prn "Pointer print ")
@@ -190,46 +194,53 @@ by Edward Puccini |;
     (:: new_value_ptr (& value3))
     (prnl (i32 (? new_value_ptr)))
     (prn "New Value Pointer: Value 3/alt ")
-    (prnl new_value_ptr)))
+    (prnl new_value_ptr)
+    (prnl "")))
 
 (defn math:void []
   (let [a:f64 10.0
         b:f64 20.0
         c:f64 15.5
         d:f64 (round c)]
+    (prnl "Math!!!")
     (prn "d = round(c) = ")
     (prnl d)
     (prn "exp(a) = ")
     (prnl (exp a))
     (prn "sin(b) = ")
-    (prnl (sin b))))
+    (prnl (sin b))
+    (prnl "")))
 
 (defn compositions:void []
   (let [test:monolith {0}]
-    (prnl "Test composition")
+    (prnl "Composition!!!")
     (:: (i32> (ref (of test a))) 1000)
     (prn "test.a = ")
     (prnl (i32 (of test a)))
     (:: (i32> (ref test>>a)) 2000)
     (:: test>>a 3000)
     (prn "test.a = ")
-    (prnl (i32 (of test a)))))
+    (prnl (i32 (of test a)))
+    (prnl "")))
 
 (defn files:void []
   (let [name:string "output.h"
         mode:string "r"
         test-file:file (open name mode)
         line:string 1]
+    (prnl "files!!!")
     (while [line != 0]
       (:: line (read-line test-file))
       (prn "line: ")
       (prn line))
-    (close test-file)))
+    (close test-file)
+    (prnl "")))
     
 (defn main:i32 []
   (let [ret:i32 (arrays-and-lists 77)]
     (layer>>fun1)
     (layer>>fun2)
+    (prnl "")
     (pointers)
     (math)
     (compositions)
