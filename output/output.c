@@ -2375,6 +2375,8 @@ i32 ret_2=arrays_and_lists_0(77);
 pointers_0();
 math_0();
 compositions_0();
+layer__fun1_0();
+layer__fun2_0();
 return(ret_2);
 }
 destroy_ptr(pointer_list);

@@ -219,4 +219,6 @@ by Edward Puccini |;
     (pointers)
     (math)
     (compositions)
+    (layer>>fun1)
+    (layer>>fun2)
     (return ret)))
