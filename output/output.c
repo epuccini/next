@@ -2363,6 +2363,7 @@ set_pointer_i32((i32*)(&(test_2.a)),1000);
 print_string("test.a = ");
 println_i32((i32)(test_2.a));
 set_pointer_i32((i32*)(&test_2.a),2000);
+set_pointer_i32(&test_2.a,3000);
 print_string("test.a = ");
 println_i32((i32)(test_2.a));
 }

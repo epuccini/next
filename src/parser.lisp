@@ -501,7 +501,16 @@
                  (setf expr-list (cdr expr-list))
                  (add-code " ")
                  (add-code (car def))
-                 (dbg "parse-types: store " (get-composition-name *current-composition*)
+                 (dbg "parse-types: store "
+                      (format nil "~a>>~a"
+                              (get-composition-name *current-composition*) (car def))
+                      " type " (cadr def))
+                 (setf (gethash (format nil "~a>>~a"
+                                        (get-composition-name *current-composition*)
+                                        (car def)) *variables*)
+                       (cadr def))
+                 (dbg "parse-types: store composition "
+                      (get-composition-name *current-composition*)
                       " " (car def))
                  (setf (gethash (get-composition-name *current-composition*) *compositions*)
                        (car def))))
@@ -1509,15 +1518,31 @@
                    (setf count (1+ count))))))
     count))
 (defun get-type (expr-list)
-  (let ((variable-type (gethash (get-iter-variable-name (cadr expr-list)) *variables*))
-        (number-type (type-of-number-string (cadr expr-list)))
-        (function-type (inspect-function-type (cdr expr-list)))
-        (tp nil)
-        (tp-str ""))
+  (let* ((variable-type (gethash (get-iter-variable-name (cadr expr-list)) *variables*))
+         (number-type (type-of-number-string (cadr expr-list)))
+         (function-type (inspect-function-type (cdr expr-list)))
+         (tp nil)
+         (tp-str "")
+         (split (split ">>" (cadr expr-list)))
+         (struct-type (gethash (get-iter-variable-name (car split)) *variables*))
+         (struct-name (get-iter-composition-name (format nil "~a" struct-type))))
+    (dbg "get-type: "  (format nil "~a" struct-type) " >"
+         (format nil "~a>>~a"  struct-name (cadr split)))
+    (if (gethash (format nil "~a>>~a" struct-name (cadr split)) *variables*)
+        (progn
+          (dbg "get-type: composition found! " struct-name ">>" (cadr split))
+          (setf variable-type (gethash (format nil "~a>>~a" struct-name (cadr split))
+                                       *variables*))
+          (dbg "get-type: var-type: " (format nil "~a" variable-type))))
+    ;; variable found?
     (cond ((remove-if-not #'(lambda (x)
                               (equal x (get-iter-variable-name (cadr expr-list))))
                           (hash-table-keys *variables*))
            (setf tp variable-type))
+           ;; struct member found?
+          ((gethash (format nil "~a>>~a" struct-name (cadr split)) *variables*)
+           (setf tp-str (format nil "~a" variable-type))
+           (return-from get-type tp-str))
           (function-type
            (setf tp function-type))
           (number-type
@@ -1942,12 +1967,16 @@
          (dbg "parse-call: RET")
          (setf expr-list (parse-call (cdr expr-list))))
         ((or (equal "set" (car expr-list)) (equal "::" (car expr-list)))
-         (let ((type (get-type expr-list)))
+         (let* ((type (get-type expr-list))
+                (split (split ">>" (cadr expr-list)))
+                (struct-type (gethash (get-iter-variable-name (car split)) *variables*))
+                (struct-name (get-iter-composition-name (format nil "~a" struct-type))))
            (store-current-function "set")
-           (if (remove-if-not #'(lambda (x)
+           (if (or (remove-if-not #'(lambda (x)
                                       (equal x (get-iter-variable-name
                                                 (cadr expr-list))))
                                   (hash-table-keys *variables*))
+                   (gethash (format nil "~a>>~a" struct-name (cadr split)) *variables*))
                (progn
                  (add-code (format nil "set_pointer_~a" type))
                  (add-code "(")
@@ -2824,7 +2853,8 @@
               (if (search ">" *current-let-definition*)
                   (add-code "&"))
               (if (search ">>" (car expr-list))
-                  (add-code (concatenate 'string (get-iter-variable-name var-name) "." sub-name))
+                  (add-code (concatenate 'string (get-iter-variable-name var-name)
+                                         "." sub-name))
                   (add-code (get-iter-variable-name var-name)))
               (if (not omit)
                   (add-code (format nil ";~%")))

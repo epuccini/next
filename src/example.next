@@ -209,6 +209,7 @@ by Edward Puccini |;
     (prn "test.a = ")
     (prnl (i32 (of test a)))
     (:: (i32> (ref test>>a)) 2000)
+    (:: test>>a 3000)
     (prn "test.a = ")
     (prnl (i32 (of test a)))))
 
