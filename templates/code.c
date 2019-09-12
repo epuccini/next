@@ -60,7 +60,7 @@ void print_f80(f80 val) {
 	printf("%Lf", val);
 }
 
-void print_string(const c8* str) {
+void print_string(cstring str) {
     printf("%s", str);
 }
 
@@ -108,14 +108,14 @@ void println_f80(f80 val) {
 	printf("%Lf \n", val);
 }
 
-void println_string(const c8* str) {
+void println_string(cstring str) {
     printf("%s \n", str);
 }
 
-void print_format(const c8* fmt, ...) {
+void print_format(cstring fmt, ...) {
     va_list arglist;
     va_start(arglist, fmt);
-    const c8* p;
+    cstring p;
     
     for(p = fmt; *p != '\0'; p++) {
         if (*p == '%') {
@@ -2133,7 +2133,7 @@ define_fmod(f32)
 define_fmod(f64)
 define_fmod(f80)
 
-file open(const c8* filename, const c8* mode) {
+file open(cstring filename, cstring mode) {
 	return fopen(filename,mode);
 } 
 ui64 read_binary(void *ptr, ui64 size_of_elements, ui64 number_of_elements, file infile) {
@@ -2144,7 +2144,7 @@ ui64 write_binary(const void *ptr, ui64 size_of_elements, ui64 number_of_element
 	return fwrite(ptr, size_of_elements, number_of_elements, outfile);
 }
 
-void write_line(file outfile, const c8* line) {
+void write_line(file outfile, cstring line) {
 	fputs(line, outfile);
 }
 
