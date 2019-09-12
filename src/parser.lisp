@@ -1415,6 +1415,8 @@
   (setf expr-list (parse-open-square-bracket expr-list))
   (setf expr-list (parse-if-vector expr-list))
   (setf expr-list (parse-close-square-bracket expr-list))
+  (loop while (equal "\n" (car expr-list)) do
+       (setf expr-list (cdr expr-list)))
   (add-code (format nil "{~%"))
   (setf expr-list (parse-expression expr-list))
   (add-code (format nil "}~%"))
@@ -1422,6 +1424,8 @@
       (progn
         (add-code "else")
         (add-code (format nil "~%{~%"))
+        (loop while (equal "\n" (car expr-list)) do
+             (setf expr-list (cdr expr-list)))
         (setf expr-list (parse-expression expr-list))
         (add-code (format nil "}~%"))))
   (dec-block)
@@ -2184,9 +2188,12 @@
          (add-code "(")
          (setf expr-list (parse-arguments (cdr expr-list) 1))
          (return-from parse-call expr-list))
+        ((equal "while" (car expr-list))
+         (store-current-function "while")
+         (dbg "parse-call: WHILE INC BLOCK " *block* " PARENS " *paranteses*)
+         (setf expr-list (parse-if (cdr expr-list))))
         ((equal "if" (car expr-list))
          (store-current-function "if")
-         (inf "Compile condition in block " *block*)
          (dbg "parse-call: IF INC BLOCK " *block* " PARENS " *paranteses*)
          (setf expr-list (parse-if (cdr expr-list))))
         ((or (equal "mod" (car expr-list))
@@ -2840,6 +2847,7 @@
               ;; omit semicolon for blocks
               (if (or (equal "for" (car expr-list))
                       (equal "if" (car expr-list))
+                      (equal "while" (car expr-list))
                       (equal "defn" (car expr-list))
                       (equal "let" (car expr-list))
                       (equal "compose" (car expr-list))

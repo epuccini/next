@@ -2315,6 +2315,14 @@ i32 cnt_3=0;
 for(cnt_3=0;cnt_3<max_i32(length_array_i32(array_2),1);cnt_3++)
 {
 set_pointer_i32(elt_array_i32(array_2,cnt_3),(cnt_3*1000));
+if(cnt_3==3)
+{
+println_string("COUNT IS 3");
+}
+else
+{
+println_string("COUNT NOT 3");
+}
 print_format("%d",power_i32(2,cnt_3));
 print_string("ELT: ");
 print_format("%d",*elt_array_i32(array_2,cnt_3));
@@ -2391,6 +2399,14 @@ set_pointer_i32((i32*)(&test_2.a),2000);
 set_pointer_i32(&test_2.a,3000);
 print_string("test.a = ");
 println_i32((i32)(test_2.a));
+}
+}
+void file_0()
+{
+{
+file test_file_2=0;
+char* mode_2="";
+ui64 ret_2=0;
 }
 }
 i32 main()

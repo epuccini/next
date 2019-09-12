@@ -148,11 +148,13 @@ by Edward Puccini |;
     ;(del my-new-array3)
     (for [cnt:i32 0 < (max (len array) 1)]
       (:: (# array cnt) (* cnt 1000))
+      (if [cnt == 3]
+        (prnl "COUNT IS 3")
+        (prnl "COUNT NOT 3"))
       (prnfmt "%d" (^ 2 cnt))
       (prn "ELT: ")
       (prnfmt "%d" (# array cnt))
       (prn "CNT: "))
-
     (del array)
     (prnl float1)
     (prnl float2)
@@ -213,7 +215,13 @@ by Edward Puccini |;
     (prn "test.a = ")
     (prnl (i32 (of test a)))))
 
-
+(defn file:void []
+  (let [test-file:file 0
+        mode:string ""
+        ret:ui64 0]))
+   ; (while [ret == 0]
+    ;  (:: ret 1))))
+    
 (defn main:i32 []
   (let [ret:i32 (arrays-and-lists 77)]
     (pointers)
