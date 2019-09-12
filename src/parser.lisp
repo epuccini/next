@@ -349,10 +349,41 @@
                 (setf cnt (- cnt 1))
                 (get-iter-composition-name-x name cnt)))))))
 
-
 (defun get-iter-composition-name (name)
   (get-iter-composition-name-x name *block*))
 
+
+
+(defun is-function-p (name)
+  (remove-if-not #'(lambda (x)
+                            (equal x (get-function-name name)))
+                 (hash-table-keys *functions*)))
+
+(defun is-variable-p (name)
+  (remove-if-not #'(lambda (x)
+                            (equal x (get-variable-name name)))
+                 (hash-table-keys *variables*)))
+
+(defun is-iter-function-p (name)
+  (remove-if-not #'(lambda (x)
+                            (equal x (get-iter-function-name name)))
+                 (hash-table-keys *functions*)))
+
+(defun is-iter-variable-p (name)
+  (remove-if-not #'(lambda (x)
+                            (equal x (get-iter-variable-name name)))
+                 (hash-table-keys *variables*)))
+
+(defun is-iter-composition-p (type-name)
+  (remove-if-not #'(lambda (x) (equal x (get-iter-composition-name type-name)))
+                 (hash-table-keys *compositions*)))
+
+(defun is-iter-composition-type-p (expr-list)
+  (let* ((split (split ">>" (car expr-list)))
+         (struct-type (gethash (get-iter-variable-name (car split)) *variables*))
+         (struct-name (get-iter-composition-name (format nil "~a" struct-type))))
+    (gethash (format nil "~a>>~a" struct-name (cadr split)) *variables*)))
+  
 (defun set-signature (name signature)
   (setf (gethash name *signatures*) signature))
 
@@ -506,6 +537,11 @@
            (setf expr-list (parse-argument expr-list)))))
   expr-list)
 
+(defun store-composition-variable (var-name type)
+  (setf (gethash (format nil "~a>>~a"
+                         (get-composition-name *current-composition*)
+                         var-name) *variables*) type))
+
 (defun parse-types (expr-list)
   (cond ((find #\: (car expr-list))
          (let ((def (split ":" (car expr-list))))
@@ -523,14 +559,11 @@
                  (setf expr-list (cdr expr-list))
                  (add-code " ")
                  (add-code (car def))
-                 (dbg "parse-types: store "
+                 (dbg "parse-types: store composition variable "
                       (format nil "~a>>~a"
                               (get-composition-name *current-composition*) (car def))
                       " type " (cadr def))
-                 (setf (gethash (format nil "~a>>~a"
-                                        (get-composition-name *current-composition*)
-                                        (car def)) *variables*)
-                       (cadr def))
+                 (store-composition-variable (car def) (cadr def))
                  (dbg "parse-types: store composition "
                       (get-composition-name *current-composition*)
                       " " (car def))
@@ -756,8 +789,7 @@
           ((equal "[" type)
            (add-code "void")
            (setf (gethash (get-function-name fn-name) *functions*) 'void))
-          ((remove-if-not #'(lambda (x) (equal x (get-iter-composition-name type)))
-                          (hash-table-keys *compositions*))
+          ((is-iter-composition-p type)
            (add-code (get-iter-composition-name "struct "))
            (add-code type)
            (setf (gethash (get-function-name fn-name) *functions*) type))
@@ -1000,8 +1032,7 @@
         ((equal "f80'" type-name)
          (add-code "node_f80*")
          (setf (gethash (get-variable-name var-name) *variables*) 'long-double-float-list))
-        ((remove-if-not #'(lambda (x) (equal x (get-iter-composition-name type-name)))
-                        (hash-table-keys *compositions*))
+        ((is-iter-composition-p type-name)
          (add-code "struct ")
          (add-code (get-iter-composition-name type-name))
          (setf (gethash (get-variable-name var-name) *variables*) type-name))
@@ -1540,22 +1571,6 @@
                    (setf count (1+ count))))))
     count))
 
-(defun is-iter-function-p (name)
-  (remove-if-not #'(lambda (x)
-                            (equal x (get-iter-function-name name)))
-                 (hash-table-keys *functions*)))
-
-(defun is-iter-variable-p (name)
-  (remove-if-not #'(lambda (x)
-                            (equal x (get-iter-variable-name name)))
-                 (hash-table-keys *variables*)))
-
-(defun is-iter-composition-p (expr-list)
-  (let* ((split (split ">>" (car expr-list)))
-         (struct-type (gethash (get-iter-variable-name (car split)) *variables*))
-         (struct-name (get-iter-composition-name (format nil "~a" struct-type))))
-    (gethash (format nil "~a>>~a" struct-name (cadr split)) *variables*)))
-  
 (defun get-iter-composition-type (expr-list)
   (let* ((split (split ">>" (car expr-list)))
          (struct-type (gethash (get-iter-variable-name (car split)) *variables*))
@@ -1573,7 +1588,7 @@
          (function-type (inspect-function-type (cdr expr-list)))
          (tp nil)
          (tp-str ""))
-    (if (is-iter-composition-p (cdr expr-list))
+    (if (is-iter-composition-type-p (cdr expr-list))
         (progn
           (dbg "get-type: composition found! " (get-iter-composition-type (cdr expr-list)))
           (setf variable-type (get-iter-composition-type (cdr expr-list)))
@@ -1584,7 +1599,7 @@
                           (hash-table-keys *variables*))
            (setf tp variable-type))
            ;; struct member found?
-          ((is-iter-composition-p (cdr expr-list))
+          ((is-iter-composition-type-p (cdr expr-list))
            (setf tp-str (format nil "~a" variable-type))
            (return-from get-type tp-str))
           (function-type
@@ -1727,7 +1742,7 @@
         (function-type (inspect-function-type (cdr expr-list)))
         (tp nil)
         (tp-str ""))
-    (if (is-iter-composition-p (cdr expr-list))
+    (if (is-iter-composition-type-p (cdr expr-list))
         (progn
           (dbg "get-math-type: composition found! "
                (get-iter-composition-type (cdr expr-list)))
@@ -1738,7 +1753,7 @@
                               (equal x (get-iter-variable-name (cadr expr-list))))
                           (hash-table-keys *variables*))
            (setf tp variable-type))
-          ((is-iter-composition-p (cdr expr-list))
+          ((is-iter-composition-type-p (cdr expr-list))
            (setf tp-str (format nil "~a" variable-type))
            (return-from get-math-type tp-str))
           (function-type
@@ -2020,7 +2035,7 @@
          (let ((type (get-type expr-list)))
            (store-current-function "set")
            (if (or (is-iter-variable-p (cadr expr-list))
-                   (is-iter-composition-p (cdr expr-list)))
+                   (is-iter-composition-type-p (cdr expr-list)))
                (progn
                  (add-code (format nil "set_pointer_~a" type))
                  (add-code "(")
