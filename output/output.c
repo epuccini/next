@@ -2401,23 +2401,30 @@ print_string("test.a = ");
 println_i32((i32)(test_2.a));
 }
 }
-void file_0()
+void files_0()
 {
 {
 file test_file_2=0;
 char* mode_2="";
 ui64 ret_2=0;
+while(ret_2!=5)
+{
+print_string("WHILE ");
+println_ui64(ret_2);
+set_pointer_ui64(&ret_2,(ret_2+1));
+};
 }
 }
 i32 main()
 {
 {
 i32 ret_2=arrays_and_lists_0(77);
+layer__fun1_0();
+layer__fun2_0();
 pointers_0();
 math_0();
 compositions_0();
-layer__fun1_0();
-layer__fun2_0();
+files_0();
 return(ret_2);
 }
 destroy_ptr(pointer_list);

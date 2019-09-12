@@ -215,18 +215,21 @@ by Edward Puccini |;
     (prn "test.a = ")
     (prnl (i32 (of test a)))))
 
-(defn file:void []
+(defn files:void []
   (let [test-file:file 0
         mode:string ""
-        ret:ui64 0]))
-   ; (while [ret == 0]
-    ;  (:: ret 1))))
+        ret:ui64 0]
+    (while [ret != 5]
+      (prn "WHILE ")
+      (prnl ret)
+      (:: ret (+ ret 1)))))
     
 (defn main:i32 []
   (let [ret:i32 (arrays-and-lists 77)]
+    (layer>>fun1)
+    (layer>>fun2)
     (pointers)
     (math)
     (compositions)
-    (layer>>fun1)
-    (layer>>fun2)
+    (files)
     (return ret)))
