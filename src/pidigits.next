@@ -2,10 +2,10 @@
 (defp den:f64 1)
 (defp num:f64 1)
 
-(defn extract-digit:f64 [nth:i64]
+(defn extract-digit:f64 [nth:ui64]
   (return (trunc (/ (+ (* num nth) acc) den))))
 
-(defn eliminate-digit:void [d:f64]
+(defn eliminate-digit:void [d:ui64]
   (:: acc (- acc (* den d)))
   (:: acc (* acc 10))
   (:: num (* num 10)))
@@ -18,7 +18,7 @@
     (:: num (* num k))))
 
 (defn main:i32 [argc:i32 argv:string>]
-  (let [d:f64 0 k:f64 0 i:i64 0 n:i64 10000]
+  (let [d:ui64 0 k:ui64 0 i:ui64 0 n:ui64 10000]
     (:: n 10000)
     (while [i < n]
       (:: k (+ k 1))
