@@ -1307,6 +1307,7 @@
       (progn
         (dbg "parse-expression: parse multiline comment")
         (setf expr-list (parse-multiline-comment (cddr expr-list)))
+        (setf expr-list (parse-block expr-list))
         (return-from parse-block expr-list)))
   (if (equal ";" (car expr-list))
       (progn
