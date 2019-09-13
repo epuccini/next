@@ -221,8 +221,12 @@
   (dbg "compile-next: load-binary")
   (let ((infile-data (load-binary-data infile)))
     (load-templates)
-    (dbg "compile-next: begin")
     (multiple-value-bind (code definition implementation) (parse infile-data)
+      (if *error*
+          (progn
+            (print-stack)
+            (sb-ext:quit)
+            (return-from compile-next)))
       (let* ((outfile-data (concatenate 'string *impl-template* code))
              (outfilename (pathname-name outfile))
              (outfilepath (directory-namestring outfile))
