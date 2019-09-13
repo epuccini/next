@@ -1687,9 +1687,30 @@
 
 (defun get-iter-composition-type (expr-list)
   (let* ((split (split ">>" (car expr-list)))
+         (lst (cdr (reverse (cdr (reverse split)))))
          (struct-type (gethash (get-iter-variable-name (car split)) *variables*))
-         (struct-name (get-iter-composition-name (format nil "~a" struct-type))))
-    (gethash (format nil "~a>>~a" struct-name (cadr split)) *variables*)))
+         (struct-name (get-iter-composition-name (format nil "~a" struct-type)))
+         (var-name (cadr split))
+         (count 2)
+         (composition (format nil "~a>>~a" struct-name var-name)))
+    (if (= (length split) 2)
+        (progn
+          (dbg "get-iter-composition-type: composition " composition)
+          (return-from get-iter-composition-type (gethash composition *variables*))))
+    (loop for sub-name in lst do
+         (dbg "get-iter-composition: sub-name " sub-name)
+         (dbg "get-iter-composition: composition " composition)
+         (setf struct-type
+               (gethash composition *variables*))
+         (dbg "get-iter-composition-type: struct-type " struct-type)
+         (setf struct-name (get-iter-composition-name (format nil "~a" struct-type)))
+         (dbg "get-iter-composition-type: struct-name " struct-name)
+         (setf var-name (elt split count))
+         (dbg "get-iter-composition-type: var-name " var-name)
+         (setf count (1+ count))
+         (setf composition (format nil "~a>>~a" struct-name var-name))
+         (dbg "get-iter-composition-type: composition " composition))
+    (gethash composition *variables*)))
 
 (defun build-dotted-type (composition)
   (let* ((split (split ">>" composition))
