@@ -32,6 +32,72 @@
 (defvar *impl-template* "")
 (defvar *is-main-defined* nil)
 (defvar *infinite-arguments* 10000)
+(defvar *types*
+  '("i16"
+    "i32"
+    "i64"
+    "ui16"
+    "ui32"
+    "ui64"
+    "f32"
+    "f64"
+    "f80"
+    "bool"
+    "b8"
+    "c8"
+    "string"
+    "i16>"
+    "i32>"
+    "i64>"
+    "ui16>"
+    "ui32>"
+    "ui64>"
+    "f32>"
+    "f64>"
+    "f80>"
+    "bool>"
+    "b8>"
+    "c8>"
+    "string>"
+    "i16#"
+    "i32#"
+    "i64#"
+    "ui16#"
+    "ui32#"
+    "ui64#"
+    "f32#"
+    "f64#"
+    "f80#"
+    "bool#"
+    "b8#"
+    "c8#"
+    "string#"
+    "i16'"
+    "i32'"
+    "i64'"
+    "ui16'"
+    "ui32'"
+    "ui64'"
+    "f32'"
+    "f64'"
+    "f80'"
+    "bool'"
+    "b8'"
+    "c8'"
+    "string'"
+    "i16>>"
+    "i32>>"
+    "i64>>"
+    "ui16>>"
+    "ui32>>"
+    "ui64>>"
+    "f32>>"
+    "f64>>"
+    "f80>>"
+    "bool>>"
+    "b8>>"
+    "c8>>"
+    "string>>"))
 
 (defun load-templates ()
   (setf *def-template* (load-binary-data "../templates/code.h"))
@@ -1657,73 +1723,6 @@
                    (setf count (1+ count))))))
     count))
 
-(defun is-type-cast-p (cast)
-  (or (equal "i16" cast)
-      (equal "i32" cast)
-      (equal "i64" cast)
-      (equal "ui16" cast)
-      (equal "ui32" cast)
-      (equal "ui64" cast)
-      (equal "f32" cast)
-      (equal "f64" cast)
-      (equal "f80" cast)
-      (equal "bool" cast)
-      (equal "b8" cast)
-      (equal "c8" cast)
-      (equal "string" cast)
-      (equal "i16>" cast)
-      (equal "i32>" cast)
-      (equal "i64>" cast)
-      (equal "ui16>" cast)
-      (equal "ui32>" cast)
-      (equal "ui64>" cast)
-      (equal "f32>" cast)
-      (equal "f64>" cast)
-      (equal "f80>" cast)
-      (equal "bool>" cast)
-      (equal "b8>" cast)
-      (equal "c8>" cast)
-      (equal "string>" cast)
-      (equal "i16#" cast)
-      (equal "i32#" cast)
-      (equal "i64#" cast)
-      (equal "ui16#" cast)
-      (equal "ui32#" cast)
-      (equal "ui64#" cast)
-      (equal "f32#" cast)
-      (equal "f64#" cast)
-      (equal "f80#" cast)
-      (equal "bool#" cast)
-      (equal "b8#" cast)
-      (equal "c8#" cast)
-      (equal "string#" cast)
-      (equal "i16'" cast)
-      (equal "i32'" cast)
-      (equal "i64'" cast)
-      (equal "ui16'" cast)
-      (equal "ui32'" cast)
-      (equal "ui64'" cast)
-      (equal "f32'" cast)
-      (equal "f64'" cast)
-      (equal "f80'" cast)
-      (equal "bool'" cast)
-      (equal "b8'" cast)
-      (equal "c8'" cast)
-      (equal "string'" cast)
-      (equal "i16>>" cast)
-      (equal "i32>>" cast)
-      (equal "i64>>" cast)
-      (equal "ui16>>" cast)
-      (equal "ui32>>" cast)
-      (equal "ui64>>" cast)
-      (equal "f32>>" cast)
-      (equal "f64>>" cast)
-      (equal "f80>>" cast)
-      (equal "bool>>" cast)
-      (equal "b8>>" cast)
-      (equal "c8>>" cast)
-      (equal "string>>" cast)))
-
 (defun get-iter-composition-type (expr-list)
   (let* ((split (split ">>" (car expr-list)))
          (lst (cdr (reverse (cdr (reverse split)))))
@@ -2022,80 +2021,19 @@
            (error-cant-infer-type expr-list)))
     tp-str))
 
-(defun if-cast-p ()
-  (or (and (equal ")" (get-last-code))
-           (equal "i16" (get-previous-code)))
-      (and (equal ")" (get-last-code))
-           (equal "i32" (get-previous-code)))
-      (and (equal ")" (get-last-code))
-           (equal "i64" (get-previous-code)))
-      (and (equal ")" (get-last-code))
-           (equal "ui16" (get-previous-code)))
-      (and (equal ")" (get-last-code))
-           (equal "ui32" (get-previous-code)))
-      (and (equal ")" (get-last-code))
-           (equal "ui64" (get-previous-code)))
-      (and (equal ")" (get-last-code))
-           (equal "f32" (get-previous-code)))
-      (and (equal ")" (get-last-code))
-           (equal "f64" (get-previous-code)))
-      (and (equal ")" (get-last-code))
-           (equal "f80" (get-previous-code)))
-      (and (equal ")" (get-last-code))
-           (equal "bool" (get-previous-code)))
-      (and (equal ")" (get-last-code))
-           (equal "c8" (get-previous-code)))
-      (and (equal ")" (get-last-code))
-           (equal "b8" (get-previous-code)))
-      (and (equal ")" (get-last-code))
-           (equal "i16*" (get-previous-code)))
-      (and (equal ")" (get-last-code))
-           (equal "i32*" (get-previous-code)))
-      (and (equal ")" (get-last-code))
-           (equal "i64*" (get-previous-code)))
-      (and (equal ")" (get-last-code))
-           (equal "ui16*" (get-previous-code)))
-      (and (equal ")" (get-last-code))
-           (equal "ui32*" (get-previous-code)))
-      (and (equal ")" (get-last-code))
-           (equal "ui64*" (get-previous-code)))
-      (and (equal ")" (get-last-code))
-           (equal "f32*" (get-previous-code)))
-      (and (equal ")" (get-last-code))
-           (equal "f64*" (get-previous-code)))
-      (and (equal ")" (get-last-code))
-           (equal "f80*" (get-previous-code)))
-      (and (equal ")" (get-last-code))
-           (equal "bool*" (get-previous-code)))
-      (and (equal ")" (get-last-code))
-           (equal "c8*" (get-previous-code)))
-      (and (equal ")" (get-last-code))
-           (equal "b8*" (get-previous-code)))
-      (and (equal ")" (get-last-code))
-           (equal "i16**" (get-previous-code)))
-      (and (equal ")" (get-last-code))
-           (equal "i32**" (get-previous-code)))
-      (and (equal ")" (get-last-code))
-           (equal "i64**" (get-previous-code)))
-      (and (equal ")" (get-last-code))
-           (equal "ui16**" (get-previous-code)))
-      (and (equal ")" (get-last-code))
-           (equal "ui32**" (get-previous-code)))
-      (and (equal ")" (get-last-code))
-           (equal "ui64**" (get-previous-code)))
-      (and (equal ")" (get-last-code))
-           (equal "f32**" (get-previous-code)))
-      (and (equal ")" (get-last-code))
-           (equal "f64**" (get-previous-code)))
-      (and (equal ")" (get-last-code))
-           (equal "f80**" (get-previous-code)))
-      (and (equal ")" (get-last-code))
-           (equal "bool**" (get-previous-code)))
-      (and (equal ")" (get-last-code))
-           (equal "c8**" (get-previous-code)))
-      (and (equal ")" (get-last-code))
-           (equal "b8**" (get-previous-code)))))
+(defun is-type-cast-p (cast)
+  (dolist (type *types*)
+    (if (equal type cast)
+        (return-from is-type-cast-p t)))
+  nil)
 
+(defun is-previous-cast-p ()
+  (dolist (type (mapcar #'(lambda (tp)
+                            (regex-replace ">" tp "*")) *types*))
+    (if (and (equal ")" (get-last-code))
+             (equal type (get-previous-code)))
+        (return-from is-previous-cast-p t)))
+  nil)
                     
 (defun parse-arguments (expr-list max)
   (dbg "parse-arguments: >" (car expr-list) "<")
@@ -2104,7 +2042,7 @@
                   (not (equal "(" (get-last-code)))
                   (not (equal "&" (get-last-code)))
                   (not (equal "*" (get-last-code)))
-                  (not (if-cast-p)))
+                  (not (is-previous-cast-p)))
              (add-code ","))
          (add-code "\"")
          (dbg "parse-arguments: parse-cstr >" (car expr-list) "<")
@@ -2159,7 +2097,7 @@
            (if (and (not (equal "(" (get-last-code)))
                     (not (equal "&" (get-last-code)))
                     (not (equal "*" (get-last-code)))
-                    (not (if-cast-p)))
+                    (not (is-previous-cast-p)))
                (add-code ","))
            (progn
              ; convert lisp double-float to c double
@@ -2173,7 +2111,7 @@
            (if (and (not (equal "(" (get-last-code)))
                     (not (equal "&" (get-last-code)))
                     (not (equal "*" (get-last-code)))
-                    (not (if-cast-p)))
+                    (not (is-previous-cast-p)))
                (add-code ","))
            (dbg "parse-arguments: VARIABLE " (get-iter-variable-name var-name))
            (if (search ">>" (car expr-list))
@@ -2196,7 +2134,7 @@
            (if (and *paranteses*
                     (not (equal "(" (get-last-code)))
                     (not (equal "&" (get-last-code)))
-                    (not (if-cast-p)))
+                    (not (is-previous-cast-p)))
                (add-code ","))
            (dbg "parse-arguments: parse-expression ( block "
                 *block* " Parens " *paranteses*)

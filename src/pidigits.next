@@ -19,7 +19,7 @@
 
 (defn main:i32 [argc:i32 argv:string>]
   (let [d:ui64 0 k:ui64 0 i:ui64 0 n:ui64 10000]
-    (:: n 480)
+    (:: n 10000)
     (while [i < n]
       (:: k (+ k 1))
       (next-term k)
@@ -35,7 +35,6 @@
       (:: i (+ 1 i))
       (if [(mod i 10) == 0]
         (prnl i))
-      (eliminate-digit d)
-      (continue))
+      (eliminate-digit d))
   (return 0)))
     
