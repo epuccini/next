@@ -1,59 +1,42 @@
 #include "output.h"
 
 
-static f80 acc_0=0;
-static f80 den_0=1;
-static f80 num_0=1;
-f80 extract_digit_0(f80 nth_1)
+i32 main()
 {
-return(trunc((((num_0*nth_1)+acc_0)/den_0)));
+{
+i32* r_2=new_i32((10000+1));
+append_ptr(r_2, 1, VARIABLE);
+i32 b_2=0;
+i32 d_2=0;
+i32 c_2=0;
+i32 i_3=0;
+for(i_3=0;i_3<10000;i_3++)
+{
+set_pointer_i32(elt_array_i32(r_2,i_3),2000);
 }
-void eliminate_digit_0(ui64 d_1)
+i32 k_3=10000;
+for(k_3=10000;k_3>0;k_3--)
 {
-set_pointer_f80(&acc_0,(acc_0-(den_0*d_1)));
-set_pointer_f80(&acc_0,(acc_0*10));
-set_pointer_f80(&num_0,(num_0*10));
+set_pointer_i32(&d_2,0);
+set_pointer_i32(&i_3,k_3);
+i32 m_4=0;
+for(m_4=0;m_4!=10000;m_4++)
+{
+set_pointer_i32(&d_2,(d_2+(*elt_array_i32(r_2,i_3)*10000)));
+set_pointer_i32(&b_2,((2*i_3)-1));
+set_pointer_i32(elt_array_i32(r_2,i_3),mod(d_2,b_2));
+set_pointer_i32(&d_2,(d_2/b_2));
+set_pointer_i32(&i_3,(i_3-1));
+if(i_3==0)
+{
+break;
 }
-void next_term_0(ui64 k_1)
-{
-{
-ui64 k2_2=(1+(k_1*2));
-set_pointer_f80(&acc_0,(acc_0+(num_0*2)));
-set_pointer_f80(&acc_0,(acc_0*k2_2));
-set_pointer_f80(&den_0,(den_0*k2_2));
-set_pointer_f80(&num_0,(num_0*k_1));
+set_pointer_i32(&d_2,(d_2*i_3));
 }
+print_i32((i32)(c_2+(d_2/10000)));
+set_pointer_i32(&c_2,mod(d_2,10000));
+set_pointer_i32(&k_3,(k_3-13));
 }
-i32 main(i32 argc_1,string* argv_1)
-{
-{
-ui64 d_2=0;
-ui64 k_2=0;
-ui64 i_2=0;
-ui64 n_2=10000;
-set_pointer_ui64(&n_2,10000);
-while(i_2<n_2)
-{
-set_pointer_ui64(&k_2,(k_2+1));
-next_term_0(k_2);
-if(num_0>acc_0)
-{
-continue;
-}
-set_pointer_ui64(&d_2,extract_digit_0(3));
-if(d_2!=extract_digit_0(4))
-{
-continue;
-}
-print_ui64(d_2);
-print_string(" ");
-set_pointer_ui64(&i_2,(1+i_2));
-if(mod(i_2,10)==0)
-{
-println_ui64(i_2);
-}
-eliminate_digit_0(d_2);
-};
 return(0);
 }
 destroy_ptr(pointer_list);

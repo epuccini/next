@@ -141,8 +141,8 @@
 (defun error-msg (expr-list msg)
   (if (not *emitted*)
       (emit-code-call))
-  (setf *error* t)
   (format t msg)
+  (setf *error* t)
   (ignore-errors
    (regex-replace "\n" (format t "~%~{~a ~}~%" (subseq expr-list 0 40)) " ")))
 
@@ -153,8 +153,8 @@
 (defun error-operator-not-defined (expr-list)
   (error-msg expr-list "~%Error no operator defined!~%"))
 
-(defun error-no-type-def (expr-list type)
-  (error-msg expr-list (format nil "~%Error no type >~a< defined!~%" type)))
+(defun error-no-type-def (expr-list)
+  (error-msg expr-list "~%Error no type defined!~%"))
 
 (defun error-function-not-defined (expr-list)
   (error-msg expr-list "~%Error function not defined!~%"))
@@ -914,7 +914,7 @@
           (t
            (dbg "parse-function-type: " (hash-table-keys *compositions*) " type " type)
            (if (not type)
-               (error-no-type-def expr-list type)
+               (error-no-type-def expr-list)
                (error-function-type-unkown expr-list type)))))
    
   expr-list)
@@ -1175,7 +1175,7 @@
         (t
          (dbg "parse-variable-type: " (hash-table-keys *compositions*) " type " type)
          (if (not type)
-             (error-no-type-def expr-list type)
+             (error-no-type-def expr-list)
              (error-type-not-supported expr-list type)))))
 
 (defun parse-signature-vector (var-name expr-list)
@@ -1209,7 +1209,7 @@
            (dbg "parse-variable: DEFINE " (car expr-list))
            (if (or (equal (format nil "~a" #\Newline) (cadr expr-list))
                    (equal "]" (cadr expr-list)))
-               (error-no-type-def expr-list (cadr def)))
+               (error-no-type-def expr-list))
            ;; store current variable
            (setf *current-let-definition* (cadr def))
            ;; parse signature
@@ -1262,8 +1262,8 @@
          (error-syntax-error expr-list)))
   expr-list)
 
-(defun parse-operator (expr-list)
-  (dbg "parse-operator " (car expr-list) " next " (cadr expr-list))
+(defun parse-logic-operator (expr-list)
+  (dbg "parse-logic-operator " (car expr-list) " next " (cadr expr-list))
   (cond ((and (equal ">" (car expr-list)) (equal "=" (cadr expr-list)))
          (setf expr-list (cddr expr-list))
          (add-code ">="))
@@ -1286,6 +1286,30 @@
          (error-operator-not-defined expr-list)))
   expr-list)
 
+(defun parse-arithmetic-operator (expr-list)
+  (dbg "parse-arithmetic-operator " (car expr-list) " next " (cadr expr-list))
+  (cond ((and (equal ">" (car expr-list)) (equal "=" (cadr expr-list)))
+         (setf expr-list (cddr expr-list))
+         (add-code ">="))
+        ((and (equal "<" (car expr-list)) (equal "=" (cadr expr-list)))
+         (setf expr-list (cddr expr-list))
+         (add-code "<="))
+        ((and (equal ">" (car expr-list)) (not (equal "=" (cadr expr-list))))
+         (setf expr-list (cdr expr-list))
+         (add-code ">"))
+        ((and (equal "<" (car expr-list)) (not (equal "=" (cadr expr-list))))
+         (setf expr-list (cdr expr-list))
+         (add-code "<"))
+        ((equal "!=" (car expr-list))
+         (setf expr-list (cdr expr-list))
+         (add-code "!="))
+        ((equal "=" (car expr-list))
+         (setf expr-list (cdr expr-list))
+         (add-code "="))
+        (t
+         (error-operator-not-defined expr-list)))
+  expr-list)
+
 (defun parse-condition (expr-list)
   (dbg "parse-condition: " (car expr-list))
   (let ((left nil)
@@ -1294,7 +1318,7 @@
            (setf left expr-list)
            (dbg "parse-condition: parse left-side " (car left))
            (setf expr-list (parse-expression expr-list t))
-           (setf expr-list (parse-operator expr-list))
+           (setf expr-list (parse-logic-operator expr-list))
            (setf right expr-list)
            (dbg "parse-condition: parse right-side " (car right))
            (setf expr-list (parse-expression expr-list t))
@@ -1316,13 +1340,15 @@
     (cond ((equal (format nil "~a" #\Newline) (car expr-list))
            (dbg "parse-range: RET")
            (setf expr-list (parse-range expr-list)))
+          ((equal "]" (car expr-list))
+           (return-from parse-range expr-list))
           ((find #\: (car expr-list))
            (let ((def (split ":" (car expr-list))))
              (dbg "parse-range: DEFINE " (car expr-list))
              (parse-variable-type expr-list (car def) (cadr def))
              (dbg "parse-range: OPEN ARG")
              (if (or (equal (format nil "~a" #\Newline) (cadr expr-list)) (equal "]" (cadr expr-list)))
-                 (error-no-type-def expr-list (cadr def)))
+                 (error-no-type-def expr-list))
              (add-code " ")
              (setf var-name (get-variable-name (car def)))
              (dbg "parse-range: get-variable-name " var-name)
@@ -1343,7 +1369,7 @@
              (dbg "parse-range: parse operator " (car expr-list))
              (add-code var-name)
              (setf operator (car expr-list))
-             (setf expr-list (parse-operator expr-list))
+             (setf expr-list (parse-arithmetic-operator expr-list))
              (dbg "parse-range: parse to " (car expr-list))
              (setf to expr-list)
              (setf expr-list (parse-expression expr-list t))
@@ -1360,7 +1386,7 @@
              (dbg "parse-range: rest ")))
           ((not (find #\: (car expr-list)))
            (setf expr-list (cdr expr-list))
-           (error-syntax-error expr-list)))
+           (error-no-type-def expr-list)))
     expr-list))
 
 (defun parse-block (expr-list)
