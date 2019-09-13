@@ -226,11 +226,13 @@ by Edward Puccini |;
     (:: (i32> (ref mono>>a)) 2000)
     (:: mono>>a 3000)
     (prn "mono.a = ")
-    (prnl (i32 (of mono a)))
+    (prnl mono>>a)
     (prnl "")
     (prn "beta.g.a = ")
     (:: (i32> (ref (of (of beta g) a))) 9000)
-    (prnl (i32 (of (of beta g) a)))))
+    (prnl (i32 (of (of beta g) a)))
+    (prn "beta.g.a = ")
+    (prnl (i32 beta>>g>>a))))
 
 (defn files:void []
   (let [name:string "output.h"

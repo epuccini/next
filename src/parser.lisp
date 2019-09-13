@@ -1692,9 +1692,14 @@
     (gethash (format nil "~a>>~a" struct-name (cadr split)) *variables*)))
 
 (defun build-dotted-type (composition)
-  (let ((sub-name (regex-replace ".*>>" composition ""))
-        (var-name (regex-replace ">>.*" composition "")))
-    (concatenate 'string (get-iter-variable-name var-name) "." sub-name)))
+  (let* ((split (split ">>" composition))
+         (lst (cdr split))
+         (var-name (elt split 0))
+         (str nil))
+    (setf str (concatenate 'string (get-iter-variable-name var-name)))
+    (loop for sub-name in lst do
+         (setf str (concatenate 'string str "." sub-name)))
+    str))
 
 (defun get-type (expr-list)
   (let* ((variable-type (gethash (get-iter-variable-name (cadr expr-list)) *variables*))

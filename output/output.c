@@ -254,11 +254,13 @@ println_i32((i32)(mono_2.a));
 set_pointer_i32((i32*)(&mono_2.a),2000);
 set_pointer_i32(&mono_2.a,3000);
 print_string("mono.a = ");
-println_i32((i32)(mono_2.a));
+println_i32(mono_2.a);
 println_string("");
 print_string("beta.g.a = ");
 set_pointer_i32((i32*)(&((beta_2.g).a)),9000);
 println_i32((i32)((beta_2.g).a));
+print_string("beta.g.a = ");
+println_i32((i32)beta_2.g.a);
 }
 }
 void files_0()
