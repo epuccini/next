@@ -1,26 +1,26 @@
-(defp acc:f32 0)
-(defp den:f32 1)
-(defp num:f32 1)
+(defp acc:f64 0)
+(defp den:f64 1)
+(defp num:f64 1)
 
-(defn extract-digit:f32 [nth:i32]
-  (trunc (+ (* num nth) acc) den))
+(defn extract-digit:f64 [nth:i64]
+  (return (trunc (/ (+ (* num nth) acc) den))))
 
-(defn eliminate-digit:f32 [d:f32]
+(defn eliminate-digit:void [d:f64]
   (:: acc (- acc (* den d)))
   (:: acc (* acc 10))
   (:: num (* num 10)))
 
-(defn next-term:f32 [k:f32]
-  (let [k2:f32 (+ 1 (* k 2))]
+(defn next-term:void [k:ui64]
+  (let [k2:ui64 (+ 1 (* k 2))]
     (:: acc (+ acc (* num 2)))
     (:: acc (* acc k2))
     (:: den (* den k2))
     (:: num (* num k))))
 
 (defn main:i32 [argc:i32 argv:string>]
-  (let [d:f32 0 k:f32 0 i:f32 0 n:i32 10000]
-    (while [i >= n]
-      (:: n (f32> (ref (string-to-f32 (# argv 1)))))
+  (let [d:f64 0 k:f64 0 i:i64 0 n:i64 10000]
+    (:: n 10000)
+    (while [i < n]
       (:: k (+ k 1))
       (next-term k)
       (if [num > acc]
@@ -30,12 +30,11 @@
       (if [d != (extract-digit 4)]
         (continue))
       
-      (prnl d)
+      (prn d)
+      (prn " ")
       (:: i (+ 1 i))
       (if [(mod i 10) == 0]
-        (prnfmt "%d" i))
-      (if [(mod i 10) == 0]
-        (prnl ""))
+        (prnl i))
       (eliminate-digit d))
   (return 0)))
     

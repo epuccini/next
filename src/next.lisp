@@ -237,7 +237,7 @@
              (outfilepath (directory-namestring outfile))
              (definition-data (concatenate 'string *def-template*
                                            (format nil "~a" definition))))
-        (dbg "compile-next: setupp data")
+        (dbg "compile-next: setup data")
         (setf outfile-data (regex-replace-all "\\$\\(OUTPUT_H\\)"
                                                  outfile-data
                                                  (concatenate 'string

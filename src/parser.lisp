@@ -67,7 +67,8 @@
   (if (not *emitted*)
       (emit-code-call))
   (format t msg)
-  (regex-replace "\n" (format t "~%~{~a ~}~%" (subseq expr-list 0 40)) " ")
+  (ignore-errors
+   (regex-replace "\n" (format t "~%~{~a ~}~%" (subseq expr-list 0 40)) " "))
   (print-stack)
   (sb-ext:quit))
 
@@ -76,7 +77,8 @@
       (emit-code-call))
   (setf *error* t)
   (format t msg)
-  (regex-replace "\n" (format t "~%~{~a ~}~%" (subseq expr-list 0 40)) " "))
+  (ignore-errors
+   (regex-replace "\n" (format t "~%~{~a ~}~%" (subseq expr-list 0 40)) " ")))
 
 (defun error-parameter-max (expr-list cnt max)
   (error-msg expr-list (format nil "Error too many parameter to function (~a). Only ~a parameter expected!~%"
@@ -198,15 +200,15 @@
                   (push str stack)
                   (return-from upto-symbol stack))
                  ((equal #\Newline obj)
-                  (push "\n" stack)
+                  (push (format nil "~a" #\Newline) stack)
                   (push str stack)
                   (return-from upto-symbol stack))
                  ((equal #\Return obj)
-                  (push "\n" stack)
+                  (push (format nil "~a" #\Newline) stack)
                   (push str stack)
                   (return-from upto-symbol stack))
                  ((equal #\Linefeed obj)
-                  (push "\n" stack)
+                  (push (format nil "~a" #\Newline) stack)
                   (push str stack)
                   (return-from upto-symbol stack))
                  ((equal #\Space obj)
@@ -248,11 +250,11 @@
                  ((equal #\Space obj)
                   (format nil " "))
                  ((equal #\Newline obj)
-                  (push "\n" stack))
+                  (push (format nil "~a" #\Newline) stack))
                  ((equal #\Return obj)
-                  (push "\n" stack))
+                  (push (format nil "~a" #\Newline) stack))
                  ((equal #\Linefeed obj)
-                  (push "\n" stack))
+                  (push (format nil "~a" #\Newline) stack))
                  ((equal #\Tab obj)
                   (format nil " "))
                  ((equal #\" obj)
@@ -542,7 +544,7 @@
                  (add-code " ")
                  (add-code (get-variable-name (car def)))))
            (dbg "parse-argument: OPEN ARG")
-           (loop while (equal "\n" (car expr-list)) do
+           (loop while (equal (format nil "~a" #\Newline) (car expr-list)) do
                 (setf expr-list (cdr expr-list)))
            (if (find #\: (car expr-list))
                (add-code ","))
@@ -582,7 +584,7 @@
                  (setf (gethash (get-composition-name *current-composition*) *compositions*)
                        (car def))))
            (dbg "parse-types: OPEN ARG")
-           (loop while (equal "\n" (car expr-list)) do
+           (loop while (equal (format nil "~a" #\Newline) (car expr-list)) do
                 (setf expr-list (cdr expr-list)))
            (add-code (format nil ";~%"))
            (setf expr-list (parse-types expr-list)))))
@@ -1133,13 +1135,13 @@
   
 (defun parse-variable (expr-list)
   (dbg "parse-variable: " (car expr-list))
-  (cond ((equal "\n" (car expr-list))
+  (cond ((equal (format nil "~a" #\Newline) (car expr-list))
          (dbg "parse-variable: RET")
          (setf expr-list (parse-variable (cdr expr-list))))
         ((find #\: (car expr-list))
          (let ((def (split ":" (car expr-list))))
            (dbg "parse-variable: DEFINE " (car expr-list))
-           (if (or (equal "\n" (cadr expr-list))
+           (if (or (equal (format nil "~a" #\Newline) (cadr expr-list))
                    (equal "]" (cadr expr-list)))
                (error-no-type-def expr-list (cadr def)))
            ;; store current variable
@@ -1188,7 +1190,7 @@
                (add-code
                 (format nil "append_ptr(~a, 1, VARIABLE);~%"
                                  (get-variable-name (car def)))))
-           (dbg "parse-variable: rest ")))
+           (dbg "parse-variable: rest " (car expr-list)))
         ((not (find #\: (car expr-list)))
          (setf expr-list (cdr expr-list))
          (error-syntax-error expr-list)))
@@ -1222,7 +1224,7 @@
   (dbg "parse-condition: " (car expr-list))
   (let ((left nil)
         (right nil))
-    (cond ((not (equal "\n" (car expr-list)))
+    (cond ((not (equal (format nil "~a" #\Newline) (car expr-list)))
            (setf left expr-list)
            (dbg "parse-condition: parse left-side " (car left))
            (setf expr-list (parse-expression expr-list t))
@@ -1234,7 +1236,7 @@
            (add-code (format nil "~%"))
            (dbg "parse-condition: rest " (car expr-list))
            (return-from parse-condition expr-list))
-          ((equal "\n" (car expr-list))
+          ((equal (format nil "~a" #\Newline) (car expr-list))
            (dbg "parse-condition: RET")
            (setf expr-list (parse-condition expr-list))))
     expr-list))
@@ -1245,7 +1247,7 @@
         (from 0)
         (to 0)
         (var-name ""))
-    (cond ((equal "\n" (car expr-list))
+    (cond ((equal (format nil "~a" #\Newline) (car expr-list))
            (dbg "parse-range: RET")
            (setf expr-list (parse-range expr-list)))
           ((find #\: (car expr-list))
@@ -1253,7 +1255,7 @@
              (dbg "parse-range: DEFINE " (car expr-list))
              (parse-variable-type expr-list (car def) (cadr def))
              (dbg "parse-range: OPEN ARG")
-             (if (or (equal "\n" (cadr expr-list)) (equal "]" (cadr expr-list)))
+             (if (or (equal (format nil "~a" #\Newline) (cadr expr-list)) (equal "]" (cadr expr-list)))
                  (error-no-type-def expr-list (cadr def)))
              (add-code " ")
              (setf var-name (get-variable-name (car def)))
@@ -1322,7 +1324,7 @@
         (dbg "parse-expression: parse singleline comment")
         (setf expr-list (parse-single-line-comment (cdr expr-list)))
         (return-from parse-block expr-list)))
-  (if (equal "\n" (car expr-list))
+  (if (equal (format nil "~a" #\Newline) (car expr-list))
       (setf expr-list (parse-block (cdr expr-list))))
   (if (equal ")" (car expr-list))
       (return-from parse-block expr-list))
@@ -1365,14 +1367,14 @@
   (dbg "parse-if-vector: condition range" (car expr-list))  
   (setf expr-list (parse-condition expr-list))
   (dbg "parse-if-vector: after condition " (car expr-list))
-  (loop while (equal "\n" (car expr-list)) do
+  (loop while (equal (format nil "~a" #\Newline) (car expr-list)) do
       (setf expr-list (cdr expr-list)))
   (if (equal "]" (car expr-list))
       (return-from parse-if-vector expr-list))
   (dbg "parse-if-vector: after loop " (car expr-list))
   (if (not (equal "]" (car expr-list)))
       (progn
-        (dbg "parse-if-vector: next variable")  
+        (dbg "parse-if-vector: next variable" (car expr-list))  
         (setf expr-list (parse-if-vector expr-list))))
   (dbg "parse-if-vector: exit" (car expr-list))
   expr-list)
@@ -1382,7 +1384,7 @@
   (setf expr-list (parse-range expr-list))
   (if (equal "]" (car expr-list))
       (return-from parse-for-vector expr-list))
-  (loop while (equal "\n" (car expr-list)) do
+  (loop while (equal (format nil "~a" #\Newline) (car expr-list)) do
       (setf expr-list (cdr expr-list)))
   (if (not (equal "]" (car expr-list)))
       (progn
@@ -1396,7 +1398,7 @@
   (setf expr-list (parse-variable expr-list))
   (if (equal "]" (car expr-list))
       (return-from parse-let-vector expr-list))
-  (loop while (equal "\n" (car expr-list)) do
+  (loop while (equal (format nil "~a" #\Newline) (car expr-list)) do
       (setf expr-list (cdr expr-list)))
   (if (not (equal "]" (car expr-list)))
       (progn
@@ -1407,7 +1409,7 @@
 
 (defun parse-open-square-bracket (expr-list)
   (dbg "parse-open-square-bracket")  
-  (loop while (equal "\n" (car expr-list)) do
+  (loop while (equal (format nil "~a" #\Newline) (car expr-list)) do
       (setf expr-list (cdr expr-list)))
   (if (equal "[" (car expr-list))
       (return-from parse-open-square-bracket (cdr expr-list))
@@ -1415,7 +1417,7 @@
 
 (defun parse-close-square-bracket (expr-list)
   (dbg "parse-close-square-bracket")  
-  (loop while (equal "\n" (car expr-list)) do
+  (loop while (equal (format nil "~a" #\Newline) (car expr-list)) do
       (setf expr-list (cdr expr-list)))
   (if (equal "]" (car expr-list))
       (return-from parse-close-square-bracket (cdr expr-list))
@@ -1555,9 +1557,12 @@
 
 (defun parse-single-line-comment (expr-list)
   (if (not expr-list) (return-from parse-single-line-comment expr-list))
-  (cond ((equal "\n" (car expr-list))
+  (cond ((equal (format nil "~a" #\Newline) (car expr-list))
+         (if (or (equal (format nil "~a" #\Newline) (cadr expr-list))
+                 (equal ";" (cadr expr-list)))
+             (setf expr-list (parse-single-line-comment (cdr expr-list))))
          (return-from parse-single-line-comment (cdr expr-list)))
-        ((not (equal "\n" (car expr-list)))
+        ((not (equal (format nil "~a" #\Newline) (car expr-list)))
          (dbg "parse-singleline-comment: COMMENT " (car expr-list))
          (setf expr-list (parse-single-line-comment (cdr expr-list))))))
 
@@ -2091,7 +2096,7 @@
            (return-from parse-arguments expr-list)))
         ((equal "," (car expr-list))
          (error-syntax-error expr-list))
-        ((equal "\n" (car expr-list))
+        ((equal (format nil "~a" #\Newline) (car expr-list))
          (setf expr-list (parse-arguments (cdr expr-list) max)))
         ((equal "'" (car expr-list))
             (let ((type (get-type (cddr expr-list)))
@@ -2188,7 +2193,7 @@
   (dbg "parse-infix: operand " (car expr-list))
   (setf expr-list (parse-expression expr-list t))
   (if (and (not (equal ")" (car expr-list)))
-           (not (equal "\n" (car expr-list))))
+           (not (equal (format nil "~a" #\Newline) (car expr-list))))
       (progn
         (add-code function)
         (setf expr-list (parse-infix expr-list function))))
@@ -2224,7 +2229,7 @@
          (return-from parse-call (cdr expr-list)))
         ((equal "," (car expr-list))
          (error-syntax-error expr-list))
-        ((equal "\n" (car expr-list))
+        ((equal (format nil "~a" #\Newline) (car expr-list))
          (dbg "parse-call: RET")
          (setf expr-list (parse-call (cdr expr-list))))
         ((or (equal "set" (car expr-list)) (equal "::" (car expr-list)))
@@ -2905,7 +2910,7 @@
   (if expr-list
       (progn
         (dbg "parse-expression: enter " (car expr-list))
-        (loop while (equal "\n" (car expr-list)) do
+        (loop while (equal (format nil "~a" #\Newline) (car expr-list)) do
              (setf expr-list (cdr expr-list)))
         (if (not expr-list)
             (return-from parse-expression expr-list))
@@ -3004,7 +3009,7 @@
               (dbg "parse-expression: VAR END " var-name)
               (return-from parse-expression (cdr expr-list))))
         (if (not (or (equal "," (car expr-list))
-                     (equal "\n" (car expr-list))
+                     (equal (format nil "~a" #\Newline) (car expr-list))
                      (equal "(" (car expr-list))
                      (equal ")" (car expr-list))
                      (equal "[" (car expr-list))
@@ -3058,7 +3063,7 @@
                   (add-code (format nil ";~%")))
               ;; exit
               (return-from parse-expression expr-list)))
-        (if (equal "\n" (car expr-list))
+        (if (equal (format nil "~a" #\Newline) (car expr-list))
             (progn
               (setf expr-list (cdr expr-list))
               (dbg "parse-expression: caught \n")
