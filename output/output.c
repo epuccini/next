@@ -1,27 +1,27 @@
 #include "output.h"
 
 
-static f64 acc_0=0;
-static f64 den_0=1;
-static f64 num_0=1;
-f64 extract_digit_0(ui64 nth_1)
+static ui64 acc_0=0;
+static ui64 den_0=1;
+static ui64 num_0=1;
+ui64 extract_digit_0(ui64 nth_1)
 {
-return(trunc((((num_0*nth_1)+acc_0)/den_0)));
+return((((num_0*nth_1)+acc_0)/den_0));
 }
 void eliminate_digit_0(ui64 d_1)
 {
-set_pointer_f64(&acc_0,(acc_0-(den_0*d_1)));
-set_pointer_f64(&acc_0,(acc_0*10));
-set_pointer_f64(&num_0,(num_0*10));
+set_pointer_ui64(&acc_0,(acc_0-(den_0*d_1)));
+set_pointer_ui64(&acc_0,(acc_0*10));
+set_pointer_ui64(&num_0,(num_0*10));
 }
 void next_term_0(ui64 k_1)
 {
 {
 ui64 k2_2=(1+(k_1*2));
-set_pointer_f64(&acc_0,(acc_0+(num_0*2)));
-set_pointer_f64(&acc_0,(acc_0*k2_2));
-set_pointer_f64(&den_0,(den_0*k2_2));
-set_pointer_f64(&num_0,(num_0*k_1));
+set_pointer_ui64(&acc_0,(acc_0+(num_0*2)));
+set_pointer_ui64(&acc_0,(acc_0*k2_2));
+set_pointer_ui64(&den_0,(den_0*k2_2));
+set_pointer_ui64(&num_0,(num_0*k_1));
 }
 }
 i32 main(i32 argc_1,string* argv_1)

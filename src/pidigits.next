@@ -1,9 +1,9 @@
-(defp acc:f64 0)
-(defp den:f64 1)
-(defp num:f64 1)
+(defp acc:ui64 0)
+(defp den:ui64 1)
+(defp num:ui64 1)
 
-(defn extract-digit:f64 [nth:ui64]
-  (return (trunc (/ (+ (* num nth) acc) den))))
+(defn extract-digit:ui64 [nth:ui64]
+  (return (/ (+ (* num nth) acc) den)))
 
 (defn eliminate-digit:void [d:ui64]
   (:: acc (- acc (* den d)))
