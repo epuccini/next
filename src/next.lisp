@@ -102,6 +102,8 @@
   (setf (gethash "geqt" *signatures*) '("value" "value" "value"))
   (setf (gethash "eq" *signatures*) '("value" "value" "value"))
   (setf (gethash "neq" *signatures*) '("value" "value" "value"))
+  (setf (gethash "trunc" *signatures*) '("value" "value"))  
+  (set-function-type "trunc" 'single-float)
   (set-function-type "string-to-i32" 'integer)
   (set-function-type "string-to-f32" 'single-float)
   (set-function-type "len" 'integer)
