@@ -216,9 +216,15 @@ by Edward Puccini |;
           e:f80
           g:monolith])
 
+(compose deltalith
+         [h:string
+          i:file
+          j:betalith])
+
 (defn compositions:void []
   (let [mono:monolith {0}
-        beta:betalith {0}]
+        beta:betalith {0}
+        delta:deltalith {0}]
     (prnl "Composition!!!")
     (:: (i32> (ref (of mono a))) 1000)
     (prn "mono.a = ")
@@ -233,7 +239,10 @@ by Edward Puccini |;
     (prnl (i32 (of (of beta g) a)))
     (prn "beta.g.a = ")
     (:: beta>>g>>a 8000)
-    (prnl beta>>g>>a)))
+    (prnl beta>>g>>a)
+    (prn "delta.j.g.a = ")
+    (:: delta>>j>>g>>a 5000)
+    (prnl delta>>j>>g>>a)))
 
 (defn files:void []
   (let [name:string "output.h"

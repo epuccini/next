@@ -122,6 +122,9 @@
 (defun error-type-not-supported ()
   (error-msg "Error type not supported!~%"))
 
+(defun error-too-many-parens ()
+  (error-msg "Error too many paranteses!~%"))
+
 (defun upto-string (expression lower)
   (let ((str ""))
     (loop for x from lower to (1- (length expression)) do
@@ -1508,8 +1511,10 @@
 
 (defun parse-module (expr-list)
   (setf *current-module* (car expr-list))
+  (inc-block)
   (setf expr-list (cdr expr-list))
   (setf expr-list (parse-block expr-list))
+  (dec-block)
   (setf *current-module* "")
   expr-list)
 
@@ -1720,6 +1725,7 @@
     (setf str (concatenate 'string (get-iter-variable-name var-name)))
     (loop for sub-name in lst do
          (setf str (concatenate 'string str "." sub-name)))
+    (dbg "build-dotted-type " str)
     str))
 
 (defun get-type (expr-list)
@@ -2189,8 +2195,7 @@
 
 (defun parse-call (expr-list)
   (cond ((equal ")" (car expr-list))
-         (progn
-           (return-from parse-call (cdr expr-list))))
+         (return-from parse-call (cdr expr-list)))
         ((equal "," (car expr-list))
          (error-syntax-error))
         ((equal "\n" (car expr-list))
@@ -2862,6 +2867,8 @@
             (error-syntax-error))        
         (if (equal "EOF" (car expr-list))
             (add-code "EOF"))
+        (if (equal ")" (car expr-list))
+            (error-too-many-parens))
         (if (equal "\"" (car expr-list))
             (progn
               (dbg "parse-expression: STRING block " *block*)

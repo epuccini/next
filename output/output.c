@@ -1,12 +1,12 @@
 #include "output.h"
 
 
-i32 layer__fun1_0()
+i32 layer__fun1_1()
 {
 println_string("Module function fun1");
 return(999);
 }
-i32 layer__fun2_0()
+i32 layer__fun2_1()
 {
 println_string("Module function fun2");
 return(888);
@@ -33,8 +33,8 @@ i32 arrays_and_lists_0(i32 argc_1)
 println_string("Arrays and lists!!!");
 mapit_0(5.5);
 println_string("Module functions!!!");
-layer__fun1_0();
-layer__fun2_0();
+layer__fun1_1();
+layer__fun2_1();
 {
 f32 float1_2=0.0;
 f32 float2_2=(0.0+0.0);
@@ -242,11 +242,19 @@ f80 e;
 struct monolith_0 g;
 };
 typedef struct betalith_0 betalith_0;
+struct deltalith_0
+{
+string h;
+file i;
+struct betalith_0 j;
+};
+typedef struct deltalith_0 deltalith_0;
 void compositions_0()
 {
 {
 struct monolith_0 mono_2={0};
 struct betalith_0 beta_2={0};
+struct deltalith_0 delta_2={0};
 println_string("Composition!!!");
 set_pointer_i32((i32*)(&(mono_2.a)),1000);
 print_string("mono.a = ");
@@ -262,6 +270,9 @@ println_i32((i32)((beta_2.g).a));
 print_string("beta.g.a = ");
 set_pointer_i32(&beta_2.g.a,8000);
 println_i32(beta_2.g.a);
+print_string("delta.j.g.a = ");
+set_pointer_i32(&delta_2.j.g.a,5000);
+println_i32(delta_2.j.g.a);
 }
 }
 void files_0()
@@ -287,8 +298,8 @@ i32 main()
 {
 {
 i32 ret_2=arrays_and_lists_0(77);
-layer__fun1_0();
-layer__fun2_0();
+layer__fun1_1();
+layer__fun2_1();
 println_string("");
 pointers_0();
 math_0();
