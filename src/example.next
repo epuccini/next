@@ -20,11 +20,6 @@ by Edward Puccini |;
       (prnl "Module function fun2")
       (return 888)))
 
-(compose monolith
-        [string:string
-         a:i32
-         b:f32])
-
 (defn mapit:f32 [op:f32]
   (prn "Map ")
   (prnl (+ op op))
@@ -211,17 +206,31 @@ by Edward Puccini |;
     (prnl (sin b))
     (prnl "")))
 
+(compose monolith
+        [string:string
+         a:i32
+         b:f32])
+
+(compose betalith
+         [d:f64
+          e:f80
+          g:monolith])
+
 (defn compositions:void []
-  (let [test:monolith {0}]
+  (let [mono:monolith {0}
+        beta:betalith {0}]
     (prnl "Composition!!!")
-    (:: (i32> (ref (of test a))) 1000)
-    (prn "test.a = ")
-    (prnl (i32 (of test a)))
-    (:: (i32> (ref test>>a)) 2000)
-    (:: test>>a 3000)
-    (prn "test.a = ")
-    (prnl (i32 (of test a)))
-    (prnl "")))
+    (:: (i32> (ref (of mono a))) 1000)
+    (prn "mono.a = ")
+    (prnl (i32 (of mono a)))
+    (:: (i32> (ref mono>>a)) 2000)
+    (:: mono>>a 3000)
+    (prn "mono.a = ")
+    (prnl (i32 (of mono a)))
+    (prnl "")
+    (prn "beta.g.a = ")
+    (:: (i32> (ref (of (of beta g) a))) 9000)
+    (prnl (i32 (of (of beta g) a)))))
 
 (defn files:void []
   (let [name:string "output.h"

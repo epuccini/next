@@ -11,13 +11,6 @@ i32 layer__fun2_0()
 println_string("Module function fun2");
 return(888);
 }
-struct monolith_0
-{
-string string;
-i32 a;
-f32 b;
-};
-typedef struct monolith_0 monolith_0;
 f32 mapit_0(f32 op_1)
 {
 print_string("Map ");
@@ -235,19 +228,37 @@ println_f64(sin_f64(b_2));
 println_string("");
 }
 }
+struct monolith_0
+{
+string string;
+i32 a;
+f32 b;
+};
+typedef struct monolith_0 monolith_0;
+struct betalith_0
+{
+f64 d;
+f80 e;
+struct monolith_0 g;
+};
+typedef struct betalith_0 betalith_0;
 void compositions_0()
 {
 {
-struct monolith_0 test_2={0};
+struct monolith_0 mono_2={0};
+struct betalith_0 beta_2={0};
 println_string("Composition!!!");
-set_pointer_i32((i32*)(&(test_2.a)),1000);
-print_string("test.a = ");
-println_i32((i32)(test_2.a));
-set_pointer_i32((i32*)(&test_2.a),2000);
-set_pointer_i32(&test_2.a,3000);
-print_string("test.a = ");
-println_i32((i32)(test_2.a));
+set_pointer_i32((i32*)(&(mono_2.a)),1000);
+print_string("mono.a = ");
+println_i32((i32)(mono_2.a));
+set_pointer_i32((i32*)(&mono_2.a),2000);
+set_pointer_i32(&mono_2.a,3000);
+print_string("mono.a = ");
+println_i32((i32)(mono_2.a));
 println_string("");
+print_string("beta.g.a = ");
+set_pointer_i32((i32*)(&((beta_2.g).a)),9000);
+println_i32((i32)((beta_2.g).a));
 }
 }
 void files_0()
