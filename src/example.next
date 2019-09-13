@@ -150,10 +150,9 @@ by Edward Puccini |;
       (if [cnt == 3]
         (prnl "COUNT IS 3")
         (prnl "COUNT NOT 3"))
-      (prnfmt "%d" (^ 2 cnt))
-      (prn "ELT: ")
-      (prnfmt "%d" (# array cnt))
-      (prn "CNT: "))
+      (prnfmt "2^cnt = %d\n" (^ 2 cnt))
+      (prnfmt "ELT = %d\n" (# array cnt))
+      (prnfmt "CNT: %d\n" cnt))
     (del array)
     (prnl float1)
     (prnl float2)

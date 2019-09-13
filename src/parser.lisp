@@ -2248,7 +2248,7 @@
                                             (1- (count-elements expr-list))))))
          ((equal "prnfmt" (car expr-list))
           (store-current-function "prnfmt")
-          (add-code "print_format")
+          (add-code "printf")
           (add-code "(")
           (dbg "parse-call: prnfmt Next arg " (cadr expr-list))
           (setf expr-list (parse-arguments (cdr expr-list) *infinite-arguments*)))
