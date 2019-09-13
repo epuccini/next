@@ -26,6 +26,7 @@
 (defvar *current-module* "")
 (defvar *block* 0)
 (defvar *error* nil)
+(defvar *emitted* nil)
 (defvar *generics-template* "")
 (defvar *def-template* "")
 (defvar *impl-template* "")
@@ -63,13 +64,16 @@
       (print stack-msg))))
 
 (defun final-error-msg (expr-list msg)
-  (emit-code-call)
+  (if (not *emitted*)
+      (emit-code-call))
   (format t msg)
   (regex-replace "\n" (format t "~%~{~a ~}~%" (subseq expr-list 0 40)) " ")
   (print-stack)
   (sb-ext:quit))
 
 (defun error-msg (expr-list msg)
+  (if (not *emitted*)
+      (emit-code-call))
   (setf *error* t)
   (format t msg)
   (regex-replace "\n" (format t "~%~{~a ~}~%" (subseq expr-list 0 40)) " "))
@@ -79,58 +83,59 @@
              cnt max)))
 
 (defun error-operator-not-defined (expr-list)
-  (error-msg expr-list "Error no operator defined!~%"))
+  (error-msg expr-list "~%Error no operator defined!~%"))
 
 (defun error-no-type-def (expr-list type)
-  (error-msg expr-list (format nil "Error no type >~a< defined!~%" type)))
+  (error-msg expr-list (format nil "~%Error no type >~a< defined!~%" type)))
 
 (defun error-function-not-defined (expr-list)
-  (error-msg expr-list "Error function not defined!~%"))
+  (error-msg expr-list "~%Error function not defined!~%"))
 
 (defun error-missing-expression (expr-list)
-  (error-msg expr-list "Error missing expression!~%"))
+  (error-msg expr-list "~%Error missing expression!~%"))
 
 (defun error-function-type-unkown (expr-list type)
-  (error-msg expr-list (format nil "Error function type >~a< unkown!~%" type)))
+  (error-msg expr-list (format nil "~%Error function type >~a< unkown!~%" type)))
 
 (defun error-syntax-error (expr-list)
-  (error-msg expr-list "Error syntax error!~%"))
+  (error-msg expr-list "~%Error syntax error!~%"))
 
 (defun error-missing-open-square-bracket (expr-list)
-  (final-error-msg expr-list "Error missing square bracket!~%"))
+  (final-error-msg expr-list "~%Error missing square bracket!~%"))
 
 (defun error-missing-open-parens (expr-list)
-  (final-error-msg expr-list "Error missing open parens!~%"))
+  (final-error-msg expr-list "~%Error missing open parens!~%"))
 
 (defun error-missing-close-square-bracket (expr-list)
-  (final-error-msg expr-list "Error missing square bracket!~%"))
+  (final-error-msg expr-list "~%Error missing square bracket!~%"))
 
 (defun error-missing-close-parens (expr-list)
-  (final-error-msg expr-list "Error missing close parens!~%"))
+  (final-error-msg expr-list "~%Error missing close parens!~%"))
 
-(defun error-variable-not-defined (expr-list)
-  (error-msg expr-list "Error variable not defined!~%"))
+(defun error-variable-not-defined (expr-list variable)
+  (error-msg expr-list
+             (format nil "~%Error variable >~a< not defined!~%" variable)))
 
 (defun error-function-vector-malformed (expr-list)
-  (error-msg expr-list "Error function vector malformed!~%"))
+  (error-msg expr-list "~%Error function vector malformed!~%"))
 
 (defun error-composition-vector-malformed (expr-list)
-  (error-msg expr-list "Error composition vector malformed!~%"))
+  (error-msg expr-list "~%Error composition vector malformed!~%"))
 
 (defun error-let-vector-malformed (expr-list)
-  (error-msg expr-list "Error let vector malformed!~%"))
+  (error-msg expr-list "~%Error let vector malformed!~%"))
 
 (defun error-cant-infer-type (expr-list)
-  (error-msg expr-list "Error cant determine type!~%"))
+  (error-msg expr-list "~%Error cant determine type!~%"))
 
 (defun error-only-lists-supported (expr-list)
-  (error-msg expr-list "Error only lists supported!~%"))
+  (error-msg expr-list "~%Error only lists supported!~%"))
 
 (defun error-type-not-supported (expr-list type)
-  (error-msg expr-list (format nil "Error type ~a not supported!~%" type)))
+  (error-msg expr-list (format nil "~%Error type >~a< not supported!~%" type)))
 
 (defun error-too-many-parens (expr-list)
-  (error-msg expr-list "Error too many paranteses!~%"))
+  (error-msg expr-list "~%Error too many paranteses!~%"))
 
 (defun upto-string (expression lower)
   (let ((str ""))
@@ -280,6 +285,7 @@
               (setf code (format nil "~%~%~{~a~}~%" *code_list*)))))
     (if (not (is-main-defined-p))
         (setf code (format nil "~a~%destroy_ptr(pointer_list);~%return 0;~%}" code)))
+    (setf *emitted* t)
     (values code definition implementation)))
 
 (defun get-current-function ()
@@ -2151,7 +2157,7 @@
          (dbg "parse-arguments: VARIABLE not defined: "
               (get-iter-variable-name  (car expr-list))" block " *block*
               " hash " (hash-table-keys *variables*))
-         (error-variable-not-defined expr-list))
+         (error-variable-not-defined expr-list (car expr-list)))
         ((equal "(" (car expr-list))
          (progn
            (if (and *paranteses*
