@@ -232,6 +232,7 @@ by Edward Puccini |;
     (:: (i32> (ref (of (of beta g) a))) 9000)
     (prnl (i32 (of (of beta g) a)))
     (prn "beta.g.a = ")
+    (:: beta>>g>>a 8000)
     (prnl beta>>g>>a)))
 
 (defn files:void []

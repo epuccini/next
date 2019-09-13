@@ -260,6 +260,7 @@ print_string("beta.g.a = ");
 set_pointer_i32((i32*)(&((beta_2.g).a)),9000);
 println_i32((i32)((beta_2.g).a));
 print_string("beta.g.a = ");
+set_pointer_i32(&beta_2.g.a,8000);
 println_i32(beta_2.g.a);
 }
 }
