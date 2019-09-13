@@ -2063,16 +2063,8 @@ T fabs_##T(T val) { \
 	return fabs(val); \
 } \
 
-define_fabs(c8)
-define_fabs(i16)
-define_fabs(i32)
-define_fabs(i64)
-define_fabs(ui16)
-define_fabs(ui32)
-define_fabs(ui64)
 define_fabs(f32)
 define_fabs(f64)
-define_fabs(f80)
 
 #define define_fmod(T) \
 T fmod_##T(T vala, T valb) { \

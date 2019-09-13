@@ -5,6 +5,7 @@
 #include <math.h>
 #include <string.h>
 #include <memory.h>
+#include <gmp.h>
 
 typedef unsigned char b8;
 typedef char c8;
@@ -1267,16 +1268,8 @@ define_header_modf(f80)
 #define define_header_fabs(T) \
 T fabs_##T(T val); \
 
-define_header_fabs(c8)
-define_header_fabs(i16)
-define_header_fabs(i32)
-define_header_fabs(i64)
-define_header_fabs(ui16)
-define_header_fabs(ui32)
-define_header_fabs(ui64)
 define_header_fabs(f32)
 define_header_fabs(f64)
-define_header_fabs(f80)
 
 #define define_header_fmod(T) \
 T fmod_##T(T vala, T valb); \
