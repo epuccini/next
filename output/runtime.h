@@ -78,6 +78,7 @@ void set_pointer_f32(f32* ptr, f32 val);
 void set_pointer_f64(f64* ptr, f64 val);
 void set_pointer_f80(f80* ptr, f80 val);
 void set_pointer_string(c8** ptr, c8* val);
+void set_pointer_file(file* ptr, file val);
 
 typedef enum PTR_TYPE {
 	ARRAY = 0,
@@ -284,6 +285,8 @@ define_header_node(ui64)
 define_header_node(f32)
 define_header_node(f64)
 define_header_node(f80)
+define_header_node(string)
+define_header_node(file)
 
 #define define_header_length_list(T) \
 i32 length_list_##T(node_##T* list);  \
@@ -930,6 +933,8 @@ define_header_set_list(ui64)
 define_header_set_list(f32)
 define_header_set_list(f64)
 define_header_set_list(f80)
+define_header_set_list(string)
+define_header_set_list(file)
 
 #define define_header_set_pointer_list(T) \
 void set_pointer_list_##T(node_##T** ptr, node_##T* val); \
@@ -946,6 +951,8 @@ define_header_set_pointer_list(ui64)
 define_header_set_pointer_list(f32)
 define_header_set_pointer_list(f64)
 define_header_set_pointer_list(f80)
+define_header_set_pointer_list(string)
+define_header_set_pointer_list(file)
 
 #define define_header_set_pointer_array(T) \
 void set_pointer_array_##T(T** ptr, T* val); \
@@ -962,6 +969,8 @@ define_header_set_pointer_array(ui64)
 define_header_set_pointer_array(f32)
 define_header_set_pointer_array(f64)
 define_header_set_pointer_array(f80)
+define_header_set_pointer_array(string)
+define_header_set_pointer_array(file)
 
 #define define_header_set_pointer_pointer(T) \
 void set_pointer_pointer_##T(T** ptr, T* val); \
@@ -978,6 +987,8 @@ define_header_set_pointer_pointer(ui64)
 define_header_set_pointer_pointer(f32)
 define_header_set_pointer_pointer(f64)
 define_header_set_pointer_pointer(f80)
+define_header_set_pointer_pointer(string)
+define_header_set_pointer_pointer(file)
 
 void print_str_pointer_c8(c8* array, c8* value);
 void print_str_array_c8(c8* array, c8* value);

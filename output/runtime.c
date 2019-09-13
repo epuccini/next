@@ -244,6 +244,10 @@ void set_pointer_string(c8** ptr, c8* val) {
 	*ptr = val;
 }
 
+void set_pointer_file(file* ptr, file val) {
+	*ptr = val;
+}
+
 
 #define define_lt(T) \
 bool lt_##T(T a, T b){ \
@@ -1603,6 +1607,8 @@ define_set_pointer_list(ui64)
 define_set_pointer_list(f32)
 define_set_pointer_list(f64)
 define_set_pointer_list(f80)
+define_set_pointer_list(string)
+define_set_pointer_list(file)
 
 #define define_set_pointer_array(T) \
 void set_pointer_array_##T(T** ptr, T* val){ \
@@ -1621,6 +1627,8 @@ define_set_pointer_array(ui64)
 define_set_pointer_array(f32)
 define_set_pointer_array(f64)
 define_set_pointer_array(f80)
+define_set_pointer_array(string)
+define_set_pointer_array(file)
 
 #define define_set_pointer_pointer(T) \
 void set_pointer_pointer_##T(T** ptr, T* val){ \
@@ -1639,6 +1647,8 @@ define_set_pointer_pointer(ui64)
 define_set_pointer_pointer(f32)
 define_set_pointer_pointer(f64)
 define_set_pointer_pointer(f80)
+define_set_pointer_pointer(string)
+define_set_pointer_pointer(file)
 
 void print_str_pointer_c8(c8* array, c8* value) {
 	sprintf(array, "%s", value);

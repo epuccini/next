@@ -245,9 +245,11 @@ by Edward Puccini |;
     (prnl delta>>j>>g>>a)))
 
 (defn files:void []
-  (let [name:string "output.h"
-        mode:string "r"
-        test-file:file (open name mode)
+  (let [read-name:string "output.h"
+        write-name:string "temp.txt"
+        mode-read:string "r"
+        mode-write:string "w"
+        test-file:file (open read-name mode-read)
         line:string (c8> 1)]
     (prnl "files!!!")
     (while [line != 0]
@@ -256,6 +258,11 @@ by Edward Puccini |;
       (prn line)
       (del line))
     (close test-file)
+    (prnl "\nRead sussess!")
+    (:: test-file (open write-name mode-write))
+    (write-line test-file "TEST")
+    (close test-file)
+    (prnl "Write sussess!")
     (prnl "")))
     
 (defn main:i32 []

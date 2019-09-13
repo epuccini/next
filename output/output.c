@@ -278,9 +278,11 @@ println_i32(delta_2.j.g.a);
 void files_0()
 {
 {
-string name_2="output.h";
-string mode_2="r";
-file test_file_2=open(name_2,mode_2);
+string read_name_2="output.h";
+string write_name_2="temp.txt";
+string mode_read_2="r";
+string mode_write_2="w";
+file test_file_2=open(read_name_2,mode_read_2);
 string line_2=(c8*)1;
 println_string("files!!!");
 while(line_2!=0)
@@ -291,6 +293,11 @@ print_string(line_2);
 delete_ptr(line_2);
 };
 close(test_file_2);
+println_string("\nRead sussess!");
+set_pointer_file(&test_file_2,open(write_name_2,mode_write_2));
+write_line(test_file_2,"TEST");
+close(test_file_2);
+println_string("Write sussess!");
 println_string("");
 }
 }
