@@ -1,6 +1,7 @@
 #include "output.h"
 
 
+static i32 param_0=0;
 i32 layer__fun1_1()
 {
 println_string("Module function fun1");
