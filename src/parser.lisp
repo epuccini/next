@@ -1285,10 +1285,10 @@
         (dbg "parse-expression: STRING END ")
         (add-code (format nil ";~%"))
         (return-from parse-block expr-list)))
-  (if (equal ";|" (car expr-list))
+  (if (and (equal ";" (car expr-list)) (equal "|" (cadr expr-list)))
       (progn
         (dbg "parse-expression: parse multiline comment")
-        (setf expr-list (parse-multiline-comment expr-list))
+        (setf expr-list (parse-multiline-comment (cddr expr-list)))
         (return-from parse-block expr-list)))
   (if (equal ";" (car expr-list))
       (progn
@@ -1514,14 +1514,16 @@
   expr-list)
 
 (defun parse-multiline-comment (expr-list)
-  (cond ((equal "|;" (car expr-list))
+  (if (not expr-list) (return-from parse-multiline-comment expr-list))
+  (cond ((and (equal "|" (car expr-list)) (equal ";" (cadr expr-list)))
          (dbg "parse-multiline-comment: CLOSE")
-         (return-from parse-multiline-comment (cdr expr-list)))
+         (return-from parse-multiline-comment (cddr expr-list)))
         ((stringp (car expr-list))
          (dbg "parse-multiline-comment: COMMENT >" (car expr-list) "<")
          (setf expr-list (parse-multiline-comment (cdr expr-list))))))
 
 (defun parse-single-line-comment (expr-list)
+  (if (not expr-list) (return-from parse-single-line-comment expr-list))
   (cond ((equal "\n" (car expr-list))
          (return-from parse-single-line-comment (cdr expr-list)))
         ((not (equal "\n" (car expr-list)))
@@ -2824,10 +2826,12 @@
      (hash-table-keys *variables*))))
 
 (defun parse-expression (expr-list &optional (omit nil))
-  (if (car expr-list)
+  (if expr-list
       (progn
         (loop while (equal "\n" (car expr-list)) do
              (setf expr-list (cdr expr-list)))
+        (if (not expr-list)
+            (return-from parse-expression expr-list))
         (if (equal "," (car expr-list))
             (error-syntax-error))        
         (if (equal "EOF" (car expr-list))
@@ -2841,10 +2845,10 @@
                   (add-code (format nil ";~%")))
               (dbg "parse-expression: STRING END ")
               (return-from parse-expression expr-list)))
-        (if (equal ";|" (car expr-list))
+        (if (and (equal ";" (car expr-list)) (equal "|" (cadr expr-list)))
             (progn
               (dbg "parse-expression: parse multiline comment")
-              (setf expr-list (parse-multiline-comment expr-list))
+              (setf expr-list (parse-multiline-comment (cddr expr-list)))
               (return-from parse-expression expr-list)))
         (if (equal ";" (car expr-list))
             (progn
@@ -2997,7 +3001,6 @@
     (dbg "parse: setup-signatures")
     (setup-signatures)
     (dbg "parse: parse-expressions")
-    (loop while (and (find "(" expr-list :test #'equal)
-                     (> (length expr-list) 0)) do
+    (loop while (> (length expr-list) 0) do
          (setf expr-list (parse-expression expr-list))))
   (emit-code-call))
