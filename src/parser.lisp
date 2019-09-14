@@ -1393,40 +1393,39 @@
   (dbg "parse-block " (car expr-list) " block " *block*)
   (if (not expr-list)
       (return-from parse-block expr-list))
-  (loop while (equal (format nil "~a" #\Newline) (car expr-list)) do
-      (setf expr-list (cdr expr-list)))
-  (if (and (equal ";" (car expr-list)) (equal "|" (cadr expr-list)))
-      (progn
-        (dbg "parse-expression: parse multiline comment")
-        (setf expr-list (parse-multiline-comment (cddr expr-list)))
-        (setf expr-list (parse-block expr-list))
-        (return-from parse-block expr-list)))
-  (if (equal ";" (car expr-list))
-      (progn
-        (dbg "parse-expression: parse singleline comment")
-        (setf expr-list (parse-single-line-comment (cdr expr-list)))
-        (setf expr-list (parse-block expr-list))
-        (return-from parse-block expr-list)))
-  (if (equal "(" (car expr-list))
-      (progn
-        (dbg "parse-block before expression " (car expr-list))
-        (setf expr-list (parse-expression expr-list))
-        (setf expr-list (parse-block expr-list))
-        (sb-ext:gc)))
-  (if (equal "\"" (car expr-list))
-      (progn
-        (dbg "parse-expression: STRING block " *block*)
-        (add-code "\"")
-        (setf expr-list (parse-cstr (cdr expr-list)))
-        (dbg "parse-expression: STRING END ")
-        (add-code (format nil ";~%"))
-        (return-from parse-block expr-list)))
-  (if (equal ")" (car expr-list))
-      (return-from parse-block expr-list))
-  (if (not (equal ")" (car expr-list)))
-      (progn
-        (dbg "parse-block " (car expr-list))
-        (setf expr-list (parse-block (cdr expr-list))))))
+  (loop while (and (not (equal ")" (car expr-list)))
+                   (not (equal "(" (car expr-list)))
+                   (not (equal ";" (car expr-list)))) do
+       (loop while (equal (format nil "~a" #\Newline) (car expr-list)) do
+            (setf expr-list (cdr expr-list)))
+       (if (and (equal ";" (car expr-list)) (equal "|" (cadr expr-list)))
+           (progn
+             (dbg "parse-expression: parse multiline comment")
+             (setf expr-list (parse-multiline-comment (cddr expr-list)))))
+       (if (equal ";" (car expr-list))
+           (progn
+             (dbg "parse-expression: parse singleline comment")
+             (setf expr-list (parse-single-line-comment (cdr expr-list)))))
+       (if (equal "(" (car expr-list))
+           (progn
+             (dbg "parse-block before expression " (car expr-list))
+             (setf expr-list (parse-expression expr-list))
+             (sb-ext:gc)))
+       (if (equal "\"" (car expr-list))
+           (progn
+             (dbg "parse-expression: STRING block " *block*)
+             (add-code "\"")
+             (setf expr-list (parse-cstr (cdr expr-list)))
+             (dbg "parse-expression: STRING END ")
+             (add-code (format nil ";~%"))
+             (return-from parse-block expr-list)))
+       (if (equal ")" (car expr-list))
+           (return-from parse-block expr-list))
+       (if (and (not (equal ")" (car expr-list)))
+                (not (equal "(" (car expr-list))))
+           (progn
+             (dbg "parse-block " (car expr-list))
+             (setf expr-list (cdr expr-list))))))
 
 (defun parse-function-vector (expr-list)
   (let ((temp-list expr-list))
