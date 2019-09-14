@@ -2114,6 +2114,7 @@ T or_##T(T vala, T valb) { \
     return (vala || valb); \
 } \
 
+define_or(bool)
 define_or(c8)
 define_or(i16)
 define_or(i32)
@@ -2130,6 +2131,7 @@ T not_##T(T val) { \
 return (!val); \
 } \
 
+define_not(bool)
 define_not(c8)
 define_not(i16)
 define_not(i32)
@@ -2146,6 +2148,7 @@ T and_##T(T vala, T valb) { \
 return (vala && valb); \
 } \
 
+define_and(bool)
 define_and(c8)
 define_and(i16)
 define_and(i32)

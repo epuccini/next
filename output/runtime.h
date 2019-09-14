@@ -1295,6 +1295,7 @@ i32 close(file file);
 #define define_header_or(T) \
 T or_##T(T vala, T valb); \
 
+define_header_or(bool)
 define_header_or(c8)
 define_header_or(i16)
 define_header_or(i32)
@@ -1309,6 +1310,7 @@ define_header_or(f80)
 #define define_header_not(T) \
 T not_##T(T val); \
 
+define_header_not(bool)
 define_header_not(c8)
 define_header_not(i16)
 define_header_not(i32)
@@ -1323,6 +1325,7 @@ define_header_not(f80)
 #define define_header_and(T) \
 T and_##T(T vala, T valb); \
 
+define_header_and(bool)
 define_header_and(c8)
 define_header_and(i16)
 define_header_and(i32)

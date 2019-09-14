@@ -156,7 +156,7 @@ i32 cnt_3=0;
 for(cnt_3=0;cnt_3<max_i32(length_array_i32(array_2),1);cnt_3++)
 {
 set_pointer_i32(elt_array_i32(array_2,cnt_3),(cnt_3*1000));
-if(cnt_3==3)
+if(or_bool(eq_i32(cnt_3,3),eq_i32(cnt_3,4)))
 {
 println_string("COUNT IS 3");
 }
