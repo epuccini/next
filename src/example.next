@@ -11,9 +11,6 @@ by Edward Puccini |;
 
 ; [1 2 3 4 5 6];
 
-(defp param1:i32 1)
-(defv param2:i32 2)
-
 (module layer
     (defn fun1:i32 []
       (prnl "Module function fun1")
@@ -193,6 +190,9 @@ by Edward Puccini |;
     (prn "New Value Pointer: Value 3/alt ")
     (prnl new_value_ptr)
     (prnl "")))
+
+(defp param1:i32 1)
+(defv param2:i32 2)
 
 (defn math:void []
   (let [a:f64 10.0

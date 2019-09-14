@@ -1,8 +1,6 @@
 #include "output.h"
 
 
-static i32 param1_0=1;
-volatile i32 param2_0=2;
 i32 layer__fun1_1()
 {
 println_string("Module function fun1");
@@ -216,6 +214,8 @@ println_pointer_i32(new_value_ptr_2);
 println_string("");
 }
 }
+static i32 param1_0=1;
+volatile i32 param2_0=2;
 void math_0()
 {
 {
