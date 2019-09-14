@@ -147,7 +147,7 @@ by Edward Puccini |;
     (del my-new-array3)
     (for [cnt:i32 0 < (max (len array) 1)]
       (:: (# array cnt) (* cnt 1000))
-      (if [cnt == 3]
+      (if [== cnt 3]
         (prnl "COUNT IS 3")
         (prnl "COUNT NOT 3"))
       (prnfmt "2^cnt = %d\n" (^ 2 cnt))
@@ -253,7 +253,7 @@ by Edward Puccini |;
         test-file:file (open read-name mode-read)
         line:string (c8> 1)]
     (prnl "files!!!")
-    (while [line != 0]
+    (while [!= line 0]
       (:: line (read-line test-file))
       (prn "line: ")
       (prn line)
@@ -283,11 +283,11 @@ by Edward Puccini |;
         (:: (# r i) (% d b))
         (:: d (/ d b))
         (:: i (- i 1))
-        (if [i == 0]
+        (if [== i 0]
           (break))
         (:: d (* d i)))
       (prnfmt "%.4d" (i32 (+ c (/ d 10000))))
-      (if [(mod k 10) == 0]
+      (if [== (mod k 10) 0]
         (prnfmt " %d\n" (/ (- max k) 7)))
       (:: c (% d 10000))
       (:: k (- k 13)))
