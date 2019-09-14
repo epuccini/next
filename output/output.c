@@ -1,7 +1,8 @@
 #include "output.h"
 
 
-static i32 param_0=0;
+static i32 param1_0=1;
+volatile i32 param2_0=2;
 i32 layer__fun1_1()
 {
 println_string("Module function fun1");
@@ -158,11 +159,11 @@ for(cnt_3=0;cnt_3<max_i32(length_array_i32(array_2),1);cnt_3++)
 set_pointer_i32(elt_array_i32(array_2,cnt_3),(cnt_3*1000));
 if(or_bool(equal_i32(cnt_3,3),eq_i32(cnt_3,4)))
 {
-println_string("COUNT IS 3");
+println_string("COUNT IS 3||4");
 }
 else
 {
-println_string("COUNT NOT 3");
+println_string("COUNT NOT 3||4");
 }
 printf("2^cnt = %d\n",power_i32(2,cnt_3));
 printf("ELT = %d\n",*elt_array_i32(array_2,cnt_3));
@@ -222,7 +223,13 @@ f64 a_2=10.0;
 f64 b_2=20.0;
 f64 c_2=15.5;
 f64 d_2=round_f64(c_2);
+register i32 param3_2=3;
 println_string("Math!!!");
+println_f32(0.5);
+println_f64(0.5f);
+println_i32(param1_0);
+println_i32(param2_0);
+println_i32(param3_2);
 print_string("d = round(c) = ");
 println_f64(d_2);
 print_string("exp(a) = ");

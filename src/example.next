@@ -11,7 +11,8 @@ by Edward Puccini |;
 
 ; [1 2 3 4 5 6];
 
-(defp param:i32 0)
+(defp param1:i32 1)
+(defv param2:i32 2)
 
 (module layer
     (defn fun1:i32 []
@@ -198,7 +199,13 @@ by Edward Puccini |;
         b:f64 20.0
         c:f64 15.5
         d:f64 (round c)]
+    (defr param3:i32 3)
     (prnl "Math!!!")
+    (prnl 0.5)
+    (prnl 0.5d0)
+    (prnl param1)
+    (prnl param2)
+    (prnl param3)
     (prn "d = round(c) = ")
     (prnl d)
     (prn "exp(a) = ")
