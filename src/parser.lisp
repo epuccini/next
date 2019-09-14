@@ -1411,6 +1411,7 @@
       (progn
         (dbg "parse-block before expression " (car expr-list))
         (setf expr-list (parse-expression expr-list))
+        (setf expr-list (parse-block expr-list))
         (sb-ext:gc)))
   (if (equal "\"" (car expr-list))
       (progn
