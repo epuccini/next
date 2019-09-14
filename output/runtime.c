@@ -2109,3 +2109,49 @@ i32 close(file file) {
 	return fclose(file);
 }
 
+#define define_or(T) \
+T or_##T(T vala, T valb) { \
+    return (vala || valb); \
+} \
+
+define_or(c8)
+define_or(i16)
+define_or(i32)
+define_or(i64)
+define_or(ui16)
+define_or(ui32)
+define_or(ui64)
+define_or(f32)
+define_or(f64)
+define_or(f80)
+
+#define define_not(T) \
+T not_##T(T val) { \
+return (!val); \
+} \
+
+define_not(c8)
+define_not(i16)
+define_not(i32)
+define_not(i64)
+define_not(ui16)
+define_not(ui32)
+define_not(ui64)
+define_not(f32)
+define_not(f64)
+define_not(f80)
+
+#define define_and(T) \
+T and_##T(T vala, T valb) { \
+return (vala && valb); \
+} \
+
+define_and(c8)
+define_and(i16)
+define_and(i32)
+define_and(i64)
+define_and(ui16)
+define_and(ui32)
+define_and(ui64)
+define_and(f32)
+define_and(f64)

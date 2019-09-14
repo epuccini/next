@@ -230,6 +230,10 @@ println_f64(exp_f64(a_2));
 print_string("sin(b) = ");
 println_f64(sin_f64(b_2));
 println_string("");
+if(a_2>not_i32(0))
+{
+println_string("a > not 0");
+}
 }
 }
 struct monolith_0

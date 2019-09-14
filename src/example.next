@@ -205,7 +205,10 @@ by Edward Puccini |;
     (prnl (exp a))
     (prn "sin(b) = ")
     (prnl (sin b))
-    (prnl "")))
+    (prnl "")
+    ;; just a comment
+    (if [> a (not 0)]
+      (prnl "a > not 0"))))
 
 (compose monolith
         [string:string
@@ -298,7 +301,6 @@ by Edward Puccini |;
     (layer>>fun1)
     (layer>>fun2)
     (prnl "")
-    ;; just a comment
     (pointers)
     (math)
     (compositions)

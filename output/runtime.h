@@ -1292,3 +1292,45 @@ int write_line(file outfile, cstring line);
 c8* read_line(file infile);
 i32 close(file file);
 
+#define define_header_or(T) \
+T or_##T(T vala, T valb); \
+
+define_header_or(c8)
+define_header_or(i16)
+define_header_or(i32)
+define_header_or(i64)
+define_header_or(ui16)
+define_header_or(ui32)
+define_header_or(ui64)
+define_header_or(f32)
+define_header_or(f64)
+define_header_or(f80)
+
+#define define_header_not(T) \
+T not_##T(T val); \
+
+define_header_not(c8)
+define_header_not(i16)
+define_header_not(i32)
+define_header_not(i64)
+define_header_not(ui16)
+define_header_not(ui32)
+define_header_not(ui64)
+define_header_not(f32)
+define_header_not(f64)
+define_header_not(f80)
+
+#define define_header_and(T) \
+T and_##T(T vala, T valb); \
+
+define_header_and(c8)
+define_header_and(i16)
+define_header_and(i32)
+define_header_and(i64)
+define_header_and(ui16)
+define_header_and(ui32)
+define_header_and(ui64)
+define_header_and(f32)
+define_header_and(f64)
+define_header_and(f80)
+
