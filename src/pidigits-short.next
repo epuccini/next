@@ -1,5 +1,5 @@
 (defn main:i32 []
-  (let [max:i32 70000
+  (let [max:i32 56000
         r:i32> (new_i32 (+ max 1))
         b:i32 0 d:i32 0 c:i32 0]
     
@@ -9,8 +9,8 @@
     (for [k:i32 max > 0]
       (:: d 0)
       (:: i k)
-      (for [m:i32 0 != max] 
-        (:: d (+ d (* (# r i) max)))
+      (for [m:i32 0 != 100000] 
+        (:: d (+ d (* (# r i) 100000)))
         (:: b (- (* 2 i) 1))
         (:: (# r i) (% d b))
         (:: d (/ d b))
@@ -18,9 +18,9 @@
         (if [i == 0]
           (break))
         (:: d (* d i)))
-      (prnfmt "%.4d" (i32 (+ c (/ d max))))
+      (prnfmt "%.4d" (i32 (+ c (/ d 100000))))
       (if [(mod k 10) == 0]
         (prnfmt " %d\n" (/ (- max k) 7)))
-      (:: c (% d max))
+      (:: c (% d 100000))
       (:: k (- k 13)))
     (return 0)))

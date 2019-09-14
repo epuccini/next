@@ -22,7 +22,7 @@ ASM_LIBRARY	= 64
 VERSION 	= 4.7.0
 CC      	= /usr/bin/gcc
 ASM         = /usr/bin/nasm
-CFLAGS  	= -Wall -g -c -D_REENTRANT -DVERSION=\"$(VERSION)\" -Wsizeof-array-argument 
+CFLAGS  	= -O0 -Wall -g -c -D_REENTRANT -DVERSION=\"$(VERSION)\" -Wsizeof-array-argument 
 LDFLAGS 	= -pthread -lm 
 SRCDIR 		= /Users/edward/Documents/Code/common-lisp/projects/next/output 
 
