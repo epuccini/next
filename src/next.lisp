@@ -210,6 +210,7 @@
   (set-function-type "!=" 'boolean)
   (set-function-type ">=" 'boolean)
   (set-function-type "<=" 'boolean)
+  (set-function-type "equal" 'boolean)
   (set-function-type "eq" 'boolean)
   (set-function-type "neq" 'boolean)
   (set-function-type "geqt" 'boolean)

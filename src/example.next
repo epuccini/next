@@ -147,9 +147,9 @@ by Edward Puccini |;
     (del my-new-array3)
     (for [cnt:i32 0 < (max (len array) 1)]
       (:: (# array cnt) (* cnt 1000))
-      (if [(or (== cnt 3) (== cnt 4))]
-        (prnl "COUNT IS 3")
-        (prnl "COUNT NOT 3"))
+      (if [(or (equal cnt 3) (== cnt 4))]
+        (prnl "COUNT IS 3||4")
+        (prnl "COUNT NOT 3||4"))
       (prnfmt "2^cnt = %d\n" (^ 2 cnt))
       (prnfmt "ELT = %d\n" (# array cnt))
       (prnfmt "CNT: %d\n" cnt))

@@ -2115,6 +2115,7 @@ T or_##T(T vala, T valb) { \
 } \
 
 define_or(bool)
+define_or(b8)
 define_or(c8)
 define_or(i16)
 define_or(i32)
@@ -2132,6 +2133,7 @@ return (!val); \
 } \
 
 define_not(bool)
+define_not(b8)
 define_not(c8)
 define_not(i16)
 define_not(i32)
@@ -2145,10 +2147,11 @@ define_not(f80)
 
 #define define_and(T) \
 T and_##T(T vala, T valb) { \
-return (vala && valb); \
+    return (vala && valb); \
 } \
 
 define_and(bool)
+define_and(b8)
 define_and(c8)
 define_and(i16)
 define_and(i32)
@@ -2158,3 +2161,106 @@ define_and(ui32)
 define_and(ui64)
 define_and(f32)
 define_and(f64)
+define_and(f80)
+
+#define define_equal(T) \
+T equal_##T(T vala, T valb) { \
+    return (vala == valb); \
+} \
+
+define_equal(bool)
+define_equal(b8)
+define_equal(c8)
+define_equal(i16)
+define_equal(i32)
+define_equal(i64)
+define_equal(ui16)
+define_equal(ui32)
+define_equal(ui64)
+define_equal(f32)
+define_equal(f64)
+define_equal(f80)
+
+bool equal_string(string vala, string valb) {
+    return strncmp(vala, valb, length(vala));
+}
+
+#define define_equal_array(T) \
+bool equal_array_##T(T* vala, T* valb) { \
+    int cnt = 0; \
+    for(cnt = 0; cnt < length(vala); cnt++) { \
+        if(vala[cnt] != valb[cnt]) { \
+            return false; \
+        } \
+    } \
+    return true; \
+} \
+
+define_equal_array(bool)
+define_equal_array(b8)
+define_equal_array(c8)
+define_equal_array(i16)
+define_equal_array(i32)
+define_equal_array(i64)
+define_equal_array(ui16)
+define_equal_array(ui32)
+define_equal_array(ui64)
+define_equal_array(f32)
+define_equal_array(f64)
+define_equal_array(f80)
+
+#define define_equal_pointer(T) \
+bool equal_pointer_##T(T* vala, T* valb) {  \
+    int cnt = 0; \
+    for(cnt = 0; cnt < length(vala); cnt++) { \
+        if(vala[cnt] != valb[cnt]) { \
+            return false; \
+        } \
+    } \
+    return true; \
+} \
+
+define_equal_pointer(bool)
+define_equal_pointer(b8)
+define_equal_pointer(c8)
+define_equal_pointer(i16)
+define_equal_pointer(i32)
+define_equal_pointer(i64)
+define_equal_pointer(ui16)
+define_equal_pointer(ui32)
+define_equal_pointer(ui64)
+define_equal_pointer(f32)
+define_equal_pointer(f64)
+define_equal_pointer(f80)
+
+#define define_equal_list(T) \
+bool equal_list_##T(node_##T* vala, node_##T* valb) { \
+    i32 cnt = 0; \
+    int sizea = length_list_##T(vala); \
+    int sizeb = length_list_##T(valb); \
+    if (sizea != sizeb) { \
+        return false; \
+    } \
+    for (cnt = 0; cnt < sizea-1; cnt++) { \
+        if (vala->value != valb->value) { \
+            return false; \
+        } \
+        if (vala->next != NULL && valb->next != NULL)  { \
+            vala = vala->next; \
+            valb = valb->next; \
+        } \
+    } \
+    return true; \
+}
+
+define_equal_list(bool)
+define_equal_list(b8)
+define_equal_list(c8)
+define_equal_list(i16)
+define_equal_list(i32)
+define_equal_list(i64)
+define_equal_list(ui16)
+define_equal_list(ui32)
+define_equal_list(ui64)
+define_equal_list(f32)
+define_equal_list(f64)

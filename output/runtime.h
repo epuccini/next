@@ -1296,6 +1296,7 @@ i32 close(file file);
 T or_##T(T vala, T valb); \
 
 define_header_or(bool)
+define_header_or(b8)
 define_header_or(c8)
 define_header_or(i16)
 define_header_or(i32)
@@ -1311,6 +1312,7 @@ define_header_or(f80)
 T not_##T(T val); \
 
 define_header_not(bool)
+define_header_not(b8)
 define_header_not(c8)
 define_header_not(i16)
 define_header_not(i32)
@@ -1326,6 +1328,7 @@ define_header_not(f80)
 T and_##T(T vala, T valb); \
 
 define_header_and(bool)
+define_header_and(b8)
 define_header_and(c8)
 define_header_and(i16)
 define_header_and(i32)
@@ -1337,3 +1340,68 @@ define_header_and(f32)
 define_header_and(f64)
 define_header_and(f80)
 
+#define define_header_equal(T) \
+T equal_##T(T vala, T valb); \
+
+define_header_equal(bool)
+define_header_equal(b8)
+define_header_equal(c8)
+define_header_equal(i16)
+define_header_equal(i32)
+define_header_equal(i64)
+define_header_equal(ui16)
+define_header_equal(ui32)
+define_header_equal(ui64)
+define_header_equal(f32)
+define_header_equal(f64)
+define_header_equal(f80)
+
+bool equal_string(string vala, string valb);
+
+#define define_header_equal_array(T) \
+bool equal_array_##T(T* vala, T* valb); \
+
+define_header_equal_array(bool)
+define_header_equal_array(b8)
+define_header_equal_array(c8)
+define_header_equal_array(i16)
+define_header_equal_array(i32)
+define_header_equal_array(i64)
+define_header_equal_array(ui16)
+define_header_equal_array(ui32)
+define_header_equal_array(ui64)
+define_header_equal_array(f32)
+define_header_equal_array(f64)
+define_header_equal_array(f80)
+
+#define define_header_equal_pointer(T) \
+bool equal_pointer_##T(T* vala, T* valb); \
+
+define_header_equal_pointer(bool)
+define_header_equal_pointer(b8)
+define_header_equal_pointer(c8)
+define_header_equal_pointer(i16)
+define_header_equal_pointer(i32)
+define_header_equal_pointer(i64)
+define_header_equal_pointer(ui16)
+define_header_equal_pointer(ui32)
+define_header_equal_pointer(ui64)
+define_header_equal_pointer(f32)
+define_header_equal_pointer(f64)
+define_header_equal_pointer(f80)
+
+#define define_header_equal_list(T) \
+bool equal_list_##T(node_##T* vala, node_##T* valb); \
+
+define_header_equal_list(bool)
+define_header_equal_list(b8)
+define_header_equal_list(c8)
+define_header_equal_list(i16)
+define_header_equal_list(i32)
+define_header_equal_list(i64)
+define_header_equal_list(ui16)
+define_header_equal_list(ui32)
+define_header_equal_list(ui64)
+define_header_equal_list(f32)
+define_header_equal_list(f64)
+define_header_equal_list(f80)
