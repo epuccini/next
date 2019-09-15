@@ -1,12 +1,12 @@
 #include "output.h"
 
 
-i32 layer__fun1_1_i32()
+i32 layer__fun1_1_void()
 {
 println_string("Module function fun1");
 return(999);
 }
-i32 layer__fun2_1_i32()
+i32 layer__fun2_1_void()
 {
 println_string("Module function fun2");
 return(888);
@@ -47,8 +47,8 @@ mapit_0_f32(5.5);
 map_once_0_f32(5.5);
 map_once_0_i32(5);
 println_string("Module functions!!!");
-layer__fun1_1_i32();
-layer__fun2_1_i32();
+layer__fun1_1_void();
+layer__fun2_1_void();
 {
 f32 float1_2=0.0;
 f32 float2_2=(0.0+0.0);
@@ -331,7 +331,7 @@ println_string("Write sussess!");
 println_string("");
 }
 }
-i32 pidigits_0_i32()
+i32 pidigits_0_void()
 {
 {
 i32 max_2=5600;
@@ -378,14 +378,14 @@ i32 main()
 {
 {
 i32 ret_2=arrays_and_lists_0_i32(77);
-layer__fun1_1_i32();
-layer__fun2_1_i32();
+layer__fun1_1_void();
+layer__fun2_1_void();
 println_string("");
 pointers_0_void();
 math_0_void();
 compositions_0_void();
 files_0_void();
-pidigits_0_i32();
+pidigits_0_void();
 return(ret_2);
 }
 destroy_ptr(pointer_list);
