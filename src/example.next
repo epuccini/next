@@ -206,6 +206,7 @@ by Edward Puccini |;
     (prnl param1)
     (prnl param2)
     (prnl param3)
+    (prnfmt "shift left: 1 << 8 = %d\n" (<< 1 8))
     (prn "d = round(c) = ")
     (prnl d)
     (prn "exp(a) = ")

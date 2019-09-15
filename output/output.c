@@ -230,6 +230,7 @@ println_f64(0.5f);
 println_i32(param1_0);
 println_i32(param2_0);
 println_i32(param3_2);
+printf("shift left: 1 << 8 = %d",1<<8);
 print_string("d = round(c) = ");
 println_f64(d_2);
 print_string("exp(a) = ");
