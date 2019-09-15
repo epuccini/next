@@ -335,8 +335,7 @@ for(k_3=max_2;k_3>0;k_3--)
 {
 set_pointer_i32(&d_2,0);
 set_pointer_i32(&i_3,k_3);
-i32 m_4=0;
-for(m_4=0;m_4!=10000;m_4++)
+for(;;)
 {
 set_pointer_i32(&d_2,(d_2+(*elt_array_i32(r_2,i_3)*10000)));
 set_pointer_i32(&b_2,((2*i_3)-1));
