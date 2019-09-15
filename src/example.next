@@ -21,7 +21,17 @@ by Edward Puccini |;
       (return 888)))
 
 (defn mapit:f32 [op:f32]
-  (prn "Map ")
+  (prn "Map f32 ")
+  (prnl (+ op op))
+  (return (+ op op)))
+
+(defn map-once:f32 [op:f32]
+  (prn "Map-once f32 ")
+  (prnl (+ op op))
+  (return (+ op op)))
+
+(defn map-once:i32 [op:i32]
+  (prn "Map-once i32 ")
   (prnl (+ op op))
   (return (+ op op)))
 
@@ -30,13 +40,15 @@ by Edward Puccini |;
   (prnl (f32 (+ op1 op2)))
   (return (+ op1 op2)))
 
-(defn work:void [f:fun[f32->f32] arg:i32]
+(defn work:f32 [f:fun[f32->f32] arg:f32]
   (prnl "Work!!!")
-  (prnfmt "%f" (f arg)))
+  (return (f arg)))
 
 (defn arrays-and-lists:i32 [argc:i32]
   (prnl "Arrays and lists!!!")
   (mapit 5.5)
+  (map-once 5.5)
+  (map-once 5)
   (prnl "Module functions!!!")
   (layer>>fun1)
   (layer>>fun2)

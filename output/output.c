@@ -1,40 +1,54 @@
 #include "output.h"
 
 
-i32 layer__fun1_1()
+i32 layer__fun1_1_i32()
 {
 println_string("Module function fun1");
 return(999);
 }
-i32 layer__fun2_1()
+i32 layer__fun2_1_i32()
 {
 println_string("Module function fun2");
 return(888);
 }
-f32 mapit_0(f32 op_1)
+f32 mapit_0_f32(f32 op_1)
 {
-print_string("Map ");
+print_string("Map f32 ");
 println_f64((op_1+op_1));
 return((op_1+op_1));
 }
-f32 reduceit_0(f32 op1_1,f32 op2_1)
+f32 map_once_0_f32(f32 op_1)
+{
+print_string("Map-once f32 ");
+println_f64((op_1+op_1));
+return((op_1+op_1));
+}
+i32 map_once_0_i32(i32 op_1)
+{
+print_string("Map-once i32 ");
+println_f64((op_1+op_1));
+return((op_1+op_1));
+}
+f32 reduceit_0_f32(f32 op1_1,f32 op2_1)
 {
 print_string("Reduce ");
 println_f32((f32)(op1_1+op2_1));
 return((op1_1+op2_1));
 }
-void work_0(f32 (*f_1)(f32),i32 arg_1)
+f32 work_0_f32(f32 (*f_1)(f32),f32 arg_1)
 {
 println_string("Work!!!");
-printf("%f",(*f_1)(arg_1));
+return((*f_1)(arg_1));
 }
-i32 arrays_and_lists_0(i32 argc_1)
+i32 arrays_and_lists_0_i32(i32 argc_1)
 {
 println_string("Arrays and lists!!!");
-mapit_0(5.5);
+mapit_0_f32(5.5);
+map_once_0_f32(5.5);
+map_once_0_i32(5);
 println_string("Module functions!!!");
-layer__fun1_1();
-layer__fun2_1();
+layer__fun1_1_i32();
+layer__fun2_1_i32();
 {
 f32 float1_2=0.0;
 f32 float2_2=(0.0+0.0);
@@ -50,7 +64,7 @@ i32* cdr_array_2=cdr_array_i32(array_2);
 append_ptr(cdr_array_2, 1, VARIABLE);
 f32 values_2[]={1.0, 2.0, 3.0, 4.0, 5.0, 6.0};
 append_ptr(values_2, sizeof(values_2)/sizeof(f32), ARRAY);
-f32* my_new_array_2=mapn_array_f32(mapit_0,values_2);
+f32* my_new_array_2=mapn_array_f32(mapit_0_f32,values_2);
 append_ptr(my_new_array_2, 1, VARIABLE);
 f32* my_new_floats_2=new_f32(10);
 append_ptr(my_new_floats_2, 1, VARIABLE);
@@ -68,7 +82,7 @@ c8 chars_2[]={'a', 'b', 'c', 'd', 'e', 'f', 'g'};
 append_ptr(chars_2, sizeof(chars_2)/sizeof(c8), ARRAY);
 c8 new_string_2[]="Just a string";
 append_ptr(new_string_2, sizeof(new_string_2)/sizeof(c8), ARRAY);
-f32 (*myfun_2)(f32)=mapit_0;
+f32 (*myfun_2)(f32)=mapit_0_f32;
 set_pointer_f32((f32*)elt_array_f32(my_new_floats_2,0),888.0);
 print_string("my-new-floats set 1. element: ");
 println_pointer_f32(my_new_floats_2);
@@ -132,10 +146,10 @@ print_string("My list set ");
 println_list_f32(my_list_2);
 print_string("My values ");
 println_array_f32(sizeof(values_2),values_2);
-mapit_0(1000.0);
-work_0(mapit_0,100);
-map_array_f32(mapit_0,values_2);
-reduce_array_f32(reduceit_0,values_2);
+(*myfun_2)(1000.0);
+work_0_f32(mapit_0_f32,100);
+map_array_f32(mapit_0_f32,values_2);
+reduce_array_f32(reduceit_0_f32,values_2);
 print_string("String: ");
 println_string(string_2);
 print_string("Chars: ");
@@ -177,7 +191,7 @@ println_i32(argc_1);
 println_string("");
 return(2);
 }
-void pointers_0()
+void pointers_0_void()
 {
 {
 i32 value_2=1000;
@@ -216,7 +230,7 @@ println_string("");
 }
 static i32 param1_0=1;
 volatile i32 param2_0=2;
-void math_0()
+void math_0_void()
 {
 {
 f64 a_2=10.0;
@@ -230,7 +244,7 @@ println_f64(0.5f);
 println_i32(param1_0);
 println_i32(param2_0);
 println_i32(param3_2);
-printf("shift left: 1 << 8 = %d",1<<8);
+printf("shift left: 1 << 8 = %d\n",1<<8);
 print_string("d = round(c) = ");
 println_f64(d_2);
 print_string("exp(a) = ");
@@ -265,7 +279,7 @@ file i;
 struct betalith_0 j;
 };
 typedef struct deltalith_0 deltalith_0;
-void compositions_0()
+void compositions_0_void()
 {
 {
 struct monolith_0 mono_2={0};
@@ -291,7 +305,7 @@ set_pointer_i32(&delta_2.j.g.a,5000);
 println_i32(delta_2.j.g.a);
 }
 }
-void files_0()
+void files_0_void()
 {
 {
 string read_name_2="output.h";
@@ -317,7 +331,7 @@ println_string("Write sussess!");
 println_string("");
 }
 }
-i32 pidigits_0()
+i32 pidigits_0_i32()
 {
 {
 i32 max_2=5600;
@@ -363,15 +377,15 @@ return(0);
 i32 main()
 {
 {
-i32 ret_2=arrays_and_lists_0(77);
-layer__fun1_1();
-layer__fun2_1();
+i32 ret_2=arrays_and_lists_0_i32(77);
+layer__fun1_1_i32();
+layer__fun2_1_i32();
 println_string("");
-pointers_0();
-math_0();
-compositions_0();
-files_0();
-pidigits_0();
+pointers_0_void();
+math_0_void();
+compositions_0_void();
+files_0_void();
+pidigits_0_i32();
 return(ret_2);
 }
 destroy_ptr(pointer_list);

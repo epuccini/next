@@ -1357,6 +1357,7 @@ define_header_equal(f64)
 define_header_equal(f80)
 
 bool equal_string(string vala, string valb);
+bool equal_cstring(cstring vala, cstring valb);
 
 #define define_header_equal_array(T) \
 bool equal_array_##T(T* vala, T* valb); \

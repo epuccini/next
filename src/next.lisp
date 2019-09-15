@@ -244,6 +244,7 @@
   (set-function-type "string" 'string)
   (set-function-type "cstring" 'const-string)
   (set-function-type "file" 'file)
+  (set-function-type "fun" 'fun)
   (set-function-type "b8" 'byte)
   (set-function-type "c8" 'char)
   (set-function-type "i16" 'short-integer)
@@ -333,6 +334,8 @@
   (set-function-type "/" 'double-float)
   (set-function-type "√" 'single-float)
   (set-function-type "^" 'single-float)
+  (set-function-type "append" 'pointer)
+  (set-function-type "reverse" 'pointer)
   (set-function-type "max" 'integer)
   (set-function-type "min" 'integer))
 
