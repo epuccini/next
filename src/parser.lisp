@@ -15,7 +15,6 @@
 (defvar *implementation_list* '(""))
 (defvar *target* 'code)
 (defvar *paranteses* 0)
-(defvar *variables* nil)
 (defvar *variable-type* nil)
 (defvar *function-type* nil)
 (defvar *function-args* nil)
@@ -406,7 +405,7 @@
               (setf hash (format nil "~a_~a" (filter-expression name) cnt))
               (setf hash (format nil "~a__~a_~a" *current-module*
                                  (filter-expression name) cnt)))
-          (if (gethash hash *variables*)
+          (if (gethash hash *variable-type*)
               (progn
                 (return-from get-iter-variable-name-x hash))
               (progn
@@ -461,7 +460,7 @@
 (defun is-variable-p (name)
   (remove-if-not #'(lambda (x)
                             (equal x (get-variable-name name)))
-                 (hash-table-keys *variables*)))
+                 (hash-table-keys *variable-type*)))
 
 (defun get-iter-function-type (fn-name)
   (gethash (get-iter-function-name fn-name) *function-type*))
@@ -515,11 +514,11 @@
   (setq *block* 0))
 
 (defun zero-hash-variables ()
-  (dolist (var (hash-table-keys *variables*))
+  (dolist (var (hash-table-keys *variable-type*))
     (if (equal (format nil "~a" *block*)
                (subseq (reverse var) 0 1))
         (progn
-          (remhash (get-variable-name var) *variables*)))))
+          (remhash (get-variable-name var) *variable-type*)))))
 
 (defun zero-hash-functions ()
   (dolist (var (hash-table-keys *function-type*))
@@ -804,7 +803,7 @@
         (progn
           (add-code "struct ")
           (add-code (get-iter-composition-name type))))
-    (setf (gethash (get-variable-name var-name) *variables*) type)
+    (setf (gethash (get-variable-name var-name) *variable-type*) type)
     (setf (gethash (get-variable-name var-name) *variable-type*) type)
     (if (equal "fun" type)
         (if signature
@@ -819,10 +818,10 @@
                                 (car (reverse signature))
                                 (get-variable-name var-name)
                                 (cadr (reverse signature))))
-              (setf (gethash (get-variable-name var-name) *variables*) "fun"))
+              (setf (gethash (get-variable-name var-name) *variable-type*) "fun"))
             (progn
               (add-code "single_fn_f32")
-              (setf (gethash (get-variable-name var-name) *variables*) "fun"))))
+              (setf (gethash (get-variable-name var-name) *variable-type*) "fun"))))
     ;; errors ?
     (if (and (not type) (not (is-iter-composition-p type)))
         (error-no-type-def expr-list))
@@ -2744,7 +2743,6 @@
     (setf *function-args* (make-hash-table :test 'equal))
     (setf *function-type* (make-hash-table :test 'equal))
     (setf *variable-type* (make-hash-table :test 'equal))
-    (setf *variables* (make-hash-table :test 'equal))
     (setf *compositions* (make-hash-table :test 'equal))
     (setf *function-map* (make-hash-table :test 'equal))
     (setf *signatures* (make-hash-table :test 'equal))
