@@ -1,6 +1,7 @@
 #include "output.h"
 
 
+static i32 layer__test_1=0;
 i32 layer__fun1_1_void()
 {
 println_string("Module function fun1");
@@ -40,15 +41,21 @@ f32 work_0_f32(f32 (*f_1)(f32),f32 arg_1)
 println_string("Work!!!");
 return((*f_1)(arg_1));
 }
+void modules_0_void()
+{
+println_string("Modules!!!");
+layer__fun1_1_void();
+layer__fun2_1_void();
+set_pointer_i32(&layer__test_1,1000);
+print_string("Test module variable: ");
+println_i32(layer__test_1);
+}
 i32 arrays_and_lists_0_i32(i32 argc_1)
 {
 println_string("Arrays and lists!!!");
 mapit_0_f32(5.5);
 map_once_0_f32(5.5);
 map_once_0_i32(5);
-println_string("Module functions!!!");
-layer__fun1_1_void();
-layer__fun2_1_void();
 {
 f32 float1_2=0.0;
 f32 float2_2=(10.0+10.0);
@@ -256,6 +263,7 @@ if(a_2>not_i32(0))
 {
 println_string("a > not 0");
 }
+println_string("");
 }
 }
 struct monolith_0
@@ -303,6 +311,7 @@ println_i32(beta_2.g.a);
 print_string("delta.j.g.a = ");
 set_pointer_i32(&delta_2.j.g.a,5000);
 println_i32(delta_2.j.g.a);
+println_string("");
 }
 }
 void files_0_void()
@@ -371,6 +380,7 @@ printf(" %d\n",((max_2-k_3)/7));
 set_pointer_i32(&c_2,mod(d_2,10000));
 set_pointer_i32(&k_3,(k_3-13));
 }
+println_string("");
 return(0);
 }
 }
@@ -386,6 +396,7 @@ math_0_void();
 compositions_0_void();
 files_0_void();
 pidigits_0_void();
+modules_0_void();
 return(ret_2);
 }
 destroy_ptr(pointer_list);

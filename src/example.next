@@ -12,6 +12,8 @@ by Edward Puccini |;
 ; [1 2 3 4 5 6];
 
 (module layer
+    (defp test:i32 0)
+        
     (defn fun1:i32 []
       (prnl "Module function fun1")
       (return 999))
@@ -44,14 +46,19 @@ by Edward Puccini |;
   (prnl "Work!!!")
   (return (f arg)))
 
+(defn modules:void []
+  (prnl "Modules!!!")
+  (layer>>fun1)
+  (layer>>fun2)
+  (:: layer>>test 1000)
+  (prn "Test module variable: ")
+  (prnl layer>>test))
+  
 (defn arrays-and-lists:i32 [argc:i32]
   (prnl "Arrays and lists!!!")
   (mapit 5.5)
   (map-once 5.5)
   (map-once 5)
-  (prnl "Module functions!!!")
-  (layer>>fun1)
-  (layer>>fun2)
   (let [float1:f32 0.0
         float2:f32 (+ 10.0 10.0)
         array:i32# [1 2 3 4 5 6]
@@ -228,7 +235,8 @@ by Edward Puccini |;
     (prnl "")
     ;; just a comment
     (if [> a (not 0)]
-      (prnl "a > not 0"))))
+      (prnl "a > not 0"))
+    (prnl "")))
 
 (compose monolith
         [string:string
@@ -266,7 +274,8 @@ by Edward Puccini |;
     (prnl beta>>g>>a)
     (prn "delta.j.g.a = ")
     (:: delta>>j>>g>>a 5000)
-    (prnl delta>>j>>g>>a)))
+    (prnl delta>>j>>g>>a)
+    (prnl "")))
 
 (defn files:void []
   (let [read-name:string "output.h"
@@ -314,6 +323,7 @@ by Edward Puccini |;
         (prnfmt " %d\n" (/ (- max k) 7)))
       (:: c (% d 10000))
       (:: k (- k 13)))
+    (prnl "")
     (return 0)))
 
 (defn main:i32 []
@@ -326,4 +336,5 @@ by Edward Puccini |;
     (compositions)
     (files)
     (pidigits)
+    (modules)
     (return ret)))

@@ -10,29 +10,49 @@
 
 (require 'parse-float)
 
+;; target lists to store c-code
+
 (defvar *code_list* '(""))
 (defvar *definition_list* '(""))
 (defvar *implementation_list* '(""))
 (defvar *target* 'code)
+
+;; counters and flags
+
+(defvar *block* 0)
+(defvar *error* nil)
+(defvar *emitted* nil)
 (defvar *paranteses* 0)
+
+;; function and var storage
+
 (defvar *variable-type* nil)
 (defvar *function-type* nil)
 (defvar *function-args* nil)
 (defvar *compositions* nil)
 (defvar *signatures* nil)
 (defvar *function-map* nil)
+
+;; states
+
 (defvar *current-function* nil)
 (defvar *current-composition* nil)
 (defvar *current-let-definition* nil)
 (defvar *current-module* "")
-(defvar *block* 0)
-(defvar *error* nil)
-(defvar *emitted* nil)
+
+;; templates
+
 (defvar *generics-template* "")
 (defvar *def-template* "")
 (defvar *impl-template* "")
 (defvar *is-main-defined* nil)
+
+;; constants
+
 (defvar *infinite-arguments* 10000)
+
+;; Builtin next-types
+
 (defvar *types*
   '("i16" "i32" "i64" "ui16" "ui32" "ui64" "f32" "f64" "f80"
     "bool" "b8" "c8" "string" "file" "fun" "void"
@@ -64,6 +84,8 @@
          (new-expr4 (regex-replace-all "∑" new-expr3 "for"))
          (new-expr5 (regex-replace-all ">>" new-expr4 "__")))
     new-expr5))
+
+;; Error handling
 
 (defun print-stack ()
   "Use swank to log a stack-trace."
@@ -1408,9 +1430,13 @@
          (lst (cdr split))
          (var-name (elt split 0))
          (str nil))
-    (setf str (concatenate 'string (get-iter-variable-name var-name)))
-    (loop for sub-name in lst do
-         (setf str (concatenate 'string str "." sub-name)))
+    (if (is-iter-variable-p var-name)
+        (progn
+          (setf str (concatenate 'string (get-iter-variable-name var-name)))
+          (loop for sub-name in lst do
+               (setf str (concatenate 'string str "." sub-name))))
+        (progn
+          (setf str (get-iter-variable-name (regex-replace ">>" composition "__")))))
     (dbg "build-dotted-type " str)
     str))
 

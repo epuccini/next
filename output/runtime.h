@@ -5,8 +5,8 @@
 #include <math.h>
 #include <string.h>
 #include <memory.h>
-/*#include <gmp.h>
-*/
+#include <gmp.h>
+
 typedef unsigned char b8;
 typedef char c8;
 typedef short i16;
