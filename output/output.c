@@ -51,7 +51,7 @@ layer__fun1_1_void();
 layer__fun2_1_void();
 {
 f32 float1_2=0.0;
-f32 float2_2=(0.0+0.0);
+f32 float2_2=(10.0+10.0);
 i32 array_2[]={1, 2, 3, 4, 5, 6};
 append_ptr(array_2, sizeof(array_2)/sizeof(i32), ARRAY);
 i32 arrayb_2[]={9, 8, 7, 6, 5, 4, 3, 2, 1};

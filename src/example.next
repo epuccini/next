@@ -53,7 +53,7 @@ by Edward Puccini |;
   (layer>>fun1)
   (layer>>fun2)
   (let [float1:f32 0.0
-        float2:f32 (+ 0.0 0.0)
+        float2:f32 (+ 10.0 10.0)
         array:i32# [1 2 3 4 5 6]
         arrayb:i32# [9 8 7 6 5 4 3 2 1]
         append-array:i32> (append array arrayb)
