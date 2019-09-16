@@ -384,6 +384,22 @@ println_string("");
 return(0);
 }
 }
+void bigints_0_void()
+{
+{
+ixx value1_2;
+mpz_init(value1_2);
+create_str_ixx(value1_2,"1234");
+append_ptr(value1_2, sizeof(value1_2)/sizeof(ixx), IXX);
+ixx value2_2;
+mpz_init(value2_2);
+create_str_ixx(value2_2,"3212");
+append_ptr(value2_2, sizeof(value2_2)/sizeof(ixx), IXX);
+println_string("Bigints!!!");
+prnl_ixx(value1_2);
+prnl_ixx(value2_2);
+}
+}
 i32 main()
 {
 {
@@ -397,6 +413,7 @@ compositions_0_void();
 files_0_void();
 pidigits_0_void();
 modules_0_void();
+bigints_0_void();
 return(ret_2);
 }
 destroy_ptr(pointer_list);

@@ -109,7 +109,15 @@ void println_f80(f80 val) {
 }
 
 void println_string(cstring str) {
-    printf("%s \n", str);
+	printf("%s \n", str);
+}
+
+void prnl_ixx(ixx num) {
+	gmp_printf("%Zd \n", num);
+}
+
+void prn_ixx(ixx num) {
+	gmp_printf("%Zd", num);
 }
 
 void print_format(cstring fmt, ...) {
@@ -526,7 +534,10 @@ int destroy_ptr(node_ptr_t* e) {
             node_ptr_t* temp = e->next;
             do
             {
-                if (e->type != ARRAY && e->type != VARIABLE && e->type != INTERMEDIATE_ARRAY 
+				//if (e->type == IXX) {
+				//	mpz_clear(e->value);
+				//}
+				if (e->type != ARRAY && e->type != VARIABLE && e->type != INTERMEDIATE_ARRAY
 					&& e->type != INTERMEDIATE_LIST && e->type != INTERMEDIATE_POINTER)
                     free(e);
                 e = NULL;
@@ -535,7 +546,10 @@ int destroy_ptr(node_ptr_t* e) {
             } while (e->next != NULL);
         }
         else {
-            if (e->type != ARRAY && e->type != VARIABLE && e->type != INTERMEDIATE_ARRAY 
+			//if (e->type == IXX) {
+			//	mpz_clear(e->value);
+			//}
+			if (e->type != ARRAY && e->type != VARIABLE && e->type != INTERMEDIATE_ARRAY
 				&& e->type != INTERMEDIATE_LIST && e->type != INTERMEDIATE_POINTER)
                 free(e);
         }
@@ -1238,6 +1252,16 @@ define_create_array(ui64)
 define_create_array(f32)
 define_create_array(f64)
 define_create_array(f80)
+
+void create_ixx(ixx z, i32 a[], i32 size) {
+	mpz_import(z, 20, 1, sizeof(a[0]), 0, 0, a);
+}
+
+i32 create_str_ixx(ixx z, const c8* val) {
+	i32 err = mpz_set_str(z, val, 10);
+	return err;
+}
+
 
 #define define_map_array(T) \
 T* map_array_##T(single_fn_##T a, T* b) { \

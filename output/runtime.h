@@ -21,6 +21,7 @@ typedef long double f80;
 typedef const char* cstring;
 typedef char* string;
 typedef FILE* file;
+typedef mpz_t ixx;
 
 i32 mod(i32 a, i32 b);
 i32 i32_mod_i32(i32 a, i32 b);
@@ -50,6 +51,8 @@ void println_f32(f32 val);
 void println_f64(f64 val);
 void println_f80(f80 val);
 void println_string(const c8* str);
+void prnl_ixx(ixx num);
+void prn_ixx(ixx num);
 void print_format(const c8* fmt, ...);
 
 bool* elt_array_bool(bool* ptr, i32 idx);
@@ -85,10 +88,11 @@ typedef enum PTR_TYPE {
 	ARRAY = 0,
 	POINTER,
 	LIST,
+	IXX,
 	INTERMEDIATE_ARRAY,
 	INTERMEDIATE_POINTER,
 	INTERMEDIATE_LIST,
-	VARIABLE = 3
+	VARIABLE
 } PTR_TYPE_t;
 
 typedef struct node_ptr {
@@ -690,7 +694,7 @@ define_header_create_list(f64)
 define_header_create_list(f80)
 
 #define define_header_create_array(T) \
-T* create_array_##T(T list[], int size); \
+T* create_array_##T(T array[], int size); \
 
 define_header_create_array(bool)
 define_header_create_array(c8)
@@ -704,6 +708,9 @@ define_header_create_array(ui64)
 define_header_create_array(f32)
 define_header_create_array(f64)
 define_header_create_array(f80)
+
+void create_ixx(ixx z, i32 array[], i32 size);
+i32 create_str_ixx(ixx z, const c8* val);
 
 #define define_header_map_array(T) \
 T* map_array_##T(single_fn_##T a, T* b); \

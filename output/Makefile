@@ -23,7 +23,7 @@ VERSION 	= 4.7.0
 CC      	= /usr/bin/gcc
 ASM         = /usr/bin/nasm
 CFLAGS  	= -O0 -Wall -g -c -D_REENTRANT -DVERSION=\"$(VERSION)\" -Wsizeof-array-argument 
-LDFLAGS 	= -pthread -lm 
+LDFLAGS 	= -pthread -lgmp -lm 
 SRCDIR 		= /Users/edward/Documents/Code/common-lisp/projects/next/output 
 
 OBJ		= runtime.o output.o

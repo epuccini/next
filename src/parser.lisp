@@ -37,6 +37,7 @@
 
 (defvar *current-function* nil)
 (defvar *current-composition* nil)
+(defvar *current-let-variable* nil)
 (defvar *current-let-definition* nil)
 (defvar *current-module* "")
 
@@ -55,19 +56,19 @@
 
 (defvar *types*
   '("i16" "i32" "i64" "ui16" "ui32" "ui64" "f32" "f64" "f80"
-    "bool" "b8" "c8" "string" "file" "fun" "void"
+    "bool" "b8" "c8" "string" "file" "fun" "void" "ixx"
 
     "i16>" "i32>" "i64>" "ui16>" "ui32>" "ui64>" "f32>" "f64>" "f80>"
-    "bool>" "b8>" "c8>" "string>" "file>" "fun>" "void>"
+    "bool>" "b8>" "c8>" "string>" "file>" "fun>" "void>" "ixx>"
 
     "i16#" "i32#" "i64#" "ui16#" "ui32#" "ui64#" "f32#" "f64#" "f80#"
     "bool#" "b8#" "c8#" "string#" "file#" "fun#" 
 
     "i16'" "i32'" "i64'" "ui16'" "ui32'" "ui64'" "f32'" "f64'" "f80'"
-    "bool'" "b8'" "c8'" "string'" "file'" "fun'"
+    "bool'" "b8'" "c8'" "string'" "file'" "fun'" 
 
     "i16>>" "i32>>" "i64>>" "ui16>>" "ui32>>" "ui64>>" "f32>>" "f64>>" "f80>>"
-    "bool>>" "b8>>" "c8>>" "string>>" "file>>" "fun>>" "void>>"))
+    "bool>>" "b8>>" "c8>>" "string>>" "file>>" "fun>>" "void>>"  "ixx>>"))
 
 (defun load-templates ()
   (setf *def-template* (load-binary-data "../templates/code.h"))
@@ -860,6 +861,7 @@
            (if (equal "]" (cadr expr-list))
                (error-no-type-def expr-list))
            ;; store current variable
+           (setf *current-let-variable* (car def))
            (setf *current-let-definition* (cadr def))
            ;; parse signature
            (if (and (equal "fun" (cadr def)) (equal "[" (cadr expr-list)))
@@ -885,8 +887,18 @@
            ;; if array emit brackezs
            (if (search "#" (cadr def))
                (add-code "[]"))
-           ;; initialisation
-           (add-code "=")
+           ;; ixx ?
+           (if (equal "ixx" (cadr def))
+               (progn
+                 (add-code (format nil ";~%"))
+                 (add-code "mpz_init")
+                 (add-code "(")
+                 (add-code (get-iter-variable-name (car def)))
+                 (add-code ")")
+                 (add-code (format nil ";~%")))
+               ;; initialisation
+               (add-code "="))
+           ;; error ?
            (dbg "parse-variable: OPEN ARG")
            (if (equal (car expr-list) "]")
                (error-missing-expression expr-list))
@@ -895,16 +907,24 @@
            (setf expr-list (parse-expression expr-list))
            ;; store poiner
            (dbg "parse-variable: append size ")
-           (if (search "#" (cadr def))
-               (add-code
-                (format nil "append_ptr(~a, sizeof(~a)/sizeof(~a), ARRAY);~%"
+           (if (or (search "#" (cadr def))
+                   (equal "ixx" (cadr def)))
+               (progn
+                 (let ((type "ARRAY"))
+                   (if (equal "ixx" (cadr def))
+                       (setf type "IXX"))
+                   (add-code
+                    (format nil "append_ptr(~a, sizeof(~a)/sizeof(~a), ~a);~%"
                                  (get-variable-name (car def))
                                  (get-variable-name (car def))
-                                 (regex-replace "#" (cadr def) ""))))
+                                 (regex-replace "#" (cadr def) "")
+                                 type)))))
            (if (search ">" (cadr def))
                (add-code
                 (format nil "append_ptr(~a, 1, VARIABLE);~%"
-                                 (get-variable-name (car def)))))
+                        (get-variable-name (car def)))))
+           (setf *current-let-variable* nil)
+           (setf *current-let-definition* nil)
            (dbg "parse-variable: rest " (car expr-list))))
         ((not (find #\: (car expr-list)))
          (dbg "parse-variable: seperator missing! " (car expr-list))
@@ -1788,12 +1808,17 @@
         ((equal "prnl" (car expr-list))
          (let ((type (get-next-token-type-string (cdr expr-list))))
            (store-current-function "prnl")
-           (if (search "array" type)
+           (if (search "ixx" type)
+               (progn
+                 (add-code "prnl_ixx")
+                 (add-code "(")))
+           (if (and (search "array" type) (not (search "ixx" type)))
                (progn
                  (add-code (format nil "println_~a" type))
                  (add-code "(")
                  (add-code (format nil "sizeof(~a)"
-                                   (get-iter-variable-name (cadr expr-list)))))
+                                   (get-iter-variable-name (cadr expr-list))))))
+           (if (and (not (search "array" type)) (not (search "ixx" type)))
                (progn
                  (add-code (format nil "println_~a" type))
                  (add-code "(")))
@@ -1802,12 +1827,17 @@
         ((equal "prn" (car expr-list))
          (let ((type (get-next-token-type-string (cdr expr-list))))
            (store-current-function "prn")
-           (if (search "array" type)
+           (if (search "ixx" type)
+               (progn
+                 (add-code "prn_ixx")
+                 (add-code "(")))
+           (if (and (search "array" type) (not (search "ixx" type)))
                (progn
                  (add-code (format nil "print_~a" type))
                  (add-code "(")
                  (add-code (format nil "sizeof(~a)"
-                                   (get-iter-variable-name (cadr expr-list)))))
+                                   (get-iter-variable-name (cadr expr-list))))))
+           (if (and (not (search "array" type)) (not (search "ixx" type)))
                (progn
                  (add-code (format nil "print_~a" type))
                  (add-code "(")))
@@ -2592,9 +2622,20 @@
               (return-from parse-expression expr-list)))
         (if (numberp (parse-integer (car expr-list) :junk-allowed t))
             (progn
-              (dbg "parse-expression: NUM block " *block*
-                   " number " (car expr-list))
-              (add-code (car expr-list))
+              (if (equal "ixx" *current-let-definition* )
+                  (progn
+                    (add-code "create_str_ixx")
+                    (add-code "(")
+                    (add-code (get-iter-variable-name *current-let-variable*))
+                    (add-code ",")
+                    (add-code "\"")
+                    (add-code (car expr-list))
+                    (add-code "\"")
+                    (add-code (format nil ")")))
+                  (progn
+                    (dbg "parse-expression: NUM block " *block*
+                         " number " (car expr-list))
+                    (add-code (car expr-list))))
               (if (not omit)
                   (add-code (format nil ";~%")))
               (return-from parse-expression (cdr expr-list))))

@@ -326,6 +326,13 @@ by Edward Puccini |;
     (prnl "")
     (return 0)))
 
+(defn bigints:void []
+  (let [value1:ixx 1234
+        value2:ixx 3212]
+    (prnl "Bigints!!!")
+    (prnl value1)
+    (prnl value2)))
+        
 (defn main:i32 []
   (let [ret:i32 (arrays-and-lists 77)]
     (layer>>fun1)
@@ -337,4 +344,5 @@ by Edward Puccini |;
     (files)
     (pidigits)
     (modules)
+    (bigints)
     (return ret)))
