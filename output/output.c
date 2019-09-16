@@ -146,7 +146,7 @@ print_string("My list set ");
 println_list_f32(my_list_2);
 print_string("My values ");
 println_array_f32(sizeof(values_2),values_2);
-(*myfun_2)(1000.0);
+myfun_2(1000.0);
 work_0_f32(mapit_0_f32,100);
 map_array_f32(mapit_0_f32,values_2);
 reduce_array_f32(reduceit_0_f32,values_2);

@@ -16,7 +16,6 @@
 (defvar *target* 'code)
 (defvar *paranteses* 0)
 (defvar *variables* nil)
-(defvar *functions* nil)
 (defvar *variable-type* nil)
 (defvar *function-type* nil)
 (defvar *function-args* nil)
@@ -425,7 +424,7 @@
               (setf hash (format nil "~a_~a" (filter-expression name) cnt))
               (setf hash (format nil "~a__~a_~a" *current-module*
                                  (filter-expression name) cnt)))
-          (if (gethash hash *functions*)
+          (if (gethash hash *function-type*)
               (progn
                 (return-from get-iter-function-name-x hash))
               (progn
@@ -523,11 +522,11 @@
           (remhash (get-variable-name var) *variables*)))))
 
 (defun zero-hash-functions ()
-  (dolist (var (hash-table-keys *functions*))
+  (dolist (var (hash-table-keys *function-type*))
     (if (equal (format nil "~a" *block*)
                (subseq (reverse var) 0 1))
         (progn
-          (remhash (get-function-name var) *functions*)))))
+          (remhash (get-function-name var) *function-type*)))))
 
 (defun zero-hash-compositions ()
   (dolist (var (hash-table-keys *compositions*))
@@ -576,7 +575,7 @@
 
 (defun register-function (name content)
   (set-function-map name content)
-  (setf (gethash (get-function-name name) *functions*) 'function)
+  (setf (gethash (get-function-name name) *function-type*) "fun")
   (dbg "register-function: Register function >" name
        "< var >" content "<"))
 
@@ -623,7 +622,7 @@
                (get-function-value (car expr-list))))))))
 
 (defun set-function-type (fn-name type)
-  (setf (gethash (get-function-name fn-name) *functions*) type)
+  (setf (gethash (get-function-name fn-name) *function-type*) type)
   (setf (gethash (get-function-name fn-name) *function-type*) type))
 
 (defun parse-argument (expr-list)
@@ -732,8 +731,7 @@
                                    (get-iter-function-type (get-function-name fn-name))
                                    (cadr (reverse signature)))))
                (progn
-                 (add-code "single_fn_f32")
-                 (setf (gethash (get-function-name fn-name) *functions*) 'function)))
+                 (add-code "single_fn_f32")))
            (setf expr-list (cdr expr-list)))
     ;; errors ?
     (if (and (not type) (not (is-iter-composition-p type)))
@@ -743,7 +741,6 @@
              (not (is-iter-composition-p type)))
         (error-function-type-unkown expr-list type))
     (setf (gethash (get-function-name fn-name) *function-type*) type)
-    (setf (gethash (get-function-name fn-name) *functions*) 'function)
   expr-list))
 
 (defun set-function-arg (name type)
@@ -822,10 +819,10 @@
                                 (car (reverse signature))
                                 (get-variable-name var-name)
                                 (cadr (reverse signature))))
-              (setf (gethash (get-variable-name var-name) *variables*) 'function))
+              (setf (gethash (get-variable-name var-name) *variables*) "fun"))
             (progn
               (add-code "single_fn_f32")
-              (setf (gethash (get-variable-name var-name) *variables*) 'function))))
+              (setf (gethash (get-variable-name var-name) *variables*) "fun"))))
     ;; errors ?
     (if (and (not type) (not (is-iter-composition-p type)))
         (error-no-type-def expr-list))
@@ -884,8 +881,8 @@
            ;; if function then register function
            (if (equal (format nil "~a"
                               (gethash (get-variable-name
-                                        (car def)) *variables*))
-                      "FUNCTION")
+                                        (car def)) *variable-type*))
+                      "fun")
                (register-function (car def) (car expr-list))
                (progn
                  (add-code " ")
@@ -2521,21 +2518,13 @@
          (let* ((fn-name (car expr-list))
                 (fn-type (get-next-token-type-string (cdr expr-list))))
            (dbg "parse-call: FN: " (get-iter-function-name fn-name))
-            (if (is-function-map-p fn-name)
-               (progn
-                 (setf fn-name (get-iter-function-type
-                                 (get-function-value fn-name)))
-                 (add-code (format nil "~a_~a"
-                                   (get-iter-function-name
-                                    (get-function-value fn-name))
-                                   fn-type)))
+           (if (is-function-map-p fn-name)
+               (add-code (get-iter-function-name fn-name))
                (add-code (format nil "~a_~a"
-                                 (get-iter-function-name
-                                  (car expr-list))
-                                 fn-type)))
-            (add-code "(")
-            (setf expr-list (cdr expr-list))
-            (setf expr-list (parse-arguments expr-list *infinite-arguments*))))
+                                 (get-iter-function-name fn-name) fn-type)))
+           (add-code "(")
+           (setf expr-list (cdr expr-list))
+           (setf expr-list (parse-arguments expr-list *infinite-arguments*))))
         ((is-iter-variable-p (car expr-list))
          (dbg "parse-call: FN emit: " (get-function-name (car expr-list)))
          (add-code "(")
@@ -2757,7 +2746,6 @@
     (setf *variable-type* (make-hash-table :test 'equal))
     (setf *variables* (make-hash-table :test 'equal))
     (setf *compositions* (make-hash-table :test 'equal))
-    (setf *functions* (make-hash-table :test 'equal))
     (setf *function-map* (make-hash-table :test 'equal))
     (setf *signatures* (make-hash-table :test 'equal))
     (setf *current-function* (make-hash-table :test 'equal))
