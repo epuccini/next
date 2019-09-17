@@ -1549,7 +1549,6 @@
                         (inspect-function-type expr-list)))
          (function-type (get-iter-function-type symbol-value))
          (type-str ""))
-    (dbg "determine-type-of-symbol " symbol-value)
     (if literal-type
         (dbg "literal-type " literal-type))
     (if variable-type
@@ -1561,10 +1560,7 @@
     (if function-type
         (dbg "function-type " (format nil "~a" function-type)))
     (cond ((is-iter-composition-type-p expr-list)
-           (dbg "get-type: composition found! "
-                (compose-iter-composition-type expr-list))
-           (setf type-str (compose-iter-composition-type expr-list))
-           (dbg "get-type: var-type: " (format nil "~a" type-str)))
+           (setf type-str (compose-iter-composition-type expr-list)))
           ((is-type-p variable-type)
            (setf type-str variable-type))
           ((is-type-p inspect-type)
@@ -1583,7 +1579,6 @@
 
 (defun get-next-token-type-string (expr-list)
   (let ((type-str (determine-type-of-symbol expr-list)))
-    (dbg "get-next-token-type-string: " type-str)
     ;; turn next-type into c-type-string
     (if (is-type-p type-str)
         (progn
@@ -1671,12 +1666,10 @@
         ((equal ")" (car expr-list))
          (let ((fn (get-current-function)))
            (dbg "parse-arguments: " (car expr-list) " function " fn)
-           (dbg "parse-arguments: block " *block* " Parens " *paranteses*)
            (return-from parse-arguments expr-list)))
         ((equal "]" (car expr-list))
          (let ((fn (get-current-function)))
            (dbg "parse-arguments: " (car expr-list) " function " fn)
-           (dbg "parse-arguments: block " *block* " Parens " *paranteses*)
            (return-from parse-arguments expr-list)))
         ((equal "," (car expr-list))
          (error-syntax-error expr-list))
@@ -1721,8 +1714,6 @@
                     (not (equal "&" (get-last-code)))
                     (not (is-previous-cast-p)))
                (add-code ","))
-           (dbg "parse-arguments: parse-expression ( block "
-                *block* " Parens " *paranteses*)
            (setf expr-list (parse-expression expr-list t))
            (setf expr-list (parse-arguments expr-list
                                             (1- (count-elements expr-list))))))
@@ -1738,7 +1729,6 @@
            (setf expr-list (parse-arguments expr-list max))))
         ((numberp (parse-integer (car expr-list) :junk-allowed t))
          (progn
-           (dbg "parse-arguments: NUMBERP ")
            (if (and (not (equal "(" (get-last-code)))
                     (not (equal "&" (get-last-code)))
                     (not (equal "*" (get-last-code)))
@@ -1800,7 +1790,6 @@
 (defun parse-infix (expr-list function)
   (if (equal ")" (car expr-list))
       (progn
-        (dbg "parse-infix: parens ) parens " *paranteses* " block " *block*)
         (dbg "parse-infix: EXIT ")
         (return-from parse-infix expr-list)))
   (dbg "parse-infix: operand " (car expr-list))
@@ -1839,20 +1828,22 @@
 
 (defmacro parse-calculation (expr-list word operator)
   `(let ((type (get-next-token-type-string (cdr ,expr-list))))
-    (store-current-function ,word)
-    (setf expr-list (cdr ,expr-list))
-    (if (equal "ixx" type)
-        (progn
-          (setf expr-list (parse-bigint-operation ,expr-list ,operator))
-          (return-from parse-call ,expr-list)))
-    (add-code "(")
-    (if (not (equal ")" (car ,expr-list)))
-        (progn
-          (dbg "parse-call: parse-infix " (get-iter-variable-name (car ,expr-list)))
-          (setf expr-list (parse-infix ,expr-list ,operator)))
-        (error-operator-not-defined ,expr-list))
-    (setf expr-list (parse-arguments ,expr-list (count-elements ,expr-list)))
-    ,expr-list))
+     (store-current-function ,word)
+     (dbg "parse-calculation " (car ,expr-list) " next "
+          (cadr ,expr-list))
+     (setf expr-list (cdr ,expr-list))
+     (if (equal "ixx" type)
+         (progn
+           (setf expr-list (parse-bigint-operation ,expr-list ,operator))
+           (return-from parse-call ,expr-list)))
+     (add-code "(")
+     (if (not (equal ")" (car ,expr-list)))
+         (progn
+           (dbg "parse-call: parse-infix " (get-iter-variable-name (car ,expr-list)))
+           (setf expr-list (parse-infix ,expr-list ,operator)))
+         (error-operator-not-defined ,expr-list))
+     (setf expr-list (parse-arguments ,expr-list (count-elements ,expr-list)))
+     ,expr-list))
 
 (defun list-into-list (lista listb index)
   (let ((new-list '())
@@ -1909,7 +1900,8 @@
   (add-code (format nil ";~%")))
 
 (defun add-bigint-operands (expr-list tmp-var tmp-var2 operator &optional (first-time nil))
-  (let ((tmp-buffer '(""))
+  (let ((tmp-target *target*)
+        (tmp-buffer '(""))
         (op1 "")
         (op2 ""))
     ;; turn around operator when doing subtraction / division
@@ -1918,15 +1910,28 @@
         (progn
           (setf op1 tmp-var)
           ;; second add iter-variable or tmp-var for value?
-          (if (is-iter-variable-p (car expr-list))
-              (setf op2 (get-iter-variable-name (car expr-list)))
-              (setf op2 tmp-var2)))
+          (if (equal "(" (car expr-list))
+              (progn
+                (setf tmp-buffer *definition_buffer*)
+                (dbg "add-bigint-operands: " (car expr-list))
+                (setf expr-list (parse-expression expr-list t))
+                (setf *definition_buffer* tmp-buffer))
+              (if (is-iter-variable-p (car expr-list))
+                  (setf op2 (get-iter-variable-name (car expr-list)))
+                  (setf op2 tmp-var2))))
         (progn
           ;; first add iter-var or tmp-var for value?
-          (if (is-iter-variable-p (car expr-list))
-              (setf op1 (get-iter-variable-name (car expr-list)))
-              (setf op1 tmp-var2))
-          (setf op2 tmp-var)))
+          (if (equal "(" (car expr-list))
+              (progn
+                (setf tmp-buffer *definition_buffer*)
+                (dbg "add-bigint-operands: " (car expr-list))
+                (setf expr-list (parse-expression expr-list t))
+                (setf *definition_buffer* tmp-buffer))
+              (progn
+                (if (is-iter-variable-p (car expr-list))
+                    (setf op1 (get-iter-variable-name (car expr-list)))
+                    (setf op1 tmp-var2))
+                (setf op2 tmp-var)))))
     ;; operate
     (add-code op1)
     (add-code ",")
@@ -1934,13 +1939,28 @@
   expr-list)
 
 (defun add-bigint-term (expr-list tmp-var operator &optional (first-time nil))
-  (let ((tmp-var2 (gensym))
-        (value (get-bigint (car expr-list))))
+  (let ((tmp-target *target*)
+        (tmp-var2 (gensym))
+        (value (get-bigint (car expr-list)))
+        (tmp-buffer))
+    (dbg "add-bigint-term: " (car expr-list))
     ;; declare var for values
-    (if (not (is-iter-variable-p (car expr-list)))
-        (if (is-bigint-p (car expr-list))
-            (add-bigint-declaration tmp-var2 value) ;; bigint
-            (add-bigint-declaration tmp-var2 (car expr-list)))) ;; integer
+    (if (equal "(" (car expr-list))
+        (progn
+          (setf tmp-buffer *definition_buffer*)
+          (set-target 'definition-buffer)
+          (setf *definition_buffer* '(""))
+          (dbg "add-bigint-term: " (car expr-list))
+          (setf expr-list (parse-expression expr-list t))
+          (setf *definition_buffer* tmp-buffer)
+          (set-target tmp-target)
+          (insert-definition-buffer)
+          (setf *definition_buffer* '(""))
+          (setf *definition_buffer* tmp-buffer))
+        (if (not (is-iter-variable-p (car expr-list)))
+            (if (is-bigint-p (car expr-list))
+                (add-bigint-declaration tmp-var2 value) ;; bigint
+                (add-bigint-declaration tmp-var2 (car expr-list))))) ;; integer
     ;; add mpz_call
     (add-code (get-bigint-operator operator))
     (add-code "(")
@@ -1965,8 +1985,11 @@
 (defun parse-bigint-operation (expr-list operator)
   (let ((tmp-target *target*)
         (tmp-var (gensym))
-        (first-time t))
+        (first-time t)
+        (tmp-buffer))
+    (dbg "parse-bigint-operation: " operator " next " (car expr-list))
     ;; switch target - clear buffer
+    (setf tmp-buffer *definition_buffer*)
     (set-target 'definition-buffer)
     (setf *definition_buffer* '(""))
     ;; add mpz_t and init with 0 +/- or 1 */ 
@@ -1981,12 +2004,14 @@
     (set-target tmp-target)
     (insert-definition-buffer)
     (setf *definition_buffer* '(""))
+    (setf *definition_buffer* tmp-buffer)
     ;; end add var
     (add-code "(")
     (add-code tmp-var)
     (return-from parse-bigint-operation expr-list)))
 
 (defun parse-call (expr-list)
+  (dbg "parse-call >" (car expr-list) "<")
   (cond ((equal ")" (car expr-list))
          (return-from parse-call (cdr expr-list)))
         ((equal "," (car expr-list))
@@ -2757,7 +2782,7 @@
 (defun parse-expression (expr-list &optional (omit nil))
   (if expr-list
       (progn
-        (dbg "parse-expression: enter " (car expr-list))
+        (dbg "parse-expression: >" (car expr-list) "<")
         (if (not expr-list)
             (return-from parse-expression expr-list))
         (if (equal "," (car expr-list))
