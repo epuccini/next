@@ -596,8 +596,9 @@
 (defun type-of-number-string (numstr)
   (cond ((and
           (typep (parse-integer numstr :junk-allowed t) 'integer)
-          (not (find #\. numstr)))
-         (return-from type-of-number-string "i32"))
+          (not (find #\. numstr))
+          (not (is-bigint-p numstr))
+          (return-from type-of-number-string "i32")))
         ((search "d0" numstr)
          (return-from type-of-number-string "f64"))
         ((typep (parse-float numstr
@@ -1613,6 +1614,8 @@
         (return-from is-previous-cast-p t)))
   nil)
 
+(defvar *tmp-var* nil)
+
 (defun parse-bigint-number (expr-list)
   (let ((tmp-var (gensym))
         (tmp-target *target*))
@@ -1645,6 +1648,7 @@
       (insert-definition-buffer)
       (setf *definition_buffer* '(""))
       (add-code tmp-var)
+      (setf *tmp-var* tmp-var)
       (return-from parse-bigint-number expr-list))))
                     
 (defun parse-arguments (expr-list max)
@@ -1927,12 +1931,20 @@
           ;; add var or tmp-var for value?
           (if (is-iter-variable-p (car expr-list))
               (add-code (get-iter-variable-name (car expr-list)))
-              (add-code tmp-var2)))
+              (if (is-bigint-p (car expr-list))
+                  (progn
+                    (setf expr-list (parse-expression expr-list t))
+                    (add-code *tmp-var*)) 
+                  (add-code tmp-var2))))
         (progn
           ;; add var or tmp-var for value?
           (if (is-iter-variable-p (car expr-list))
               (add-code (get-iter-variable-name (car expr-list)))
-              (add-code tmp-var2))
+              (if (is-bigint-p (car expr-list))
+                  (progn
+                    (setf expr-list (parse-expression expr-list t))
+                    (add-code *tmp-var*))
+                  (add-code tmp-var2)))
           (add-code ",")
           (add-code tmp-var)))
     (add-code ")")
@@ -1943,7 +1955,7 @@
     (insert-definition-buffer)
     (setf *definition_buffer* '(""))
     expr-list))
-
+  
 (defun parse-bigint-operation-x (expr-list tmp-var operator)
      ;(if (equal "(" (car expr-list))
      ;   (setf expr-list (parse-expression expr-list t)))
