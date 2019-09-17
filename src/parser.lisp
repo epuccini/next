@@ -1810,46 +1810,105 @@
       (return-from get-bigint-operator "mpz_div"))
   (if (or (equal "mul" operator) (equal "*" operator))
       (return-from get-bigint-operator "mpz_mul")))
-  
-(defun parse-bigint-operation (expr-list operator)
-  (let ((tmp-target *target*)
-        (tmp-var (gensym)))
-    (add-code "(")
+
+(defun insert-definition-buffer ()
+  (if (equal *target* 'code)
+      (progn
+        (setf *code_list* (list-into-list
+                           *code_list*
+                           *definition_buffer*
+                           *line-start-code*))
+              (setf *line-start-code* (+ *line-start-code*
+                                         (length *definition_buffer*)))))
+  (if (equal *target* 'implementation)
+      (progn
+        (setf *implementation_list* (list-into-list
+                                     *implementation_list*
+                                     *definition_buffer*
+                                     *line-start-implementation*))
+              (setf *line-start-implementation* (+ *line-start-implementation*
+                                         (length *definition_buffer*))))))
+(defun add-bigint-declaration (tmp-var &optional (value "0"))
+  (let ((tmp-target *target*))
     (setf *target* 'definition-buffer)
     (setf *definition_buffer* '(""))
     (add-code "mpz_t")
     (add-code " ")
     (add-code tmp-var)
     (add-code (format nil ";~%"))
-    (add-code "mpz_init")
+    (add-code "mpz_init_set_str")
     (add-code "(")
     (add-code tmp-var)
+    (add-code ",")
+    (add-code (format nil "\"~a\"" value))
+    (add-code ",")
+    (add-code "10")
     (add-code ")")
     (add-code (format nil ";~%"))
+    (setf *target* tmp-target)
+    (insert-definition-buffer)))
+   
+(defun add-bigint-code (expr-list tmp-var operator &optional (first-time nil))
+  (let ((tmp-target *target*)
+        (tmp-var2 (gensym)))
+    ;; switch target - clear buffer
+    (setf *target* 'definition-buffer)
+    (setf *definition_buffer* '(""))
+    ;; declare var for values
+    (if (not (is-iter-variable-p (car expr-list)))
+        (add-bigint-declaration tmp-var2 (car expr-list)))
     (add-code (get-bigint-operator operator))
     (add-code "(")
     (add-code tmp-var)
     (add-code ",")
-    (add-code (get-iter-variable-name (car expr-list)))
-    (setf expr-list (cdr expr-list))
-    (add-code ",")
-    (add-code (get-iter-variable-name (car expr-list)))
+    ;; turn around operator when doing subtraction / division
+    (if (and (not first-time)
+             (or (equal "/" operator) (equal "/" operator)))
+        (progn
+          (add-code tmp-var)
+          (add-code ",")
+          ;; add var or tmp-var for value?
+          (if (is-iter-variable-p (car expr-list))
+              (add-code (get-iter-variable-name (car expr-list)))
+              (add-code tmp-var2)))
+        (progn
+          ;; add var or tmp-var for value?
+          (if (is-iter-variable-p (car expr-list))
+              (add-code (get-iter-variable-name (car expr-list)))
+              (add-code tmp-var2))
+          (add-code ",")
+          (add-code tmp-var)))
     (add-code ")")
     (add-code (format nil ";~%"))
     (setf expr-list (cdr expr-list))
+    ;; swith target and insert buffer
     (setf *target* tmp-target)
-    (if (equal *target* 'code)
-        (setf *code_list* (list-into-list
-                           *code_list*
-                           *definition_buffer*
-                           *line-start-code*)))
-    (if (equal *target* 'implementation)
-        (setf *implementation_list* (list-into-list
-                                     *implementation_list*
-                                     *definition_buffer*
-                                     *line-start-implementation*)))
-    (dbg "buffer: " *definition_buffer*)
+    (insert-definition-buffer)
     (setf *definition_buffer* '(""))
+    expr-list))
+
+(defun parse-bigint-operation-x (expr-list tmp-var operator)
+     ;(if (equal "(" (car expr-list))
+     ;   (setf expr-list (parse-expression expr-list t)))
+  (if (not (equal ")" (car expr-list)))
+      (progn
+        (setf expr-list (add-bigint-code expr-list tmp-var operator))
+        (setf expr-list (parse-bigint-operation-x expr-list tmp-var operator)))
+      (return-from parse-bigint-operation-x expr-list)))
+
+(defun parse-bigint-operation (expr-list operator)
+  (let ((tmp-var (gensym))
+        (first-time t))
+    ;; add mpz_t and init with 0 +/- or 1 */ 
+    (if (or (equal "*" operator) (equal "/" operator))
+        (add-bigint-declaration tmp-var "1")
+        (add-bigint-declaration tmp-var))
+    ;; add calculation code
+    (setf expr-list (add-bigint-code expr-list tmp-var operator first-time))
+    ;; next var
+    (setf expr-list (parse-bigint-operation-x expr-list tmp-var operator))
+    ;; end add var
+    (add-code "(")
     (add-code tmp-var)
     (return-from parse-bigint-operation expr-list)))
 
