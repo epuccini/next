@@ -1900,8 +1900,7 @@
   (add-code (format nil ";~%")))
 
 (defun add-bigint-operands (expr-list tmp-var tmp-var2 operator &optional (first-time nil))
-  (let ((tmp-target *target*)
-        (tmp-buffer '(""))
+  (let ((tmp-buffer '(""))
         (op1 "")
         (op2 ""))
     ;; turn around operator when doing subtraction / division
@@ -1939,24 +1938,24 @@
   expr-list)
 
 (defun add-bigint-term (expr-list tmp-var operator &optional (first-time nil))
-  (let ((tmp-target *target*)
-        (tmp-var2 (gensym))
-        (value (get-bigint (car expr-list)))
-        (tmp-buffer))
+  (let ((tmp-var2 (gensym))
+        (value (get-bigint (car expr-list))))
     (dbg "add-bigint-term: " (car expr-list))
     ;; declare var for values
+    (if (equal ")" (car expr-list))
+        (return-from add-bigint-term expr-list))
     (if (equal "(" (car expr-list))
         (progn
-          (setf tmp-buffer *definition_buffer*)
-          (set-target 'definition-buffer)
-          (setf *definition_buffer* '(""))
-          (dbg "add-bigint-term: " (car expr-list))
-          (setf expr-list (parse-expression expr-list t))
-          (setf *definition_buffer* tmp-buffer)
-          (set-target tmp-target)
-          (insert-definition-buffer)
-          (setf *definition_buffer* '(""))
-          (setf *definition_buffer* tmp-buffer))
+          (setf expr-list (cdr expr-list))
+          (setf operator (car expr-list))
+          (setf expr-list (cdr expr-list))
+          (setf tmp-var (gensym))
+          ;; next var
+          (if (or (equal "*" operator) (equal "/" operator))
+              (add-bigint-declaration tmp-var "1")
+              (add-bigint-declaration tmp-var))
+          (setf expr-list (add-bigint-term expr-list tmp-var operator))
+          (setf expr-list (parse-bigint-operation-next expr-list tmp-var operator)))
         (if (not (is-iter-variable-p (car expr-list)))
             (if (is-bigint-p (car expr-list))
                 (add-bigint-declaration tmp-var2 value) ;; bigint
