@@ -1909,27 +1909,29 @@
   (add-code (format nil ";~%")))
 
 (defun add-bigint-operands (expr-list tmp-var tmp-var2 operator &optional (first-time nil))
-  (let ((tmp-buffer '("")))
+  (let ((tmp-buffer '(""))
+        (op1 "")
+        (op2 ""))
     ;; turn around operator when doing subtraction / division
-  (if (and (not first-time)
-           (equal "/" operator))
-      (progn
-        ;; first tmp-var
-        (add-code tmp-var)
-        (add-code ",")
-        ;; second add iter-variable or tmp-var for value?
-        (if (is-iter-variable-p (car expr-list))
-            (add-code (get-iter-variable-name (car expr-list)))
-            (add-code tmp-var2)))
-      (progn
-        ;; first add iter-var or tmp-var for value?
-        (if (is-iter-variable-p (car expr-list))
-            (add-code (get-iter-variable-name (car expr-list)))
-            (add-code tmp-var2))
-        (add-code ",")
-        ;; second add second operand
-        (add-code tmp-var)))
-  expr-list))
+    (if (and (not first-time)
+             (equal "/" operator))
+        (progn
+          (setf op1 tmp-var)
+          ;; second add iter-variable or tmp-var for value?
+          (if (is-iter-variable-p (car expr-list))
+              (setf op2 (get-iter-variable-name (car expr-list)))
+              (setf op2 tmp-var2)))
+        (progn
+          ;; first add iter-var or tmp-var for value?
+          (if (is-iter-variable-p (car expr-list))
+              (setf op1 (get-iter-variable-name (car expr-list)))
+              (setf op1 tmp-var2))
+          (setf op2 tmp-var)))
+    ;; operate
+    (add-code op1)
+    (add-code ",")
+    (add-code op2))
+  expr-list)
 
 (defun add-bigint-term (expr-list tmp-var operator &optional (first-time nil))
   (let ((tmp-var2 (gensym))
