@@ -1847,13 +1847,15 @@
     ,expr-list))
 
 (defun list-into-list (lista listb index)
-  (let ((new-list '()))
+  (let ((new-list '())
+        (lena (length lista))
+        (lenb (length listb)))
     (loop for x from 0 to (1- (length lista)) do
-         (setf new-list (append new-list (list (elt lista x))) )
-         (if (equal x (1- index))
+         (push (elt lista (- lena x 1)) new-list)
+         (if (equal x (- lena index 1))
              (progn
                (loop for y from 0 to (1- (length listb)) do
-                    (setf new-list (append new-list (list (elt listb y))))))))
+                    (push (elt listb (- lenb y 1)) new-list)))))
     new-list))
 
 (defun get-bigint-operator (operator)
