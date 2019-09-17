@@ -1894,26 +1894,22 @@
               (setf *line-start-implementation* (+ *line-start-implementation*
                                          (length *definition_buffer*))))))
 (defun add-bigint-declaration (tmp-var &optional (value "0"))
-  (let ((tmp-target *target*))
-    (set-target 'definition-buffer)
-    (setf *definition_buffer* '(""))
-    (add-code "mpz_t")
-    (add-code " ")
-    (add-code tmp-var)
-    (add-code (format nil ";~%"))
-    (add-code "mpz_init_set_str")
-    (add-code "(")
-    (add-code tmp-var)
-    (add-code ",")
-    (add-code (format nil "\"~a\"" value))
-    (add-code ",")
-    (add-code "10")
-    (add-code ")")
-    (add-code (format nil ";~%"))
-    (set-target tmp-target)
-    (insert-definition-buffer)))
+  (add-code "mpz_t")
+  (add-code " ")
+  (add-code tmp-var)
+  (add-code (format nil ";~%"))
+  (add-code "mpz_init_set_str")
+  (add-code "(")
+  (add-code tmp-var)
+  (add-code ",")
+  (add-code (format nil "\"~a\"" value))
+  (add-code ",")
+  (add-code "10")
+  (add-code ")")
+  (add-code (format nil ";~%")))
 
 (defun add-bigint-operand (expr-list tmp-var tmp-var2 operator &optional (first-time nil))
+  (let ((tmp-buffer '("")))
   ;; turn around operator when doing subtraction / division
   (if (and (not first-time)
            (equal "/" operator))
@@ -1925,7 +1921,9 @@
             (add-code (get-iter-variable-name (car expr-list)))
             (if (is-bigint-p (car expr-list))
                 (progn
+                  (setf tmp-buffer *definition_buffer*)
                   (setf expr-list (parse-expression expr-list t))
+                  (setf *definition_buffer* tmp-buffer)
                   (add-code *tmp-var*)) 
                 (add-code tmp-var2))))
       (progn
@@ -1934,19 +1932,17 @@
             (add-code (get-iter-variable-name (car expr-list)))
             (if (is-bigint-p (car expr-list))
                 (progn
+                  (setf tmp-buffer *definition_buffer*)
                   (setf expr-list (parse-expression expr-list t))
+                  (setf *definition_buffer* tmp-buffer)
                   (add-code *tmp-var*))
                 (add-code tmp-var2)))
         (add-code ",")
         (add-code tmp-var)))
-  expr-list)
+  expr-list))
 
 (defun add-bigint-term (expr-list tmp-var operator &optional (first-time nil))
-  (let ((tmp-target *target*)
-        (tmp-var2 (gensym)))
-    ;; switch target - clear buffer
-    (set-target 'definition-buffer)
-    (setf *definition_buffer* '(""))
+  (let ((tmp-var2 (gensym)))
     ;; declare var for values
     (if (not (is-iter-variable-p (car expr-list)))
         (add-bigint-declaration tmp-var2 (car expr-list)))
@@ -1962,22 +1958,22 @@
     ;; end of operation
     (add-code (format nil ";~%"))
     (setf expr-list (cdr expr-list))
-    ;; swith target and insert buffer
-    (set-target tmp-target)
-    (insert-definition-buffer)
-    (setf *definition_buffer* '(""))
     expr-list))
   
 (defun parse-bigint-operation-next (expr-list tmp-var operator)
   (if (not (equal ")" (car expr-list)))
       (progn
         (setf expr-list (add-bigint-term expr-list tmp-var operator))
-        (setf expr-list (parse-bigint-operation-x expr-list tmp-var operator)))
-      (return-from parse-bigint-operation-x expr-list)))
+        (setf expr-list (parse-bigint-operation-next expr-list tmp-var operator)))
+      (return-from parse-bigint-operation-next expr-list)))
 
 (defun parse-bigint-operation (expr-list operator)
-  (let ((tmp-var (gensym))
+  (let ((tmp-target *target*)
+        (tmp-var (gensym))
         (first-time t))
+    ;; switch target - clear buffer
+    (set-target 'definition-buffer)
+    (setf *definition_buffer* '(""))
     ;; add mpz_t and init with 0 +/- or 1 */ 
     (if (or (equal "*" operator) (equal "/" operator))
         (add-bigint-declaration tmp-var "1")
@@ -1986,6 +1982,10 @@
     (setf expr-list (add-bigint-term expr-list tmp-var operator first-time))
     ;; next var
     (setf expr-list (parse-bigint-operation-next expr-list tmp-var operator))
+    ;; swith target and insert buffer
+    (set-target tmp-target)
+    (insert-definition-buffer)
+    (setf *definition_buffer* '(""))
     ;; end add var
     (add-code "(")
     (add-code tmp-var)
