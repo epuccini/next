@@ -1917,6 +1917,7 @@
 (defun add-bigint-term (expr-list tmp-var operator)
   (let ((op1 tmp-var)
         (op2)
+        (skip nil)
         (tmp-var2 (gensym)))
     
     (dbg "add-bigint-term: " (car expr-list))
@@ -1926,7 +1927,8 @@
           (dbg "add-bigint-term: 1 " (car expr-list))
           (setf expr-list (parse-expression expr-list t))
           (dbg "add-bigint-term: 2 " (car expr-list))
-          (setf op2 *temp-var*))
+          (setf op2 *temp-var*)
+          (setf skip t))
         (if (not (is-iter-variable-p (car expr-list)))
             (if (is-bigint-p (car expr-list))
                 (progn
@@ -1949,7 +1951,8 @@
     (add-code ")")
     ;; end of operation
     (add-code (format nil ";~%"))
-    (setf expr-list (cdr expr-list))
+    (if (not skip)
+        (setf expr-list (cdr expr-list)))
     expr-list))
   
 (defun parse-bigint-operation-next (expr-list tmp-var operator)

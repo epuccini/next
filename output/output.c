@@ -423,15 +423,16 @@ mpz_mul(G553,G553,value2_2);
 mpz_t G551;
 mpz_init_set(G551,value1_2);
 mpz_sub(G551,G551,G553);
+mpz_sub(G551,G551,value2_2);
 prnl_ixx((G551));
-mpz_t G555;
-mpz_init_set(G555,value1_2);
-mpz_mul(G555,G555,value2_2);
-prnl_ixx((G555));
-mpz_t G557;
-mpz_init_set(G557,value1_2);
-mpz_div(G557,G557,value2_2);
-prnl_ixx((G557));
+mpz_t G556;
+mpz_init_set(G556,value1_2);
+mpz_mul(G556,G556,value2_2);
+prnl_ixx((G556));
+mpz_t G558;
+mpz_init_set(G558,value1_2);
+mpz_div(G558,G558,value2_2);
+prnl_ixx((G558));
 }
 }
 i32 main()
