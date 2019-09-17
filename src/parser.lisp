@@ -15,6 +15,7 @@
 (defvar *code_list* '(""))
 (defvar *definition_list* '(""))
 (defvar *implementation_list* '(""))
+(defvar *definition_buffer* '(""))
 (defvar *target* 'code)
 
 ;; counters and flags
@@ -23,6 +24,8 @@
 (defvar *error* nil)
 (defvar *emitted* nil)
 (defvar *paranteses* 0)
+(defvar *line-start-code* 0)
+(defvar *line-start-implementation* 0)
 
 ;; function and var storage
 
@@ -549,7 +552,10 @@
                                                  (list expression))))
             ((equal *target* 'definition)
              (setf *definition_list* (append *definition_list*
-                                             (list expression)))))))
+                                             (list expression))))
+            ((equal *target* 'definition-buffer)
+             (setf *definition_buffer* (append *definition_buffer*
+                                               (list expression)))))))
 
 (defun get-last-code ()
   (cond ((equal *target* 'code)
@@ -1473,6 +1479,8 @@
                  (setq type-str "i32"))
                 ((equal type "fixnum")
                  (setq type-str "i64"))
+                ((equal type "big-integer")
+                 (setq type-str "ixx"))
                 ((equal type "double-float")
                  (setq type-str "f64"))
                 ((equal type "single-float")
@@ -1501,6 +1509,8 @@
                  (setq type-str "c8>"))
                 ((equal type "integer-pointer")
                  (setq type-str "i32>"))
+                ((equal type "big-integer-pointer")
+                 (setq type-str "ixx>"))
                 ((equal type "double-float-pointer")
                  (setq type-str "f64>"))
                 ((equal type "single-float-pointer")
@@ -1764,6 +1774,68 @@
      (setf expr-list (parse-arguments (cdr ,expr-list) ,max))
      (return-from parse-call ,expr-list)))
 
+(defun list-into-list (lista listb index)
+  (let ((new-list '()))
+    (loop for x from 0 to (1- (length lista)) do
+         (setf new-list (append new-list (list (elt lista x))) )
+         (if (equal x (1- index))
+             (progn
+               (loop for y from 0 to (1- (length listb)) do
+                    (setf new-list (append new-list (list (elt listb y))))))))
+    new-list))
+
+(defun get-bigint-operator (operator)
+  (if (or (equal "add" operator) (equal "+" operator))
+      (return-from get-bigint-operator "mpz_add"))
+  (if (or (equal "sub" operator) (equal "-" operator))
+      (return-from get-bigint-operator "mpz_sub"))
+  (if (or (equal "div" operator) (equal "/" operator))
+      (return-from get-bigint-operator "mpz_div"))
+  (if (or (equal "mul" operator) (equal "*" operator))
+      (return-from get-bigint-operator "mpz_mul")))
+  
+(defun parse-bigint-operation (expr-list operator)
+  (let ((tmp-target *target*)
+        (tmp-var (gensym)))
+    (add-code "(")
+    (setf *target* 'definition-buffer)
+    (setf *definition_buffer* '(""))
+    (add-code "mpz_t")
+    (add-code " ")
+    (add-code tmp-var)
+    (add-code (format nil ";~%"))
+    (add-code "mpz_init")
+    (add-code "(")
+    (add-code tmp-var)
+    (add-code ")")
+    (add-code (format nil ";~%"))
+    (add-code (get-bigint-operator operator))
+    (add-code "(")
+    (add-code tmp-var)
+    (add-code ",")
+    (add-code (get-iter-variable-name (car expr-list)))
+    (setf expr-list (cdr expr-list))
+    (add-code ",")
+    (add-code (get-iter-variable-name (car expr-list)))
+    (add-code ")")
+    (add-code (format nil ";~%"))
+    (setf expr-list (cdr expr-list))
+    (setf *target* tmp-target)
+    (if (equal *target* 'code)
+        (setf *code_list* (list-into-list
+                           *code_list*
+                           *definition_buffer*
+                           *line-start-code*)))
+    (if (equal *target* 'implementation)
+        (setf *implementation_list* (list-into-list
+                                     *implementation_list*
+                                     *definition_buffer*
+                                     *line-start-implementation*)))
+    (dbg "buffer: " *definition_buffer*)
+    (setf *definition_buffer* '(""))
+    (add-code tmp-var)
+    (return-from parse-bigint-operation expr-list)))
+                 
 (defun parse-call (expr-list)
   (cond ((equal ")" (car expr-list))
          (return-from parse-call (cdr expr-list)))
@@ -1945,57 +2017,91 @@
            (setf expr-list (parse-arguments (cdr expr-list) 2))
            (return-from parse-call expr-list)))
         ((or (equal "add" (car expr-list)) (equal "+" (car expr-list)))
-         (store-current-function "add")
-         (dbg "parse-call: operator + ")
-         (setf expr-list (cdr expr-list))
-         (add-code "(")
-         (if (not (equal ")" (car expr-list)))
-             (progn
-               (dbg "parse-call: parse-infix notation " (get-iter-variable-name (car expr-list)))
-               (setf expr-list (parse-infix expr-list "+")))
-             (error-operator-not-defined expr-list))
-         (setf expr-list (parse-arguments expr-list
-                                              (count-elements expr-list)))
-         (return-from parse-call expr-list))
+         (let ((type (get-next-token-type-string (cdr expr-list))))
+           (store-current-function "add")     
+           (setf expr-list (cdr expr-list))
+           (if (equal "ixx" type)
+               (progn
+                 (setf expr-list (parse-bigint-operation expr-list "+"))
+                 (return-from parse-call expr-list)))
+           (add-code "(")
+           (if (not (equal ")" (car expr-list)))
+               (progn
+                 (dbg "parse-call: parse-infix notation " (get-iter-variable-name (car expr-list)))
+                 (setf expr-list (parse-infix expr-list "+")))
+               (error-operator-not-defined expr-list))
+           (setf expr-list (parse-arguments expr-list
+                                            (count-elements expr-list)))
+           (return-from parse-call expr-list)))
         ((or (equal "sub" (car expr-list)) (equal "-" (car expr-list)))
-         (store-current-function "sub")
-         (dbg "parse-call: operator - ")
-         (setf expr-list (cdr expr-list))
-         (add-code "(")
-         (if (not (equal ")" (car expr-list)))
-             (progn
-               (dbg "parse-call: parse-infix notation " (car expr-list))
-               (setf expr-list (parse-infix expr-list "-")))
-             (error-operator-not-defined expr-list))
-         (setf expr-list (parse-arguments expr-list
-                                              (count-elements expr-list)))
-         (return-from parse-call expr-list))
+         (let ((type (get-next-token-type-string (cdr expr-list))))
+           (store-current-function "sub")
+           (setf expr-list (cdr expr-list))
+           (if (equal "ixx" type)
+               (progn
+                 (setf expr-list (parse-bigint-operation expr-list "-"))
+                 (return-from parse-call expr-list)))
+           (add-code "(")
+           (if (not (equal ")" (car expr-list)))
+               (progn
+                 (dbg "parse-call: parse-infix notation " (get-iter-variable-name (car expr-list)))
+                 (setf expr-list (parse-infix expr-list "-")))
+               (error-operator-not-defined expr-list))
+           (setf expr-list (parse-arguments expr-list
+                                            (count-elements expr-list)))
+           (return-from parse-call expr-list)))
         ((or (equal "mul" (car expr-list)) (equal "*" (car expr-list)))
-         (store-current-function "mul")
-         (dbg "parse-call: operator * ")
-         (setf expr-list (cdr expr-list))
-         (add-code "(")
-         (if (not (equal ")" (car expr-list)))
-             (progn
-               (dbg "parse-call: parse-infix notation " (car expr-list))
-               (setf expr-list (parse-infix expr-list "*")))
-             (error-operator-not-defined expr-list))
-         (setf expr-list (parse-arguments expr-list
-                                              (count-elements expr-list)))
-         (return-from parse-call expr-list))
+         (let ((type (get-next-token-type-string (cdr expr-list))))
+           (store-current-function "mul")
+           (setf expr-list (cdr expr-list))
+           (if (equal "ixx" type)
+               (progn
+                 (setf expr-list (parse-bigint-operation expr-list "*"))
+                 (return-from parse-call expr-list)))
+           (add-code "(")
+           (if (not (equal ")" (car expr-list)))
+               (progn
+                 (dbg "parse-call: parse-infix notation " (get-iter-variable-name (car expr-list)))
+                 (setf expr-list (parse-infix expr-list "*")))
+               (error-operator-not-defined expr-list))
+           (setf expr-list (parse-arguments expr-list
+                                            (count-elements expr-list)))
+           (return-from parse-call expr-list)))
         ((or (equal "div" (car expr-list)) (equal "/" (car expr-list)))
-         (store-current-function "div")
-         (dbg "parse-call: operator / ")
-         (setf expr-list (cdr expr-list))
-         (add-code "(")
-         (if (not (equal ")" (car expr-list)))
-             (progn
-               (dbg "parse-call: parse-infix notation " (car expr-list))
-               (setf expr-list (parse-infix expr-list "/")))
-             (error-operator-not-defined expr-list))
-         (setf expr-list (parse-arguments expr-list
-                                              (count-elements expr-list)))
-         (return-from parse-call expr-list))
+         (let ((type (get-next-token-type-string (cdr expr-list))))
+           (store-current-function "div")
+           (setf expr-list (cdr expr-list))
+           (if (equal "ixx" type)
+               (progn
+                 (setf expr-list (parse-bigint-operation expr-list "/"))
+                 (return-from parse-call expr-list)))
+           (add-code "(")
+           (if (not (equal ")" (car expr-list)))
+               (progn
+                 (dbg "parse-call: parse-infix notation " (get-iter-variable-name (car expr-list)))
+                 (setf expr-list (parse-infix expr-list "/")))
+               (error-operator-not-defined expr-list))
+           (setf expr-list (parse-arguments expr-list
+                                            (count-elements expr-list)))
+           (return-from parse-call expr-list)))
+        ((or (equal "mul" (car expr-list)) (equal "*" (car expr-list)))
+         (let ((type (get-next-token-type-string (cdr expr-list))))
+           (store-current-function "mul")
+           (setf expr-list (cdr expr-list))
+           (if (equal "ixx" type)
+               (progn
+                 (setf expr-list (parse-bigint-operation expr-list "*"))
+                 (return-from parse-call expr-list)))
+           (add-code "(")
+           (if (not (equal ")" (car expr-list)))
+               (progn
+                 (dbg "parse-call: parse-infix notation " (get-iter-variable-name (car expr-list)))
+                 (setf expr-list (parse-infix expr-list "*")))
+               (error-operator-not-defined expr-list))
+           (setf expr-list (parse-arguments expr-list
+                                            (count-elements expr-list)))
+           (return-from parse-call expr-list)))
+
         ((or (equal "sqrt" (car expr-list)) (equal "√" (car expr-list)))
          (let ((type (get-next-token-type-string (cdr expr-list))))
            (store-current-function "sqrt")
@@ -2287,6 +2393,10 @@
          (parse-type-cast expr-list "f64" "f64"))
         ((equal "f80" (car expr-list))
          (parse-type-cast expr-list "f80" "f80"))
+        ((equal "ixx" (car expr-list))
+         (setf expr-list (cdr expr-list))
+         (setf expr-list (parse-arguments expr-list (1- (count-elements expr-list))))
+         (return-from parse-call expr-list))
         ((equal "string" (car expr-list))
          (parse-type-cast expr-list "string" "string"))
         ((equal "cstring" (car expr-list))
@@ -2317,6 +2427,8 @@
          (parse-type-cast expr-list "f64>" "f64*"))
         ((equal "f80>" (car expr-list))
          (parse-type-cast expr-list "f80>" "f80*"))
+        ((equal "ixx>>" (car expr-list))
+         (parse-type-cast expr-list "ixx>" "ixx*"))
         ((equal "string>" (car expr-list))
          (parse-type-cast expr-list "string>" "string*"))
         ((equal "cstring>" (car expr-list))
@@ -2347,6 +2459,8 @@
          (parse-type-cast expr-list "f64>>" "f64**"))
         ((equal "f80>>" (car expr-list))
          (parse-type-cast expr-list "f80>>" "f80**"))
+        ((equal "ixx>>" (car expr-list))
+         (parse-type-cast expr-list "ixx>>" "ixx**"))
         ((equal "string>>" (car expr-list))
          (parse-type-cast expr-list "string>>" "string**"))
         ((equal "cstring>>" (car expr-list))
@@ -2553,6 +2667,7 @@
          (equal x (get-iter-variable-name (car split))))
      (hash-table-keys *variable-type*))))
 
+
 (defun parse-expression (expr-list &optional (omit nil))
   (if expr-list
       (progn
@@ -2693,6 +2808,12 @@
         (if (equal "(" (car expr-list))
             (let ((space nil)
                   (no-parens nil))
+              ;; add macro
+              (if (equal (get-last-code) (format nil ";~%"))
+                  (progn
+                    (setf *line-start-code* (length *code_list*))
+                    (setf *line-start-implementation* (length *implementation_list*))))
+
               ;; parse-open-parens
               (setf expr-list (parse-open-parens expr-list))
               (inc-parens)
@@ -2721,8 +2842,6 @@
                   (setf no-parens t))
               ;; parse-call
               (setf expr-list (parse-call expr-list))
-              (dbg "parse-expression: CALL END rest " (car expr-list)
-                   " parens " *paranteses* " block " *block*)
               (dbg "parse-expression: CLOSE parens " *paranteses* " block " *block*
                    " omit " omit)
               (if (car expr-list)
@@ -2731,7 +2850,8 @@
                   (add-code ")"))
               (dec-parens)
               (if (and (not space) (not omit))
-                  (add-code (format nil ";~%")))
+                  (progn
+                    (add-code (format nil ";~%"))))
               ;; exit
               (return-from parse-expression expr-list))))))
   

@@ -331,7 +331,11 @@ by Edward Puccini |;
         value2:ixx 3212]
     (prnl "Bigints!!!")
     (prnl value1)
-    (prnl value2)))
+    (prnl value2)
+    (prnl (ixx (+ value1 value2)))
+    (prnl (ixx (- value1 value2)))
+    (prnl (ixx (* value1 value2)))
+    (prnl (ixx (/ value1 value2)))))
         
 (defn main:i32 []
   (let [ret:i32 (arrays-and-lists 77)]

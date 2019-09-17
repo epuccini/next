@@ -398,6 +398,22 @@ append_ptr(value2_2, sizeof(value2_2)/sizeof(ixx), IXX);
 println_string("Bigints!!!");
 prnl_ixx(value1_2);
 prnl_ixx(value2_2);
+mpz_t G547;
+mpz_init(G547);
+mpz_add(G547,value1_2,value2_2);
+prnl_ixx((G547));
+mpz_t G548;
+mpz_init(G548);
+mpz_sub(G548,value1_2,value2_2);
+prnl_ixx((G548));
+mpz_t G549;
+mpz_init(G549);
+mpz_mul(G549,value1_2,value2_2);
+prnl_ixx((G549));
+mpz_t G550;
+mpz_init(G550);
+mpz_div(G550,value1_2,value2_2);
+prnl_ixx((G550));
 }
 }
 i32 main()
