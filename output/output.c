@@ -389,7 +389,7 @@ void bigints_0_void()
 {
 ixx value1_2;
 mpz_init(value1_2);
-create_str_ixx(value1_2,"1234");
+create_str_ixx(value1_2,"51234");
 append_ptr(value1_2, sizeof(value1_2)/sizeof(ixx), IXX);
 ixx value2_2;
 mpz_init(value2_2);
