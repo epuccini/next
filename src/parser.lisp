@@ -1913,7 +1913,7 @@
     (set-target tmp-target)
     (insert-definition-buffer)))
 
-(defun add-bigint-operator (expr-list tmp-var tmp-var2 operator &optional (first-time nil))
+(defun add-bigint-operand (expr-list tmp-var tmp-var2 operator &optional (first-time nil))
   ;; turn around operator when doing subtraction / division
   (if (and (not first-time)
            (equal "/" operator))
@@ -1941,7 +1941,7 @@
         (add-code tmp-var)))
   expr-list)
 
-(defun add-bigint-code (expr-list tmp-var operator &optional (first-time nil))
+(defun add-bigint-term (expr-list tmp-var operator &optional (first-time nil))
   (let ((tmp-target *target*)
         (tmp-var2 (gensym)))
     ;; switch target - clear buffer
@@ -1957,7 +1957,7 @@
     (add-code tmp-var)
     (add-code ",")
     ;; add op2
-    (setf expr-list (add-bigint-operator expr-list tmp-var tmp-var2 operator first-time))
+    (setf expr-list (add-bigint-operand expr-list tmp-var tmp-var2 operator first-time))
     (add-code ")")
     ;; end of operation
     (add-code (format nil ";~%"))
@@ -1968,10 +1968,10 @@
     (setf *definition_buffer* '(""))
     expr-list))
   
-(defun parse-bigint-operation-x (expr-list tmp-var operator)
+(defun parse-bigint-operation-next (expr-list tmp-var operator)
   (if (not (equal ")" (car expr-list)))
       (progn
-        (setf expr-list (add-bigint-code expr-list tmp-var operator))
+        (setf expr-list (add-bigint-term expr-list tmp-var operator))
         (setf expr-list (parse-bigint-operation-x expr-list tmp-var operator)))
       (return-from parse-bigint-operation-x expr-list)))
 
@@ -1983,9 +1983,9 @@
         (add-bigint-declaration tmp-var "1")
         (add-bigint-declaration tmp-var))
     ;; add calculation code
-    (setf expr-list (add-bigint-code expr-list tmp-var operator first-time))
+    (setf expr-list (add-bigint-term expr-list tmp-var operator first-time))
     ;; next var
-    (setf expr-list (parse-bigint-operation-x expr-list tmp-var operator))
+    (setf expr-list (parse-bigint-operation-next expr-list tmp-var operator))
     ;; end add var
     (add-code "(")
     (add-code tmp-var)
