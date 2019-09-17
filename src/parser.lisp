@@ -1863,7 +1863,7 @@
     (add-code ",")
     ;; turn around operator when doing subtraction / division
     (if (and (not first-time)
-             (or (equal "/" operator) (equal "/" operator)))
+             (equal "/" operator))
         (progn
           (add-code tmp-var)
           (add-code ",")
