@@ -1908,44 +1908,37 @@
   (add-code ")")
   (add-code (format nil ";~%")))
 
-(defun add-bigint-operand (expr-list tmp-var tmp-var2 operator &optional (first-time nil))
+(defun add-bigint-operands (expr-list tmp-var tmp-var2 operator &optional (first-time nil))
   (let ((tmp-buffer '("")))
-  ;; turn around operator when doing subtraction / division
+    ;; turn around operator when doing subtraction / division
   (if (and (not first-time)
            (equal "/" operator))
       (progn
+        ;; first tmp-var
         (add-code tmp-var)
         (add-code ",")
-        ;; add var or tmp-var for value?
+        ;; second add iter-variable or tmp-var for value?
         (if (is-iter-variable-p (car expr-list))
             (add-code (get-iter-variable-name (car expr-list)))
-            (if (is-bigint-p (car expr-list))
-                (progn
-                  (setf tmp-buffer *definition_buffer*)
-                  (setf expr-list (parse-expression expr-list t))
-                  (setf *definition_buffer* tmp-buffer)
-                  (add-code *tmp-var*)) 
-                (add-code tmp-var2))))
+            (add-code tmp-var2)))
       (progn
-        ;; add var or tmp-var for value?
+        ;; first add iter-var or tmp-var for value?
         (if (is-iter-variable-p (car expr-list))
             (add-code (get-iter-variable-name (car expr-list)))
-            (if (is-bigint-p (car expr-list))
-                (progn
-                  (setf tmp-buffer *definition_buffer*)
-                  (setf expr-list (parse-expression expr-list t))
-                  (setf *definition_buffer* tmp-buffer)
-                  (add-code *tmp-var*))
-                (add-code tmp-var2)))
+            (add-code tmp-var2))
         (add-code ",")
+        ;; second add second operand
         (add-code tmp-var)))
   expr-list))
 
 (defun add-bigint-term (expr-list tmp-var operator &optional (first-time nil))
-  (let ((tmp-var2 (gensym)))
+  (let ((tmp-var2 (gensym))
+        (value (get-bigint (car expr-list))))
     ;; declare var for values
     (if (not (is-iter-variable-p (car expr-list)))
-        (add-bigint-declaration tmp-var2 (car expr-list)))
+        (if (is-bigint-p (car expr-list))
+            (add-bigint-declaration tmp-var2 value) ;; bigint
+            (add-bigint-declaration tmp-var2 (car expr-list)))) ;; integer
     ;; add mpz_call
     (add-code (get-bigint-operator operator))
     (add-code "(")
@@ -1953,7 +1946,7 @@
     (add-code tmp-var)
     (add-code ",")
     ;; add op2
-    (setf expr-list (add-bigint-operand expr-list tmp-var tmp-var2 operator first-time))
+    (setf expr-list (add-bigint-operands expr-list tmp-var tmp-var2 operator first-time))
     (add-code ")")
     ;; end of operation
     (add-code (format nil ";~%"))
