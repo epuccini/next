@@ -433,6 +433,18 @@ mpz_t G558;
 mpz_init_set(G558,value1_2);
 mpz_div(G558,G558,value2_2);
 prnl_ixx((G558));
+mpz_t G563;
+mpz_init_set_str(G563,"1000",10);
+mpz_t G564;
+mpz_init_set_str(G564,"900",10);
+mpz_sub(G563,G563,G564);
+mpz_t G560;
+mpz_init_set_str(G560,"100",10);
+mpz_t G561;
+mpz_init_set_str(G561,"100",10);
+mpz_mul(G560,G560,G561);
+mpz_mul(G560,G560,G563);
+prnl_ixx((G560));
 }
 }
 i32 main()
