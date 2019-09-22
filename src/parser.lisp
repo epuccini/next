@@ -1617,12 +1617,11 @@
   (let ((tmp-var (fgensym))
         (tmp-target *target*))
     (setf (gethash *paranteses* *definition_buffer*) '(""))
-    (if (not (equal "ixx" *current-let-definition*))
-        (progn
-          (setf *target* 'definition-buffer)
-          (add-bigint-declaration tmp-var)))
     (let ((number (get-bigint (car expr-list))))
       (setf *target* 'definition-buffer)
+      (if (not (equal "ixx" *current-let-definition*))
+          (progn
+            (add-bigint-declaration tmp-var)))
       (add-code "create_str_ixx")
       (add-code "(")
       (if (equal "ixx" *current-let-definition*)
@@ -1638,7 +1637,15 @@
       (set-target tmp-target)
       (insert-definition-buffer)
       (setf (gethash *paranteses* *definition_buffer*) '(""))
-      (add-code tmp-var)
+      (if (or (not *current-let-definition*)
+           (equal "ixx" *current-let-definition*))
+          (add-code tmp-var))
+      (if *current-let-definition*
+          (progn
+            (add-code "mpz_get_si")
+            (add-code "(")
+            (add-code tmp-var)
+            (add-code ")")))
       (setf *tmp-var* tmp-var)
       (return-from parse-bigint-number expr-list))))
 

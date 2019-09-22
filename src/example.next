@@ -329,11 +329,18 @@ by Edward Puccini |;
 (defn bigints:void []
   (let [value1:ixx 5000
         value2:ixx 2
-        value3:ixx 3]
+        value3:ixx 3
+        value4:i64 B5000]
     (prnl "Bigints!!!")
     (prnl B10000)
+    (prn "Value1: ")
     (prnl value1)
+    (prn "Value2: ")
     (prnl value2)
+    (prn "Value3: ")
+    (prnl value3)
+    (prn "Value4: ")
+    (prnl value4)
     (prnl (ixx (+ value1 B500 value2 value3 1000)))
     (prnl (ixx (- value1 (* value1 value2) value2)))
     (prnl (ixx (* value1 value2)))
