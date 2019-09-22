@@ -1851,13 +1851,13 @@
     new-list))
 
 (defun get-bigint-operator (operator)
-  (if (or (equal "add" operator) (equal "+" operator))
+  (if (or (equal "add" operator) (equal "badd" operator) (equal "+" operator))
       (return-from get-bigint-operator "mpz_add"))
-  (if (or (equal "sub" operator) (equal "-" operator))
+  (if (or (equal "sub" operator) (equal "bsub" operator) (equal "-" operator))
       (return-from get-bigint-operator "mpz_sub"))
-  (if (or (equal "div" operator) (equal "/" operator))
+  (if (or (equal "div" operator) (equal "bdiv" operator) (equal "/" operator))
       (return-from get-bigint-operator "mpz_div"))
-  (if (or (equal "mul" operator) (equal "*" operator))
+  (if (or (equal "mul" operator) (equal "bmul" operator) (equal "*" operator))
       (return-from get-bigint-operator "mpz_mul")))
 
 (defun insert-definition-buffer ()
@@ -1952,7 +1952,7 @@
                   (setf op2 tmp-var2))) ;; integer
             (setf op2 (get-iter-variable-name (car expr-list))))) ;; variable
     ;; add mpz_call
-    (add-code (get-bigint-operator operator))
+    (add-code operator)
     (add-code "(")
     ;; add op1
     (add-code tmp-var)
@@ -1979,35 +1979,48 @@
 (defun parse-bigint-operation (expr-list operator)
   (let ((tmp-target *target*)
         (tmp-var (fgensym))
+        (bigint-operator (get-bigint-operator operator))
         (op1)
-        (skip nil))
-    (dbg "parse-bigint-operation: " operator " next " (car expr-list))
-    ;; switch target - clear buffer
-    (set-target 'definition-buffer)
-    (setf (gethash *paranteses* *definition_buffer*) '(""))
+        (skip nil)
+        (skip-with-var nil))
+    (dbg "parse-bigint-operation: " bigint-operator " next " (car expr-list))
+
     ;; add mpz_t and init with 0 +/- or 1 */ 
     (if (equal "(" (car expr-list))
         (progn
-          (dbg "add-bigint-operands: " (car expr-list))
+          (dbg "add-bigint-operands: 1 " (car expr-list))
           (setf expr-list (parse-expression expr-list t))
-          (setf tmp-var *temp-var*))
+          (dbg "add-bigint-operands: 2 " (car expr-list))
+          (setf tmp-var *temp-var*)
+          (setf skip t))
         (if (not (is-iter-variable-p (car expr-list)))
             (if (is-bigint-p (car expr-list))
-                (setf op1 (get-bigint (car expr-list))) ; mpz_t
-                (setf op1 (car expr-list))) ; integer
+                (progn
+                  (setf op1 (get-bigint (car expr-list)))) ; mpz_t
+                (progn
+                  (setf op1 (car expr-list))))                
             (progn
-              (add-bigint-declaration-with-var tmp-var (car expr-list))
-              (setf expr-list (cdr expr-list))
+              (setf op1 (car expr-list))
+              (setf skip-with-var t)
               (setf skip t)))) ;; integer
 
-    ;; add declaration
+    ;; switch target - clear buffer
+    (set-target 'definition-buffer)
+    (setf (gethash *paranteses* *definition_buffer*) '(""))        
+
+          ;; add declaration
     (if (not skip)
         (progn
           (add-bigint-declaration tmp-var op1)
           (setf expr-list (cdr expr-list))))
+    (if skip-with-var
+        (progn
+          (add-bigint-declaration-with-var tmp-var op1)
+          (setf expr-list (cdr expr-list))))
     
     ;; next var
-    (setf expr-list (parse-bigint-operation-next expr-list tmp-var operator))
+    (setf expr-list
+          (parse-bigint-operation-next expr-list tmp-var bigint-operator))
 
     ;; swith target and insert buffer
     (set-target tmp-target)
@@ -2199,6 +2212,22 @@
            (add-code "(")
            (setf expr-list (parse-arguments (cdr expr-list) 2))
            (return-from parse-call expr-list)))
+        ((equal "badd" (car expr-list))
+         (setf expr-list (cdr expr-list))
+         (setf expr-list (parse-bigint-operation expr-list "badd"))
+         (return-from parse-call expr-list))
+        ((equal "bsub" (car expr-list))
+         (setf expr-list (cdr expr-list))
+         (setf expr-list (parse-bigint-operation expr-list "bsub"))
+         (return-from parse-call expr-list))
+        ((equal "bmul" (car expr-list))
+         (setf expr-list (cdr expr-list))
+         (setf expr-list (parse-bigint-operation expr-list "bmul"))
+         (return-from parse-call expr-list))
+        ((equal "bdiv" (car expr-list))
+         (setf expr-list (cdr expr-list))
+         (setf expr-list (parse-bigint-operation expr-list "bdiv"))
+         (return-from parse-call expr-list))
         ((or (equal "add" (car expr-list)) (equal "+" (car expr-list)))
          (setf expr-list (parse-calculation expr-list "add" "+"))
          (return-from parse-call expr-list))
