@@ -59,7 +59,7 @@
 
 (defvar *types*
   '("i16" "i32" "i64" "ui16" "ui32" "ui64" "f32" "f64" "f80"
-    "bool" "b8" "c8" "string" "file" "fun" "void" "ixx"
+    "bool" "b8" "c8" "string" "file" "fun" "void" "ixx" "pixx"
 
     "i16>" "i32>" "i64>" "ui16>" "ui32>" "ui64>" "f32>" "f64>" "f80>"
     "bool>" "b8>" "c8>" "string>" "file>" "fun>" "void>" "ixx>"
@@ -422,7 +422,6 @@
               (progn
                 (setf cnt (- cnt 1))
                 (get-iter-variable-name-x name cnt)))))))
-
 (defun get-iter-variable-name (name)
   (get-iter-variable-name-x name *block*))
 
@@ -1615,20 +1614,13 @@
 (defvar *tmp-var* nil)
 
 (defun parse-bigint-number (expr-list)
-  (let ((tmp-var (gensym))
+  (let ((tmp-var (fgensym))
         (tmp-target *target*))
     (setf (gethash *paranteses* *definition_buffer*) '(""))
     (if (not (equal "ixx" *current-let-definition*))
         (progn
           (setf *target* 'definition-buffer)
-          (add-code "mpz_t ")
-          (add-code tmp-var)
-          (add-code (format nil ";~%"))
-          (add-code "mpz_init")
-          (add-code "(")
-          (add-code tmp-var)
-          (add-code ")")
-          (add-code (format nil ";~%"))))
+          (add-bigint-declaration tmp-var)))
     (let ((number (get-bigint (car expr-list))))
       (setf *target* 'definition-buffer)
       (add-code "create_str_ixx")
@@ -1839,7 +1831,8 @@
      (add-code "(")
      (if (not (equal ")" (car ,expr-list)))
          (progn
-           (dbg "parse-call: parse-infix " (get-iter-variable-name (car ,expr-list)))
+           (dbg "parse-call: parse-infix "
+                (get-iter-variable-name (car ,expr-list)))
            (setf expr-list (parse-infix ,expr-list ,operator)))
          (error-operator-not-defined ,expr-list))
      (setf expr-list (parse-arguments ,expr-list (count-elements ,expr-list)))
@@ -1897,7 +1890,13 @@
               (+ *line-start-implementation*
                  (length (gethash *paranteses* *definition_buffer*)))))))
 
+(defun fgensym ()
+  (let* ((sym1 (gensym))
+         (sym (format nil "~a" sym1)))
+    sym))
+
 (defun add-bigint-declaration (tmp-var &optional (value "0"))
+  (setf (gethash (get-variable-name tmp-var) *variable-type*) "ixx")
   (add-code "mpz_t")
   (add-code " ")
   (add-code tmp-var)
@@ -1912,13 +1911,27 @@
   (add-code ")")
   (add-code (format nil ";~%")))
 
+(defun add-bigint-declaration-with-var (tmp-var var-name)
+  (setf (gethash (get-variable-name tmp-var) *variable-type*) "ixx")
+  (add-code "mpz_t")
+  (add-code " ")
+  (add-code tmp-var)
+  (add-code (format nil ";~%"))
+  (add-code "mpz_init_set")
+  (add-code "(")
+  (add-code tmp-var)
+  (add-code ",")
+  (add-code (get-iter-variable-name var-name))
+  (add-code ")")
+  (add-code (format nil ";~%")))
+
 (defvar *temp-var* niL)
 
 (defun add-bigint-term (expr-list tmp-var operator)
   (let ((op1 tmp-var)
         (op2)
         (skip nil)
-        (tmp-var2 (gensym)))
+        (tmp-var2 (fgensym)))
     
     (dbg "add-bigint-term: " (car expr-list))
     ;; declare var for values
@@ -1965,7 +1978,7 @@
 
 (defun parse-bigint-operation (expr-list operator)
   (let ((tmp-target *target*)
-        (tmp-var (gensym))
+        (tmp-var (fgensym))
         (op1)
         (skip nil))
     (dbg "parse-bigint-operation: " operator " next " (car expr-list))
@@ -1983,17 +1996,7 @@
                 (setf op1 (get-bigint (car expr-list))) ; mpz_t
                 (setf op1 (car expr-list))) ; integer
             (progn
-              (add-code "mpz_t")
-              (add-code " ")
-              (add-code tmp-var)
-              (add-code (format nil ";~%"))
-              (add-code "mpz_init_set")
-              (add-code "(")
-              (add-code tmp-var)
-              (add-code ",")
-              (add-code (get-iter-variable-name (car expr-list)))
-              (add-code ")")
-              (add-code (format nil ";~%"))
+              (add-bigint-declaration-with-var tmp-var (car expr-list))
               (setf expr-list (cdr expr-list))
               (setf skip t)))) ;; integer
 
@@ -2500,9 +2503,7 @@
         ((equal "f80" (car expr-list))
          (parse-type-cast expr-list "f80" "f80"))
         ((equal "ixx" (car expr-list))
-         (setf expr-list (cdr expr-list))
-         (setf expr-list (parse-arguments expr-list (1- (count-elements expr-list))))
-         (return-from parse-call expr-list))
+         (parse-type-cast expr-list "ixx" "pixx"))
         ((equal "string" (car expr-list))
          (parse-type-cast expr-list "string" "string"))
         ((equal "cstring" (car expr-list))
@@ -2794,8 +2795,6 @@
             (error-syntax-error expr-list))        
         (if (equal "EOF" (car expr-list))
             (add-code "EOF"))
-        (if (equal ")" (car expr-list))
-            (error-too-many-parens expr-list))
         (if (equal "\"" (car expr-list))
             (progn
               (dbg "parse-expression: STRING block " *block*)

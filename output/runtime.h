@@ -22,6 +22,7 @@ typedef const char* cstring;
 typedef char* string;
 typedef FILE* file;
 typedef mpz_t ixx;
+typedef __mpz_struct* pixx;
 
 i32 mod(i32 a, i32 b);
 i32 i32_mod_i32(i32 a, i32 b);

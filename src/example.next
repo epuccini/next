@@ -338,7 +338,7 @@ by Edward Puccini |;
     (prnl (ixx (- value1 (* value1 value2) value2)))
     (prnl (ixx (* value1 value2)))
     (prnl (ixx (/ value1 value2)))
-    (prnl (ixx (* B100 B100 (- B1000 B900))))))
+    (prnl (ixx (* B1 (/ B100000 B100) (- B1000 B500))))))
         
 (defn main:i32 []
   (let [ret:i32 (arrays-and-lists 77)]
