@@ -75,6 +75,11 @@
     "i16>>" "i32>>" "i64>>" "ui16>>" "ui32>>" "ui64>>" "f32>>" "f64>>" "f80>>"
     "bool>>" "b8>>" "c8>>" "string>>" "file>>" "fun>>" "void>>"  "ixx>>"))
 
+(defun is-fixed-math-type-p (type)
+  (or (equal "f32" type) (equal "f64" type) (equal "f80" type)
+      (equal "i16" type) (equal "i32" type) (equal "i64" type)
+      (equal "ui16" type) (equal "ui32" type) (equal "ui64" type)))
+
 (defun set-target (target)
   (setf *target* target))
 
@@ -1640,12 +1645,7 @@
       (if (or (not *current-let-definition*)
            (equal "ixx" *current-let-definition*))
           (add-code tmp-var))
-      (if (or (equal "i16" *current-let-definition*)
-              (equal "i32" *current-let-definition*)
-              (equal "i64" *current-let-definition*)
-              (equal "ui16" *current-let-definition*)
-              (equal "ui32" *current-let-definition*)
-              (equal "ui64" *current-let-definition*))
+      (if (is-fixed-math-type-p *current-let-definition*)
           (progn
             (add-code "mpz_get_si")
             (add-code "(")
