@@ -1932,7 +1932,9 @@
         (op1 tmp-var)
         (op2)
         (skip-progress nil)
-        (tmp-var2 (fgensym)))
+        (skip-declaration nil)
+        (tmp-var2 (fgensym))
+        (intz 0))
     
     (dbg "add-bigint-term: " (car expr-list))
     ;; declare var for values
@@ -1943,30 +1945,25 @@
           (dbg "add-bigint-term: 2 " (car expr-list))
           (setf op2 *temp-var*)
           (setf skip-progress t)
-          ;; switch target - clear buffer
-          (set-target 'definition-buffer)
-          (setf (gethash *paranteses* *definition_buffer*) '("")))
+          (setf skip-declaration t))
         (if (not (is-iter-variable-p (car expr-list)))
             (if (is-bigint-p (car expr-list))
                 (progn
-                  ;; switch target - clear buffer
-                  (set-target 'definition-buffer)
-                  (setf (gethash *paranteses* *definition_buffer*) '(""))        
-
-                  (add-bigint-declaration tmp-var2 (get-bigint (car expr-list)))
+                  (setf intz (get-bigint (car expr-list)))
                   (setf op2 tmp-var2)) ;; mpz_t
                 (progn
-                  ;; switch target - clear buffer
-                  (set-target 'definition-buffer)
-                  (setf (gethash *paranteses* *definition_buffer*) '(""))        
-
-                 (add-bigint-declaration tmp-var2 (car expr-list))
+                  (setf intz (car expr-list))
                   (setf op2 tmp-var2))) ;; integer
             (progn
-              (setf op2 (get-iter-variable-name (car expr-list)))
-              ;; switch target - clear buffer
-              (set-target 'definition-buffer)
-              (setf (gethash *paranteses* *definition_buffer*) '(""))))) ;; variable
+              (setf op2 (get-iter-variable-name (car expr-list))))))
+    
+    ;; switch target - clear buffer
+    (set-target 'definition-buffer)
+    (setf (gethash *paranteses* *definition_buffer*) '(""))
+
+    ;; add declaration
+    (if (not skip-declaration)
+        (add-bigint-declaration tmp-var2 intz))
     
     ;; add mpz_call
     (add-code operator)
