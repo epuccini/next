@@ -1640,7 +1640,12 @@
       (if (or (not *current-let-definition*)
            (equal "ixx" *current-let-definition*))
           (add-code tmp-var))
-      (if *current-let-definition*
+      (if (or (equal "i16" *current-let-definition*)
+              (equal "i32" *current-let-definition*)
+              (equal "i64" *current-let-definition*)
+              (equal "ui16" *current-let-definition*)
+              (equal "ui32" *current-let-definition*)
+              (equal "ui64" *current-let-definition*))
           (progn
             (add-code "mpz_get_si")
             (add-code "(")
