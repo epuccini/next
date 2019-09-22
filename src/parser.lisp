@@ -432,7 +432,7 @@
           (if (equal *current-module* "")
               (setf hash (format nil "~a_~a" (filter-expression name) cnt))
               (setf hash (format nil "~a__~a_~a" *current-module*
-                                 (filter-expression name) cnt)))
+                                 (filter-expression name) cnt)))
           (if (gethash hash *function-type*)
               (progn
                 (return-from get-iter-function-name-x hash))
@@ -2840,7 +2840,7 @@
 (defun is-bigint-p (expr)
   (get-bigint expr))
 
-(defun parse-expression (expr-list &optional (omit nil))
+(defun parse-expression (expr-list &optional (omit-semicolon nil))
   (if expr-list
       (progn
         (dbg "parse-expression: >" (car expr-list) "<")
@@ -2855,7 +2855,7 @@
               (dbg "parse-expression: STRING block " *block*)
               (add-code "\"")
               (setf expr-list (parse-cstr (cdr expr-list)))
-              (if (not omit)
+              (if (not omit-semicolon)
                   (add-code (format nil ";~%")))
               (dbg "parse-expression: STRING END ")
               (return-from parse-expression expr-list)))
@@ -2873,7 +2873,7 @@
             (progn
               (dbg "parse-expression: parse null")
               (setf expr-list (parse-null expr-list))
-                (if (not omit)
+                (if (not omit-semicolon)
                   (add-code (format nil ";~%")))
             (return-from parse-expression expr-list)))
         (if (equal "[" (car expr-list))
@@ -2883,7 +2883,7 @@
               (dbg "parse-expression: parse vector literal ")
               (setf expr-list (parse-vector (cdr expr-list)))
               (add-code (format nil "}"))
-              (if (not omit)
+              (if (not omit-semicolon)
                   (add-code (format nil ";~%")))
               (return-from parse-expression expr-list)))
         (if (equal "'" (car expr-list))
@@ -2902,13 +2902,13 @@
               (add-code ",")
               (add-code (format nil "~a" (count-elements start)))
               (add-code (format nil ")"))
-              (if (not omit)
+              (if (not omit-semicolon)
                   (add-code (format nil ";~%")))
               (return-from parse-expression expr-list)))
         (if (is-bigint-p (car expr-list))
             (progn
               (setf expr-list (parse-bigint-number expr-list))
-              (if (not omit)
+              (if (not omit-semicolon)
                   (add-code (format nil ";~%")))
               (setf expr-list (cdr expr-list))
               (return-from parse-expression expr-list)))
@@ -2928,7 +2928,7 @@
                     (dbg "parse-expression: NUM block " *block*
                          " number " (car expr-list))
                     (add-code (car expr-list))))
-              (if (not omit)
+              (if (not omit-semicolon)
                   (add-code (format nil ";~%")))
               (return-from parse-expression (cdr expr-list))))
         (if (or (is-variable-split-name-p (car expr-list))
@@ -2943,7 +2943,7 @@
               (if (search ">>" (car expr-list))
                   (add-code comp-name)
                   (add-code (get-iter-variable-name var-name)))
-              (if (not omit)
+              (if (not omit-semicolon)
                   (add-code (format nil ";~%")))
               (dbg "parse-expression: VAR END " var-name)
               (setf expr-list (cdr expr-list))
@@ -2964,7 +2964,7 @@
                                   (car expr-list))
                                  fn-type))
                (add-code (get-iter-function-name (car expr-list))))
-           (if (not omit)
+           (if (not omit-semicolon)
                (add-code (format nil ";~%")))
            (setf expr-list (cdr expr-list))
            (return-from parse-expression expr-list)))
@@ -2995,7 +2995,7 @@
               (inc-parens)
               (dbg "parse-expression: OPEN parens "
                    *paranteses* " block " *block*)
-              ;; omit semicolon for blocks
+              ;; omit-semicolon semicolon for blocks
               (if (or (equal "for" (car expr-list))
                       (equal "if" (car expr-list))
                       (equal "while" (car expr-list))
@@ -3011,8 +3011,7 @@
                       (equal "shiftl" (car expr-list))
                       (equal "shiftr" (car expr-list))
                       (equal ">>" (car expr-list))
-                      (equal "<<" (car expr-list))
-                      (equal "i16" (car expr-list)))
+                      (equal "<<" (car expr-list)))
                   (setf space t))
               (if (is-type-p (car expr-list))
                   (setf no-parens t))
@@ -3020,7 +3019,7 @@
               (setf expr-list (parse-call expr-list))
               (dbg "parse-expression: CLOSE parens " *paranteses*
                    " block " *block*
-                   " omit " omit)
+                   " omit-semicolon " omit-semicolon)
               (if (car expr-list)
                   (setf expr-list (parse-close-parens expr-list)))
               (if (and (not space)
@@ -3028,7 +3027,7 @@
                        (= *start-operation* -1))
                   (add-code ")"))
               (dec-parens)
-              (if (and (not space) (not omit))
+              (if (and (not space) (not omit-semicolon))
                   (progn
                     (add-code (format nil ";~%"))))
               ;; exit
