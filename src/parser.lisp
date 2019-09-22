@@ -596,9 +596,12 @@
   (remove-if-not #'(lambda (fn) (equal fn fn-name))
                  (hash-table-keys *function-map*)))
 
+(defun set-function-type (fn-name type)
+  (setf (gethash (get-function-name fn-name) *function-type*) type))
+
 (defun register-function (name content)
   (set-function-map name content)
-  (setf (gethash (get-function-name name) *function-type*) "fun")
+  (set-function-type name "fun")
   (dbg "register-function: Register function >" name
        "< var >" content "<"))
 
@@ -646,10 +649,6 @@
             (return-from inspect-function-type
               (get-iter-function-name
                (get-function-value (car expr-list))))))))
-
-(defun set-function-type (fn-name type)
-  (setf (gethash (get-function-name fn-name) *function-type*) type)
-  (setf (gethash (get-function-name fn-name) *function-type*) type))
 
 (defun parse-argument (expr-list)
   (cond ((find #\: (car expr-list))
@@ -1551,8 +1550,7 @@
          (literal-type (get-literal-type symbol-value))
          (variable-type (get-iter-variable-type symbol-value))
          (number-type (type-of-number-string symbol-value))
-         (inspect-type (lisp-to-next-type
-                        (inspect-function-type expr-list)))
+         (inspect-type (inspect-function-type expr-list))
          (function-type (get-iter-function-type symbol-value))
          (type-str ""))
     (if literal-type
