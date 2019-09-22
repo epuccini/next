@@ -17,6 +17,7 @@
 (defvar *implementation_list* '(""))
 (defvar *definition_buffer* nil)
 (defvar *target* 'code)
+(defvar *tmp-var* nil)
 
 ;; counters and flags
 
@@ -43,6 +44,7 @@
 (defvar *current-let-variable* nil)
 (defvar *current-let-definition* nil)
 (defvar *current-module* "")
+(defvar *start-operation* -1)
 
 ;; templates
 
@@ -59,7 +61,7 @@
 
 (defvar *types*
   '("i16" "i32" "i64" "ui16" "ui32" "ui64" "f32" "f64" "f80"
-    "bool" "b8" "c8" "string" "file" "fun" "void" "ixx" "pixx"
+    "bool" "b8" "c8" "string" "file" "fun" "void" "ixx" "ixx_cast"
 
     "i16>" "i32>" "i64>" "ui16>" "ui32>" "ui64>" "f32>" "f64>" "f80>"
     "bool>" "b8>" "c8>" "string>" "file>" "fun>" "void>" "ixx>"
@@ -1611,8 +1613,6 @@
         (return-from is-previous-cast-p t)))
   nil)
 
-(defvar *tmp-var* nil)
-
 (defun parse-bigint-number (expr-list)
   (let ((tmp-var (fgensym))
         (tmp-target *target*))
@@ -1641,7 +1641,7 @@
       (add-code tmp-var)
       (setf *tmp-var* tmp-var)
       (return-from parse-bigint-number expr-list))))
-                    
+
 (defun parse-arguments (expr-list max)
   (dbg "parse-arguments: >" (car expr-list) "<")
   (cond ((equal "\"" (car expr-list))
@@ -1925,7 +1925,6 @@
   (add-code ")")
   (add-code (format nil ";~%")))
 
-(defvar *temp-var* niL)
 
 (defun add-bigint-term (expr-list tmp-var operator)
   (let ((tmp-target *target*)
@@ -1943,7 +1942,7 @@
           (dbg "add-bigint-term: 1 " (car expr-list))
           (setf expr-list (parse-expression expr-list t))
           (dbg "add-bigint-term: 2 " (car expr-list))
-          (setf op2 *temp-var*)
+          (setf op2 *tmp-var*)
           (setf skip-progress t)
           (setf skip-declaration t))
         (if (not (is-iter-variable-p (car expr-list)))
@@ -1995,8 +1994,6 @@
                          expr-list tmp-var operator)))
       (return-from parse-bigint-operation-next expr-list)))
 
-(defvar *start-operation* -1)
-
 (defun parse-bigint-operation (expr-list operator)
   (let ((tmp-target *target*)
         (tmp-var (fgensym))
@@ -2014,7 +2011,7 @@
           (dbg "add-bigint-operands: 1 " (car expr-list))
           (setf expr-list (parse-expression expr-list t))
           (dbg "add-bigint-operands: 2 " (car expr-list))
-          (setf tmp-var *temp-var*)
+          (setf tmp-var *tmp-var*)
           (setf skip-declaration t))
         (if (not (is-iter-variable-p (car expr-list)))
             (if (is-bigint-p (car expr-list))
@@ -2054,7 +2051,7 @@
           (add-code "(")
           (add-code tmp-var)
           (setf *start-operation* -1)))
-    (setf *temp-var* tmp-var)
+    (setf *tmp-var* tmp-var)
     (return-from parse-bigint-operation expr-list)))
 
 (defun parse-call (expr-list)
@@ -2558,7 +2555,7 @@
         ((equal "f80" (car expr-list))
          (parse-type-cast expr-list "f80" "f80"))
         ((equal "ixx" (car expr-list))
-         (parse-type-cast expr-list "ixx" "pixx"))
+         (parse-type-cast expr-list "ixx" "ixx_cast"))
         ((equal "string" (car expr-list))
          (parse-type-cast expr-list "string" "string"))
         ((equal "cstring" (car expr-list))
@@ -2832,7 +2829,8 @@
 (defun get-bigint (expr)
   (if expr
       (if (> (length expr) 1)
-          (let ((number (parse-integer (subseq expr 1 (length expr)) :junk-allowed t)))
+          (let ((number (parse-integer
+                         (subseq expr 1 (length expr)) :junk-allowed t)))
             (if (and (numberp number) (equal "B" (subseq expr 0 1)))
                 (return-from get-bigint number)))
         nil)))
