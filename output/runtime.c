@@ -1528,6 +1528,7 @@ void println_pointer_##T(T* pointer) {  \
 		printf("\n"); \
 	} else { \
 		for (cnt = 0; cnt < size; cnt++) { \
+            print_##T(pointer[cnt]); \
 			printf(" "); \
 		} \
 		printf("\n"); \
