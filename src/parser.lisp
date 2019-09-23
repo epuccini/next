@@ -75,8 +75,9 @@
     "i16>>" "i32>>" "i64>>" "ui16>>" "ui32>>" "ui64>>" "f32>>" "f64>>" "f80>>"
     "bool>>" "b8>>" "c8>>" "string>>" "file>>" "fun>>" "void>>"  "ixx>>"))
 
-(defvar *math-operators* '("+" "-" "*" "/"
-                           "add" "badd" "sub" "bsub" "mul" "bmul" "div" "bdiv"))
+(defvar *math-operators* '("+" "-" "*" "/" "√"
+                           "add" "badd" "sub" "bsub" "mul" "bmul" "div" "bdiv"
+                           "sqrt" "power" "bsqrt" "bpower"))
 
 (defun is-fixed-math-type-p (type)
   (or (equal "f32" type) (equal "f64" type) (equal "f80" type)
@@ -239,6 +240,9 @@
                   (push "$" stack)
                   (push str stack)
                   (return-from upto-symbol stack))
+                 ((equal #\√ obj)
+                  (push str stack)
+                  (return-from upto-symbol stack))
                  ((equal #\; obj)
                   (push str stack)
                   (return-from upto-symbol stack))
@@ -315,7 +319,8 @@
                       (equal #\} obj)
                       (equal #\% obj)
                       (equal #\& obj)
-                      (equal #\# obj))
+                      (equal #\# obj)
+                      (equal #\√ obj))
                   (push (format nil "~a" obj) stack))
                  ((and (equal #\< obj) (equal #\< next))
                   (push "<<" stack)
@@ -1456,9 +1461,9 @@
         (type "")
         (len (length expr-list)))
     (dbg "infer-math-type: enter " (car expr-list))
-    (loop for x from 1 to (- len 1) do
-         (let ((obj (elt expr-list (1- x)))
-               (next (elt expr-list x)))
+    (loop for x from 0 to (- len 2) do
+         (let ((obj (elt expr-list x))
+               (next (elt expr-list (1+ x))))
            (if (or (not expr-list) (not obj))
                (return-from infer-math-type type))
            (if (or (equal "(" obj)
@@ -1739,11 +1744,20 @@
         (dbg "parse-infix: EXIT ")
         (return-from parse-infix expr-list)))
   (dbg "parse-infix: operand " (car expr-list))
+  (if (or (equal "pow" function) (equal "^" function))
+      (progn
+        (add-code "pow")
+        (add-code "(")
+        (setf expr-list (parse-expression expr-list t))
+        (add-code ",")))
   (setf expr-list (parse-expression expr-list t))
   (if (not (equal ")" (car expr-list)))
       (progn
         (dbg "parse-infix: function " function)
-        (add-code function)
+        (if (or (equal "pow" function) (equal "^" function))
+            (progn
+              (add-code ")"))
+            (add-code function))
         (setf expr-list (parse-infix expr-list function))))
   expr-list)
 
@@ -1785,7 +1799,8 @@
          (progn
            (setf expr-list (parse-bigint-operation ,expr-list ,operator))
            (return-from parse-call ,expr-list)))
-     (add-code "(")
+     (if (and (not (equal "pow" ,operator)) (not (equal "^" ,operator)))
+         (add-code "("))
      (if (not (equal ")" (car ,expr-list)))
          (progn
            (dbg "parse-call: parse-infix "
@@ -1815,7 +1830,11 @@
   (if (or (equal "div" operator) (equal "bdiv" operator) (equal "/" operator))
       (return-from get-bigint-operator "mpz_div"))
   (if (or (equal "mul" operator) (equal "bmul" operator) (equal "*" operator))
-      (return-from get-bigint-operator "mpz_mul")))
+      (return-from get-bigint-operator "mpz_mul"))
+  (if (or (equal "sqrt" operator) (equal "bsqrt" operator) (equal "√" operator))
+      (return-from get-bigint-operator "mpz_sqrt"))
+  (if (or (equal "power" operator) (equal "bpower" operator) (equal "^" operator))
+      (return-from get-bigint-operator "mpz_powm")))
 
 (defun insert-definition-buffer ()
   (if (equal *target* 'definition-buffer)
@@ -1890,6 +1909,7 @@
         (skip-progress nil)
         (skip-declaration nil)
         (tmp-var2 (fgensym))
+        (op3 (fgensym))
         (intz 0))
     
     (dbg "add-bigint-term: " (car expr-list))
@@ -1920,6 +1940,11 @@
     ;; add declaration
     (if (not skip-declaration)
         (add-bigint-declaration tmp-var2 intz))
+
+    ;; add modulator var
+    (if (equal "mpz_powm" operator)
+        (progn
+          (add-bigint-declaration op3 (format nil "~a" (expt 2 128)))))
     
     ;; add mpz_call
     (add-code operator)
@@ -1931,8 +1956,15 @@
     (add-code op1)
     (add-code ",")
     (add-code op2)
-    (add-code ")")
+    
+    ;; modulator
+    (if (equal "mpz_powm" operator)
+        (progn
+          (add-code ",")
+          (add-code op3)))
+    
     ;; end of operation
+    (add-code ")")
     (add-code (format nil ";~%"))
 
     ;; swith target and insert buffer
@@ -2153,6 +2185,7 @@
          (let ((type (get-next-token-type-string (cdr expr-list)))
                (omit-comma nil))
            (store-current-function "set")
+           ;; set following arguments-type this type
            (setf *current-type-definition* type)
            (if (or (is-iter-variable-p (cadr expr-list))
                    (is-iter-composition-type-p (cdr expr-list)))
@@ -2350,6 +2383,14 @@
          (setf expr-list (cdr expr-list))
          (setf expr-list (parse-bigint-operation expr-list "bdiv"))
          (return-from parse-call expr-list))
+        ((equal "bsqrt" (car expr-list))
+         (setf expr-list (cdr expr-list))
+         (setf expr-list (parse-bigint-operation expr-list "bsqrt"))
+         (return-from parse-call expr-list))
+        ((equal "bpower" (car expr-list))
+         (setf expr-list (cdr expr-list))
+         (setf expr-list (parse-bigint-operation expr-list "bpower"))
+         (return-from parse-call expr-list))
         ((or (equal "add" (car expr-list)) (equal "+" (car expr-list)))
          (setf expr-list (parse-calculation expr-list "add" "+"))
          (return-from parse-call expr-list))
@@ -2363,12 +2404,11 @@
          (setf expr-list (parse-calculation expr-list "div" "/"))
          (return-from parse-call expr-list))
         ((or (equal "sqrt" (car expr-list)) (equal "√" (car expr-list)))
-         (let ((type (get-next-token-type-string (cdr expr-list))))
-           (store-current-function "sqrt")
-           (add-code (format nil "sqrt_~a" type))
-           (add-code "(")
-           (setf expr-list (parse-arguments (cdr expr-list) 2))
-           (return-from parse-call expr-list)))
+         (setf expr-list (parse-calculation expr-list "sqrt" "√"))
+         (return-from parse-call expr-list))
+        ((or (equal "power" (car expr-list)) (equal "^" (car expr-list)))
+         (setf expr-list (parse-calculation expr-list "pow" "^"))
+         (return-from parse-call expr-list))
         ((equal "fabs" (car expr-list))
            (store-current-function "fabs")
            (add-code (format nil "fabs_f64"))
@@ -2448,13 +2488,6 @@
          (parse-map expr-list "atof" 1))
         ((equal "trunc" (car expr-list))
          (parse-map expr-list "trunc" 1))
-        ((or (equal "power" (car expr-list)) (equal "^" (car expr-list)))
-         (let ((type (get-next-token-type-string (cdr expr-list))))
-           (store-current-function "power")
-           (add-code (format nil "power_~a" type))
-           (add-code "(")
-           (setf expr-list (parse-arguments (cdr expr-list) 2))
-           (return-from parse-call expr-list)))
         ((equal "max" (car expr-list))
          (let ((type (get-next-token-type-string (cdr expr-list))))
            (store-current-function "max")
