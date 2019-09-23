@@ -345,7 +345,7 @@ by Edward Puccini |;
     (prnl (ixx (- value1 (* value1 value2) value2)))
     (prnl (ixx (* value1 value2)))
     (prnl (ixx (/ value1 value2)))
-    (prnl (ixx (bmul (/ B100000 B100) (- B1000 B500))))
+    (prnl (ixx (* (/ B100000 100) (- B1000 B500))))
     (prnl (ixx (* (ixx (/ B100000 B100)) (ixx (- B1000 B500)))))))
         
 (defn main:i32 []

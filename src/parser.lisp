@@ -41,8 +41,8 @@
 
 (defvar *current-function* nil)
 (defvar *current-composition* nil)
-(defvar *current-let-variable* nil)
-(defvar *current-let-definition* nil)
+(defvar *current-type-variable* nil)
+(defvar *current-type-definition* nil)
 (defvar *current-module* "")
 (defvar *start-operation* -1)
 
@@ -882,8 +882,8 @@
            (if (equal "]" (cadr expr-list))
                (error-no-type-def expr-list))
            ;; store current variable
-           (setf *current-let-variable* (car def))
-           (setf *current-let-definition* (cadr def))
+           (setf *current-type-variable* (car def))
+           (setf *current-type-definition* (cadr def))
            ;; parse signature
            (if (and (equal "fun" (cadr def)) (equal "[" (cadr expr-list)))
                (progn
@@ -944,8 +944,8 @@
                (add-code
                 (format nil "append_ptr(~a, 1, VARIABLE);~%"
                         (get-variable-name (car def)))))
-           (setf *current-let-variable* nil)
-           (setf *current-let-definition* nil)
+           (setf *current-type-variable* nil)
+           (setf *current-type-definition* nil)
            (dbg "parse-variable: rest " (car expr-list))))
         ((not (find #\: (car expr-list)))
          (dbg "parse-variable: seperator missing! " (car expr-list))
@@ -1622,13 +1622,13 @@
     (setf (gethash *paranteses* *definition_buffer*) '(""))
     (let ((number (get-bigint (car expr-list))))
       (setf *target* 'definition-buffer)
-      (if (not (equal "ixx" *current-let-definition*))
+      (if (not (equal "ixx" *current-type-definition*))
           (progn
             (add-bigint-declaration tmp-var)))
       (add-code "create_str_ixx")
       (add-code "(")
-      (if (equal "ixx" *current-let-definition*)
-          (add-code (get-iter-variable-name *current-let-variable*))
+      (if (equal "ixx" *current-type-definition*)
+          (add-code (get-iter-variable-name *current-type-variable*))
           (add-code tmp-var))
       (add-code ",")
       (add-code "\"")
@@ -1640,10 +1640,10 @@
       (set-target tmp-target)
       (insert-definition-buffer)
       (setf (gethash *paranteses* *definition_buffer*) '(""))
-      (if (or (not *current-let-definition*)
-           (equal "ixx" *current-let-definition*))
+      (if (or (not *current-type-definition*)
+           (equal "ixx" *current-type-definition*))
           (add-code tmp-var))
-      (if (is-fixed-math-type-p *current-let-definition*)
+      (if (is-fixed-math-type-p *current-type-definition*)
           (progn
             (add-code "mpz_get_si")
             (add-code "(")
@@ -1817,10 +1817,12 @@
 (defmacro parse-type-cast (expr-list current form &optional (max 1))
   `(progn
      (store-current-function ,current)
+     (setf *current-type-definition* ,current)
      (add-code "(")
      (add-code ,form)
      (add-code ")")
      (setf expr-list (parse-arguments (cdr ,expr-list) ,max))
+     (setf *current-type-definition* nil)
      (return-from parse-call ,expr-list)))
 
 (defmacro parse-calculation (expr-list word operator)
@@ -1829,7 +1831,8 @@
      (dbg "parse-calculation " (car ,expr-list) " next "
           (cadr ,expr-list))
      (setf expr-list (cdr ,expr-list))
-     (if (equal "ixx" type)
+     (if (or (equal *current-type-definition* "ixx")
+             (equal "ixx" type))
          (progn
            (setf expr-list (parse-bigint-operation ,expr-list ,operator))
            (return-from parse-call ,expr-list)))
@@ -2668,9 +2671,9 @@
          (setf expr-list (parse-arguments expr-list 0))
          (return-from parse-call expr-list))
         ((equal "new" (car expr-list))
-         (if (not (search ">" *current-let-definition*))
-             (error-type-not-supported expr-list *current-let-definition*))
-         (let ((type (regex-replace ">" *current-let-definition* "")))
+         (if (not (search ">" *current-type-definition*))
+             (error-type-not-supported expr-list *current-type-definition*))
+         (let ((type (regex-replace ">" *current-type-definition* "")))
            (store-current-function "new")
            (add-code (format nil "new_~a" type))
            (add-code "(")
@@ -2925,11 +2928,11 @@
               (return-from parse-expression expr-list)))
         (if (numberp (parse-integer (car expr-list) :junk-allowed t))
             (progn
-              (if (equal "ixx" *current-let-definition*)
+              (if (equal "ixx" *current-type-definition*)
                   (progn
                     (add-code "create_str_ixx")
                     (add-code "(")
-                    (add-code (get-iter-variable-name *current-let-variable*))
+                    (add-code (get-iter-variable-name *current-type-variable*))
                     (add-code ",")
                     (add-code "\"")
                     (add-code (car expr-list))
@@ -2949,7 +2952,7 @@
               (dbg "parse-expression: VARIABLE "
                    (get-iter-variable-name var-name))
               (if (and (equal "let" (get-current-function))
-                       (search ">" *current-let-definition*))
+                       (search ">" *current-type-definition*))
                   (add-code "&"))
               (if (search ">>" (car expr-list))
                   (add-code comp-name)
