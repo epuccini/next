@@ -15,19 +15,19 @@ return(888);
 f32 mapit_0_f32(f32 op_1)
 {
 print_string("Map f32 ");
-println_f64((op_1+op_1));
+println_f32((op_1+op_1));
 return((op_1+op_1));
 }
 f32 map_once_0_f32(f32 op_1)
 {
 print_string("Map-once f32 ");
-println_f64((op_1+op_1));
+println_f32((op_1+op_1));
 return((op_1+op_1));
 }
 i32 map_once_0_i32(i32 op_1)
 {
 print_string("Map-once i32 ");
-println_f64((op_1+op_1));
+println_i32((op_1+op_1));
 return((op_1+op_1));
 }
 f32 reduceit_0_f32(f32 op1_1,f32 op2_1)
@@ -466,7 +466,7 @@ mpz_t G568;
 mpz_init_set_str(G568,"500",10);
 mpz_sub(G567,G567,G568);
 mpz_mul(G564,G564,G567);
-prnl_ixx((ixx_cast)(G564));
+prnl_ixx((G564));
 mpz_t G570;
 mpz_init_set_str(G570,"100000",10);
 mpz_t G571;
@@ -478,7 +478,35 @@ mpz_t G574;
 mpz_init_set_str(G574,"500",10);
 mpz_sub(G573,G573,G574);
 mpz_mul(G570,G570,G573);
-prnl_ixx((ixx_cast)(ixx_cast)(ixx_cast)(G570));
+prnl_ixx((G570));
+mpz_t G575;
+mpz_init_set_str(G575,"0",10);
+create_str_ixx(G575,"500");
+println_f64((f64)((100000/100)*(1000-mpz_get_si(G575))));
+mpz_t G577;
+mpz_init_set_str(G577,"100000",10);
+mpz_t G578;
+mpz_init_set_str(G578,"100",10);
+mpz_div(G577,G577,G578);
+mpz_t G580;
+mpz_init_set_str(G580,"1000",10);
+mpz_t G581;
+mpz_init_set_str(G581,"500",10);
+mpz_sub(G580,G580,G581);
+mpz_mul(G577,G577,G580);
+prnl_ixx((ixx_cast)(G577));
+mpz_t G583;
+mpz_init_set_str(G583,"100000",10);
+mpz_t G584;
+mpz_init_set_str(G584,"100",10);
+mpz_div(G583,G583,G584);
+mpz_t G586;
+mpz_init_set_str(G586,"1000",10);
+mpz_t G587;
+mpz_init_set_str(G587,"500",10);
+mpz_sub(G586,G586,G587);
+mpz_mul(G583,G583,G586);
+prnl_ixx((ixx_cast)(ixx_cast)(ixx_cast)(G583));
 }
 }
 i32 main()

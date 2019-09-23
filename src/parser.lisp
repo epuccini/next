@@ -75,6 +75,9 @@
     "i16>>" "i32>>" "i64>>" "ui16>>" "ui32>>" "ui64>>" "f32>>" "f64>>" "f80>>"
     "bool>>" "b8>>" "c8>>" "string>>" "file>>" "fun>>" "void>>"  "ixx>>"))
 
+(defvar *math-operators* '("+" "-" "*" "/"
+                           "add" "badd" "sub" "bsub" "mul" "bmul" "div" "bdiv"))
+
 (defun is-fixed-math-type-p (type)
   (or (equal "f32" type) (equal "f64" type) (equal "f80" type)
       (equal "i16" type) (equal "i32" type) (equal "i64" type)
@@ -1420,6 +1423,89 @@
            (setf expr-list (parse-element expr-list))
            (setf expr-list (parse-list expr-list)))))
   expr-list)
+
+(defun is-math-operator-p (obj)
+  (dolist (operator *math-operators*)
+    (if (equal obj operator)
+        (return-from is-math-operator-p t)))
+  (return-from is-math-operator-p nil))
+
+(defun infer-parens (expr-list x)
+  (let ((type "")
+        (len (length expr-list)))
+    (if (or (= x (- len 2))
+            (equal ")" (car expr-list)))
+        (progn
+          (setf x (1+ x))
+          (return-from infer-parens x))
+        (progn
+          (setf type (determine-type-of-symbol (subseq expr-list x (- len 1))))
+          (if (equal type "ixx")
+              (return-from infer-parens x))
+          (setf x (1+ x))
+          (infer-parens expr-list x)))))
+
+(defun skip-parens (expr-list x)
+  (let ((len (length expr-list)))
+    (if (or (= x (- len 2))
+            (equal ")" (car expr-list)))
+        (progn
+          (setf x (1+ x))
+          (return-from skip-parens x))
+        (progn
+          (setf x (1+ x))
+          (skip-parens expr-list x)))))
+  
+(defun infer-math-type (expr-list)
+  (let ((parens 0)
+        (type "f64")
+        (len (length expr-list)))
+    (dbg "infer-math-type: enter " (car expr-list))
+    (loop for x from 0 to (- len 2) do
+         (let ((obj (elt expr-list x))
+               (next (elt expr-list (1+ x))))
+           (if (or (equal "(" obj)
+                   (equal "[" obj))
+               (progn
+                 (if (= parens 0)
+                     (progn
+                       (if (is-math-operator-p next)
+                           (progn
+                             (setf x (infer-parens expr-list x))
+                             (if (< x (- len 2))
+                                 (progn
+                                   (setf type (determine-type-of-symbol
+                                               (subseq expr-list x (- len 1))))
+                                   (if (equal type "ixx")
+                                       (return-from infer-math-type type)))))
+                           (progn
+                             (setf x (skip-parens expr-list x))
+                             (if (< x (- len 2))
+                                 (progn
+                                   (setf type (determine-type-of-symbol
+                                               (subseq expr-list x (- len 1))))
+                                   (if (equal type "ixx")
+                                       (return-from infer-math-type type)))))))
+                     (setf parens (1+ parens)))))
+           (if (or (equal ")" obj)
+                   (equal "]" obj))
+               (progn
+                 (setf parens (1- parens))
+                 (if (< parens 0)
+                     (progn
+                       (return-from infer-math-type type)))))
+           (if (and (not (equal "(" obj))
+                    (not (equal ")" obj))
+                    (not (is-math-operator-p obj)))
+               (progn
+                 (if (= parens 0)
+                     (progn
+                       (setf type (determine-type-of-symbol
+                                   (subseq expr-list x (- len 1))))
+                       (dbg "infer-math-type: >" type "<")
+                       (if (equal type "ixx")
+                           (return-from infer-math-type type))))))))
+    type))
   
 (defun count-elements (expr-list)
   (let ((count 0)
@@ -2114,6 +2200,11 @@
         ((equal "prnl" (car expr-list))
          (let ((type (get-next-token-type-string (cdr expr-list))))
            (store-current-function "prnl")
+           (dbg "parse-call: prnl next " (caddr expr-list))
+           (if (is-math-operator-p (caddr expr-list))
+               (progn
+                 (setf type (infer-math-type (cddr expr-list)))
+                 (setf *current-type-definition* type)))
            (if (search "ixx" type)
                (progn
                  (add-code "prnl_ixx")
@@ -2129,10 +2220,16 @@
                  (add-code (format nil "println_~a" type))
                  (add-code "(")))
            (dbg "parse-call: prnl Next arg " (cadr expr-list))
-           (setf expr-list (parse-arguments (cdr expr-list) 2))))
+           (setf expr-list (parse-arguments (cdr expr-list) 2))
+           (setf *current-type-definition* nil)))
         ((equal "prn" (car expr-list))
          (let ((type (get-next-token-type-string (cdr expr-list))))
            (store-current-function "prn")
+           (dbg "parse-call: prn next " (caddr expr-list))
+           (if (is-math-operator-p (caddr expr-list))
+               (progn
+                 (setf type (infer-math-type (cddr expr-list)))
+                 (setf *current-type-definition* type)))
            (if (search "ixx" type)
                (progn
                  (add-code "prn_ixx")
@@ -2148,7 +2245,8 @@
                  (add-code (format nil "print_~a" type))
                  (add-code "(")))
            (dbg "parse-call: prn Next arg " (cadr expr-list))
-           (setf expr-list (parse-arguments (cdr expr-list) 2))))
+           (setf expr-list (parse-arguments (cdr expr-list) 2))
+           (setf *current-type-definition* nil)))
         ((equal "prnstr" (car expr-list))
          (let ((type (get-next-token-type-string (cdr expr-list))))
            (store-current-function "prnstr")
