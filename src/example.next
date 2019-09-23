@@ -39,7 +39,7 @@ by Edward Puccini |;
 
 (defn reduceit:f32 [op1:f32 op2:f32]
   (prn "Reduce ")
-  (prnl (f32 (+ op1 op2)))
+  (prnl (+ op1 op2))
   (return (+ op1 op2)))
 
 (defn work:f32 [f:fun[f32->f32] arg:f32]
@@ -347,6 +347,9 @@ by Edward Puccini |;
     (prnl (ixx (/ value1 value2)))
     (prnl (* (/ 100000 100) (- 1000 500)))
     (prnl (* (/ 100000 100) (- 1000 B500)))
+    (:: value1 (* 990 B1000))
+    (prn "Value1 redef: ")
+    (prnl value1)
     (prnl (f64 (* (/ 100000 100) (- 1000 B500))))
     (prnl (ixx (* (/ B100000 100) (- B1000 B500))))
     (prnl (ixx (* (ixx (/ B100000 B100)) (ixx (- B1000 B500)))))))

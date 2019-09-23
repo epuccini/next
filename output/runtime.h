@@ -84,6 +84,7 @@ void set_pointer_f64(f64* ptr, f64 val);
 void set_pointer_f80(f80* ptr, f80 val);
 void set_pointer_string(c8** ptr, c8* val);
 void set_pointer_file(file* ptr, file val);
+void set_pointer_ixx(ixx* ptr, ixx val);
 
 typedef enum PTR_TYPE {
 	ARRAY = 0,

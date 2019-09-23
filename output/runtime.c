@@ -256,6 +256,10 @@ void set_pointer_file(file* ptr, file val) {
 	*ptr = val;
 }
 
+void set_pointer_ixx(ixx* ptr, ixx val) {
+	mpz_set(*ptr, val);
+}
+
 
 #define define_lt(T) \
 bool lt_##T(T a, T b){ \
