@@ -1628,7 +1628,8 @@
              (equal "(" (car expr-list))
              (is-math-operator-p (cadr expr-list)))
         (progn
-          (setf inspect-type (infer-math-type expr-list))))
+          (setf inspect-type (infer-math-type expr-list))
+          (setf *current-type-definition* inspect-type)))
     (if literal-type
         (dbg "literal-type " literal-type))
     (if variable-type
@@ -2151,7 +2152,6 @@
          (let ((type (get-next-token-type-string (cdr expr-list)))
                (omit-comma nil))
            (store-current-function "set")
-           (setf *current-type-definition* type)
            (if (or (is-iter-variable-p (cadr expr-list))
                    (is-iter-composition-type-p (cdr expr-list)))
                (progn
@@ -2168,8 +2168,7 @@
                        (add-code (format nil "set_~a" type))
                        (add-code "(")))))
            (dbg "parse-call: set Next arg " (cadr expr-list))
-           (setf expr-list (parse-arguments (cdr expr-list) 2 omit-comma))
-           (setf *current-type-definition* nil)))
+           (setf expr-list (parse-arguments (cdr expr-list) 2 omit-comma))))
         ((or (equal "elt" (car expr-list)) (equal "#" (car expr-list)))
          (let ((type (get-next-token-type-string (cdr expr-list)))
                (omit-comma nil))
@@ -2195,7 +2194,6 @@
         ((equal "prnl" (car expr-list))
          (let ((type (get-next-token-type-string (cdr expr-list))))
            (store-current-function "prnl")
-           (setf *current-type-definition* type)
            (dbg "parse-call: prnl next " (caddr expr-list))
            (if (search "ixx" type)
                (progn
@@ -2212,12 +2210,10 @@
                  (add-code (format nil "println_~a" type))
                  (add-code "(")))
            (dbg "parse-call: prnl Next arg " (cadr expr-list))
-           (setf expr-list (parse-arguments (cdr expr-list) 2))
-           (setf *current-type-definition* nil)))
+           (setf expr-list (parse-arguments (cdr expr-list) 2))))
         ((equal "prn" (car expr-list))
          (let ((type (get-next-token-type-string (cdr expr-list))))
            (store-current-function "prn")
-           (setf *current-type-definition* type)
            (dbg "parse-call: prn next " (caddr expr-list))
            (if (search "ixx" type)
                (progn
@@ -2234,8 +2230,7 @@
                  (add-code (format nil "print_~a" type))
                  (add-code "(")))
            (dbg "parse-call: prn Next arg " (cadr expr-list))
-           (setf expr-list (parse-arguments (cdr expr-list) 2))
-           (setf *current-type-definition* nil)))
+           (setf expr-list (parse-arguments (cdr expr-list) 2))))
         ((equal "prnstr" (car expr-list))
          (let ((type (get-next-token-type-string (cdr expr-list))))
            (store-current-function "prnstr")
