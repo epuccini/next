@@ -79,7 +79,7 @@
                            "add" "badd" "sub" "bsub" "mul" "bmul" "div" "bdiv"
                            "sqrt" "power" "bsqrt" "bpower"))
 
-(defvar *non-infix-operators* '("^" "power"))
+(defvar *non-infix-operators* '("^" "power" "√" "sqrt"))
 
 (defun is-non-infix-operator-p (operator)
   (dolist (op *non-infix-operators*)
@@ -1752,19 +1752,10 @@
         (dbg "parse-infix: EXIT ")
         (return-from parse-infix expr-list)))
   (dbg "parse-infix: operand " (car expr-list))
-  (if (is-non-infix-operator-p function)
-      (progn
-        (add-code "pow")
-        (add-code "(")
-        (setf expr-list (parse-expression expr-list t))
-        (add-code ",")))
   (setf expr-list (parse-expression expr-list t))
   (if (not (equal ")" (car expr-list)))
       (progn
-        (dbg "parse-infix: function " function)
-        (if (is-non-infix-operator-p function)
-            (add-code ")")
-            (add-code function))
+        (add-code function)
         (setf expr-list (parse-infix expr-list function))))
   expr-list)
 
@@ -1804,10 +1795,15 @@
      (if (or (equal *current-type-definition* "ixx")
              (equal "ixx" type))
          (progn
-           (setf expr-list (parse-bigint-operation ,expr-list ,operator))
+           (setf expr-list (parse-bigint-operation ,expr-list ,word))
            (return-from parse-call ,expr-list)))
-     (if (not (is-non-infix-operator-p ,operator))
-         (add-code "("))
+     (if (is-non-infix-operator-p ,word)
+         (progn
+           (add-code ,operator)
+           (add-code "(")
+           (setf expr-list (parse-arguments ,expr-list (count-elements ,expr-list)))
+           (return-from parse-call ,expr-list)))
+     (add-code "(")
      (if (not (equal ")" (car ,expr-list)))
          (progn
            (dbg "parse-call: parse-infix "
@@ -2411,11 +2407,17 @@
          (setf expr-list (parse-calculation expr-list "div" "/"))
          (return-from parse-call expr-list))
         ((or (equal "sqrt" (car expr-list)) (equal "√" (car expr-list)))
-         (setf expr-list (parse-calculation expr-list "sqrt" "√"))
+         (setf expr-list (parse-calculation expr-list "sqrt" "sqrt"))
          (return-from parse-call expr-list))
         ((or (equal "power" (car expr-list)) (equal "^" (car expr-list)))
-         (setf expr-list (parse-calculation expr-list "pow" "^"))
+         (setf expr-list (parse-calculation expr-list "power" "pow"))
          (return-from parse-call expr-list))
+        ((equal "fpower" (car expr-list))
+           (store-current-function "power")
+           (add-code (format nil "pow"))
+           (add-code "(")
+           (setf expr-list (parse-arguments (cdr expr-list) 2))
+           (return-from parse-call expr-list))
         ((equal "fabs" (car expr-list))
            (store-current-function "fabs")
            (add-code (format nil "fabs_f64"))

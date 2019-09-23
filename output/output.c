@@ -457,7 +457,7 @@ mpz_t G570;
 mpz_init_set_str(G570,"0",10);
 mpz_div(G569,G569,value2_2);
 prnl_ixx((ixx_cast)(G569));
-println_f64(((100000/100)*(1000-500)*(9)));
+println_f64(((100000/100)*(1000-500)*sqrt(9)));
 mpz_t G573;
 mpz_init_set_str(G573,"100000",10);
 mpz_t G574;
