@@ -1917,7 +1917,7 @@
         (tmp-var2 (fgensym))
         (op3 (fgensym))
         (intz 0))
-    
+
     (dbg "add-bigint-term: " (car expr-list))
     ;; declare var for values
     (if (equal "(" (car expr-list))
@@ -1996,10 +1996,12 @@
         (op1)
         (skip-declaration nil)
         (init-with-var nil))
+    
     (dbg "parse-bigint-operation: " bigint-operator " next " (car expr-list))
     ;; set start marker
     (if (= *start-operation* -1)
         (setf *start-operation* *paranteses*))
+
     ;; add mpz_t and init with 0 +/- or 1 */ 
     (if (equal "(" (car expr-list))
         (progn
@@ -2033,9 +2035,20 @@
           (add-bigint-declaration-with-var tmp-var op1)
           (setf expr-list (cdr expr-list))))
     
+    (if (equal "sqrt" operator)
+        (progn
+          (add-code bigint-operator)
+          (add-code "(")
+          (add-code tmp-var)
+          (add-code ",")
+          (add-code tmp-var)
+          (add-code ")")
+          (add-code (format nil ";~%"))))
+          
     ;; swith target and insert buffer
     (set-target tmp-target)
     (insert-definition-buffer)
+          
     ;; next var
     (setf expr-list
           (parse-bigint-operation-next expr-list tmp-var bigint-operator))
