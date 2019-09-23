@@ -233,6 +233,8 @@ by Edward Puccini |;
     (prn "sin(b) = ")
     (prnl (sin b))
     (prnl "")
+    (prn "100.0 * cos(35) = ")
+    (prnl (f64 (* 100.0 (cos 35.0))))
     ;; just a comment
     (if [> a (not 0)]
       (prnl "a > not 0"))

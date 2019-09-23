@@ -79,6 +79,14 @@
                            "add" "badd" "sub" "bsub" "mul" "bmul" "div" "bdiv"
                            "sqrt" "power" "bsqrt" "bpower"))
 
+(defvar *non-infix-operators* '("^" "power"))
+
+(defun is-non-infix-operator-p (operator)
+  (dolist (op *non-infix-operators*)
+    (if (equal op operator)
+        (return-from is-non-infix-operator-p t)))
+  (return-from is-non-infix-operator-p nil))
+
 (defun is-fixed-math-type-p (type)
   (or (equal "f32" type) (equal "f64" type) (equal "f80" type)
       (equal "i16" type) (equal "i32" type) (equal "i64" type)
@@ -1744,7 +1752,7 @@
         (dbg "parse-infix: EXIT ")
         (return-from parse-infix expr-list)))
   (dbg "parse-infix: operand " (car expr-list))
-  (if (or (equal "pow" function) (equal "^" function))
+  (if (is-non-infix-operator-p function)
       (progn
         (add-code "pow")
         (add-code "(")
@@ -1754,9 +1762,8 @@
   (if (not (equal ")" (car expr-list)))
       (progn
         (dbg "parse-infix: function " function)
-        (if (or (equal "pow" function) (equal "^" function))
-            (progn
-              (add-code ")"))
+        (if (is-non-infix-operator-p function)
+            (add-code ")")
             (add-code function))
         (setf expr-list (parse-infix expr-list function))))
   expr-list)
@@ -1799,7 +1806,7 @@
          (progn
            (setf expr-list (parse-bigint-operation ,expr-list ,operator))
            (return-from parse-call ,expr-list)))
-     (if (and (not (equal "pow" ,operator)) (not (equal "^" ,operator)))
+     (if (not (is-non-infix-operator-p ,operator))
          (add-code "("))
      (if (not (equal ")" (car ,expr-list)))
          (progn

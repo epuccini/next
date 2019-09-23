@@ -259,6 +259,8 @@ println_f64(exp_f64(a_2));
 print_string("sin(b) = ");
 println_f64(sin_f64(b_2));
 println_string("");
+print_string("100.0 * cos(35) = ");
+println_f64((f64)(100.0*cos_f32(35.0)));
 if(a_2>not_i32(0))
 {
 println_string("a > not 0");
