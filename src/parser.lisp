@@ -1624,22 +1624,23 @@
          (inspect-type (inspect-function-type expr-list))
          (function-type (get-iter-function-type symbol-value))
          (type-str ""))
+    ;; infer type when math operation
     (if (and (not skip-infer)
              (equal "(" (car expr-list))
              (is-math-operator-p (cadr expr-list)))
         (progn
           (setf inspect-type (infer-math-type expr-list))
           (setf *current-type-definition* inspect-type)))
-    (if literal-type
-        (dbg "literal-type " literal-type))
-    (if variable-type
-        (dbg "variable-type " variable-type))
-    (if number-type
-        (dbg "number-type " (format nil "~a" number-type)))
-    (if inspect-type
-        (dbg "inspect-type " inspect-type))
-    (if function-type
-        (dbg "function-type " (format nil "~a" function-type)))
+    ;(if literal-type
+    ;    (dbg "literal-type " literal-type))
+    ;(if variable-type
+    ;    (dbg "variable-type " variable-type))
+    ;(if number-type
+    ;    (dbg "number-type " (format nil "~a" number-type)))
+    ;(if inspect-type
+    ;    (dbg "inspect-type " inspect-type))
+    ;(if function-type
+    ;    (dbg "function-type " (format nil "~a" function-type)))
     (cond ((is-iter-composition-type-p expr-list)
            (setf type-str (compose-iter-composition-type expr-list)))
           ((is-type-p variable-type)
@@ -1654,7 +1655,7 @@
            (setf type-str literal-type))
           (t
            (setf type-str "void")))
-;           (error-cant-infer-type symbol-value)))
+    ;           (error-cant-infer-type symbol-value)))
     (dbg "determine-type-of-symbol: type-str " type-str)
     type-str))
 
@@ -2152,6 +2153,7 @@
          (let ((type (get-next-token-type-string (cdr expr-list)))
                (omit-comma nil))
            (store-current-function "set")
+           (setf *current-type-definition* type)
            (if (or (is-iter-variable-p (cadr expr-list))
                    (is-iter-composition-type-p (cdr expr-list)))
                (progn
@@ -3125,6 +3127,7 @@
               (dec-parens)
               (if (and (not space) (not omit-semicolon))
                   (progn
+                    (setf *current-type-definition* nil)
                     (add-code (format nil ";~%"))))
               ;; exit
               (return-from parse-expression expr-list))))))
