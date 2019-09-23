@@ -1792,17 +1792,20 @@
      (dbg "parse-calculation " (car ,expr-list) " next "
           (cadr ,expr-list))
      (setf expr-list (cdr ,expr-list))
+     ;; handling ixx types
      (if (or (equal *current-type-definition* "ixx")
              (equal "ixx" type))
          (progn
            (setf expr-list (parse-bigint-operation ,expr-list ,word))
            (return-from parse-call ,expr-list)))
+     ;; handling non-infix operators
      (if (is-non-infix-operator-p ,word)
          (progn
            (add-code ,operator)
            (add-code "(")
            (setf expr-list (parse-arguments ,expr-list (count-elements ,expr-list)))
            (return-from parse-call ,expr-list)))
+     ;; handling infix operations
      (add-code "(")
      (if (not (equal ")" (car ,expr-list)))
          (progn
