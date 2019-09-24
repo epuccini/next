@@ -407,9 +407,6 @@
     (setf *emitted* t)
     (values code definition implementation)))
 
-(defun get-current-function ()
-  (gethash *paranteses* *current-function*))
-
 (defun store-current-function (fun)
   (setf (gethash *paranteses* *current-function*) fun))
 
@@ -1701,14 +1698,6 @@
     (if (equal type cast)
         (return-from is-type-p t))))
 
-(defun is-previous-cast-p ()
-  (dolist (type (mapcar #'(lambda (tp)
-                            (regex-replace ">" tp "*")) *types*))
-    (if (and (equal ")" (get-last-code))
-             (equal type (get-previous-code)))
-        (return-from is-previous-cast-p t)))
-  nil)
-
 (defun parse-bigint-number (expr-list)
   (let ((tmp-var (fgensym))
         (tmp-target *target*))
@@ -1784,7 +1773,7 @@
      (add-code "(")
      (add-code ,form)
      (add-code ")")
-     (setf expr-list (parse-arguments (cdr ,expr-list) ,max))
+     (setf expr-list (parse-arguments (cdr ,expr-list) ,max t))
      (setf *current-type-definition* nil)
      (return-from parse-call ,expr-list)))
 
@@ -2069,8 +2058,7 @@
   (cond ((equal "\"" (car expr-list))
          (if (and *paranteses*
                   (not (equal "(" (get-last-code)))
-                  (not omit-comma)
-                  (not (is-previous-cast-p)))
+                  (not omit-comma))
              (add-code ","))
          (add-code "\"")
          (dbg "parse-arguments: parse-cstr >" (car expr-list) "<")
@@ -2122,8 +2110,7 @@
          (progn
            (if (and *paranteses*
                     (not (equal "(" (get-last-code)))
-                    (not omit-comma)
-                    (not (is-previous-cast-p)))
+                    (not omit-comma))
                (add-code ","))
            (setf expr-list (parse-expression expr-list t))
            (setf expr-list (parse-arguments expr-list
@@ -2131,8 +2118,7 @@
         ((is-bigint-p (car expr-list))
          (progn
            (if (and (not (equal "(" (get-last-code)))
-                    (not omit-comma)
-                    (not (is-previous-cast-p)))
+                    (not omit-comma))
                (add-code ","))
            (setf expr-list (parse-bigint-number expr-list))
            (setf expr-list (cdr expr-list))
@@ -2140,8 +2126,7 @@
         ((numberp (parse-integer (car expr-list) :junk-allowed t))
          (progn
            (if (and (not (equal "(" (get-last-code)))
-                    (not omit-comma)
-                    (not (is-previous-cast-p)))
+                    (not omit-comma))
                (add-code ","))
            (progn
              ; convert lisp double-float to c double
@@ -2153,8 +2138,7 @@
          (let ((comp-name (build-dotted-type (car expr-list)))
                (var-name (regex-replace ">>.*" (car expr-list) "")))
            (if (and (not (equal "(" (get-last-code)))
-                    (not omit-comma)
-                    (not (is-previous-cast-p)))
+                    (not omit-comma))
                (add-code ","))
            (dbg "parse-arguments: VARIABLE " (get-iter-variable-name var-name))
            (if (search ">>" (car expr-list))
@@ -2167,8 +2151,7 @@
                 (fn-type (get-iter-function-args fn-name)))
            (dbg "parse-arguments: FN: " (get-iter-function-name fn-name))
            (if (and (not (equal "(" (get-last-code)))
-                    (not omit-comma)
-                    (not (is-previous-cast-p)))
+                    (not omit-comma))
                (add-code ","))
            (if (is-function-map-p fn-name)
                (progn
