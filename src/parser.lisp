@@ -79,7 +79,8 @@
 
 (defvar *math-operators* '("+" "-" "*" "/" "√"
                            "add" "badd" "sub" "bsub" "mul" "bmul" "div" "bdiv"
-                           "sqrt" "power" "bsqrt" "bpower"))
+                           "sqrt" "power" "bsqrt" "bpower"
+                           "mod" "eq" "neq" "lt" "gt" "leqt" "geqt"))
 
 (defvar *non-infix-operators* '("^" "power" "√" "sqrt"))
 
@@ -2217,7 +2218,8 @@
                (progn
                  (add-code (format nil "set_pointer_~a" type))
                  (add-code "(")
-                 (add-code "&")
+                 (if (not (equal "ixx" type))
+                     (add-code "&"))
                  (setf omit-comma t))
                (progn
 

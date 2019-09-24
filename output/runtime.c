@@ -140,7 +140,7 @@ void print_format(cstring fmt, ...) {
             continue;
         }
     };
-    va_end(arglist);
+	va_end(arglist);
     printf("\n");
 }
 
@@ -293,8 +293,8 @@ void set_pointer_file(file* ptr, file val) {
 	*ptr = val;
 }
 
-void set_pointer_ixx(ixx* ptr, ixx val) {
-	mpz_set(*ptr, val);
+void set_pointer_ixx(ixx result, ixx val) {
+	mpz_set(result, val);
 }
 
 

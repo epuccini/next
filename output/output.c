@@ -375,7 +375,7 @@ break;
 set_pointer_i32(&d_2,(d_2*i_3));
 }
 printf("%.4d",(i32)(c_2+(d_2/10000)));
-if(eq_i32(mod(k_3,10),0))
+if(eq_f64(mod(k_3,10),0))
 {
 printf(" %d\n",((max_2-k_3)/7));
 }
@@ -502,7 +502,7 @@ mpz_init_set_str(G596,"990",10);
 mpz_t G597;
 mpz_init_set_str(G597,"1000",10);
 mpz_mul(G596,G596,G597);
-set_pointer_ixx(&value1_2,(G596));
+set_pointer_ixx(value1_2,(G596));
 print_string("Value1 redef: ");
 prnl_ixx(value1_2);
 mpz_t G599;
