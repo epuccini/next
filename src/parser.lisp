@@ -932,7 +932,11 @@
                  (add-code "(")
                  (add-code (get-iter-variable-name (car def)))
                  (add-code ")")
-                 (add-code (format nil ";~%")))
+                 (add-code (format nil ";~%"))
+                 (add-code "mpz_set")
+                 (add-code "(")
+                 (add-code (get-iter-variable-name (car def)))
+                 (add-code ","))
                ;; initialisation
                (add-code "="))
            ;; if pointer auto ref variables
@@ -946,20 +950,23 @@
                (error-missing-expression expr-list))
            ;; parse initialisation
            (dbg "parse-variable: next ")
-           (setf expr-list (parse-expression expr-list))
+           (setf expr-list (parse-expression expr-list t))
+           ;; ixx ?
+           (if (equal "ixx" (cadr def))
+               (progn
+                 (add-code ")")))
+           (add-code (format nil ";~%"))
            ;; store poiner
            (dbg "parse-variable: append size ")
-           (if (or (search "#" (cadr def))
-                   (equal "ixx" (cadr def)))
+           (if (or (search "#" (cadr def)))
                (progn
                  (let ((type "ARRAY"))
-                   (if (not (equal "ixx" (cadr def)))
-                       (add-code
-                        (format nil "append_ptr(~a, sizeof(~a)/sizeof(~a), ~a);~%"
-                                (get-variable-name (car def))
-                                (get-variable-name (car def))
-                                (regex-replace "#" (cadr def) "")
-                                type))))))
+                   (add-code
+                    (format nil "append_ptr(~a, sizeof(~a)/sizeof(~a), ~a);~%"
+                            (get-variable-name (car def))
+                            (get-variable-name (car def))
+                            (regex-replace "#" (cadr def) "")
+                            type)))))
            (if (search ">" (cadr def))
                (add-code
                 (format nil "append_ptr(~a, 1, VARIABLE);~%"
@@ -1275,9 +1282,9 @@
   (dbg "parse-let: open square block " *block* " parens " *paranteses*)
   (setf expr-list (parse-open-square-bracket expr-list))
   (add-code (format nil "{~%"))
+  (set-insert-points)
   (setf expr-list (parse-let-vector expr-list))
   (setf expr-list (parse-close-square-bracket expr-list))
-  (set-insert-points)
   (setf expr-list (parse-block expr-list))
   (dec-block)
   (add-code (format nil "}~%"))
@@ -1695,44 +1702,27 @@
     (if (equal type cast)
         (return-from is-type-p t))))
 
-(defun parse-bigint-number (expr-list)
+(defun parse-bigint-number (expr-list number)
   (let ((tmp-var (fgensym))
         (tmp-target *target*))
     (setf (gethash *paranteses* *definition_buffer*) '(""))
-    (let ((number (get-bigint (car expr-list))))
-      (setf *target* 'definition-buffer)
-      (if (or (not (equal "ixx" *current-type-definition*))
-              (not *current-type-variable*))
-          (progn
-            (add-bigint-declaration tmp-var)))
-      (add-code "create_str_ixx")
-      (add-code "(")
-      (if (equal "ixx" *current-type-definition*)
-          (if *current-type-variable*
-              (add-code (get-iter-variable-name *current-type-variable*))
-              (add-code tmp-var))
-          (add-code tmp-var))
-      (add-code ",")
-      (add-code "\"")
-      (add-code number)
-      (add-code "\"")
-      (add-code (format nil ")"))
-      (add-code (format nil ";~%"))
-      ;; last real target
-      (set-target tmp-target)
-      (insert-definition-buffer)
-      (setf (gethash *paranteses* *definition_buffer*) '(""))
-      (if (or (not *current-type-definition*)
-              (equal "ixx" *current-type-definition*))
-          (add-code tmp-var))
-      (if (is-fixed-math-type-p *current-type-definition*)
-          (progn
-            (add-code "mpz_get_si")
-            (add-code "(")
-            (add-code tmp-var)
-            (add-code ")")))
-      (setf *tmp-var* tmp-var)
-      (return-from parse-bigint-number expr-list))))
+    (setf *target* 'definition-buffer)
+    (add-bigint-declaration tmp-var number)
+    ;; last real target
+    (set-target tmp-target)
+    (insert-definition-buffer)
+    (setf (gethash *paranteses* *definition_buffer*) '(""))
+    (if (or (not *current-type-definition*)
+            (equal "ixx" *current-type-definition*))
+        (add-code tmp-var))
+    (if (is-fixed-math-type-p *current-type-definition*)
+        (progn
+          (add-code "mpz_get_si")
+          (add-code "(")
+          (add-code tmp-var)
+          (add-code ")")))
+    (setf *tmp-var* tmp-var)
+    (return-from parse-bigint-number expr-list)))
 
 (defun parse-infix (expr-list function)
   (if (equal ")" (car expr-list))
@@ -1921,7 +1911,6 @@
   (add-code ")")
   (add-code (format nil ";~%")))
 
-
 (defun add-bigint-term (expr-list tmp-var operator)
   (let ((tmp-target *target*)
         (op1 tmp-var)
@@ -2029,7 +2018,7 @@
                 (progn
                   (setf op1 (get-bigint (car expr-list)))) ; mpz_t
                 (progn
-                  (setf op1 (car expr-list))))                
+                  (setf op1 (car expr-list))))
             (progn
               (setf op1 (car expr-list))
               (setf init-with-var t)
@@ -2143,7 +2132,7 @@
            (if (and (not (equal "(" (get-last-code)))
                     (not omit-comma))
                (add-code ","))
-           (setf expr-list (parse-bigint-number expr-list))
+           (setf expr-list (parse-bigint-number expr-list (get-bigint (car expr-list))))
            (setf expr-list (cdr expr-list))
            (setf expr-list (parse-arguments expr-list max))))
         ((numberp (parse-integer (car expr-list) :junk-allowed t))
@@ -3056,7 +3045,7 @@
               (return-from parse-expression expr-list)))
         (if (is-bigint-p (car expr-list))
             (progn
-              (setf expr-list (parse-bigint-number expr-list))
+              (setf expr-list (parse-bigint-number expr-list (get-bigint (car expr-list))))
               (if (not omit-semicolon)
                   (add-code (format nil ";~%")))
               (setf expr-list (cdr expr-list))
@@ -3065,14 +3054,7 @@
             (progn
               (if (equal "ixx" *current-type-definition*)
                   (progn
-                    (add-code "create_str_ixx")
-                    (add-code "(")
-                    (add-code (get-iter-variable-name *current-type-variable*))
-                    (add-code ",")
-                    (add-code "\"")
-                    (add-code (car expr-list))
-                    (add-code "\"")
-                    (add-code (format nil ")")))
+                    (setf expr-list (parse-bigint-number expr-list (car expr-list))))
                   (progn
                     (dbg "parse-expression: NUM block " *block*
                          " number " (car expr-list))
@@ -3132,11 +3114,6 @@
             (let ((space nil)
                   (no-parens nil))
               
-              ;; add macro
-              (if (equal (get-last-code) (format nil ";~%"))
-                  (progn
-                    (set-insert-points)))
-
               ;; parse-open-parens
               (setf expr-list (parse-open-parens expr-list))
               (inc-parens)
@@ -3177,7 +3154,8 @@
               (if (and (not space) (not omit-semicolon))
                   (progn
                     (setf *current-type-definition* nil)
-                    (add-code (format nil ";~%"))))
+                    (add-code (format nil ";~%"))
+                    (set-insert-points)))
               ;; exit
               (return-from parse-expression expr-list))))))
   

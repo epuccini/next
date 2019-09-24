@@ -344,6 +344,8 @@ by Edward Puccini |;
     (prnl value3)
     (prn "Value4: ")
     (prnl value4)
+    (prn "Value5: ")
+    (prnl value5)
     (prnl (ixx (+ value1 B500 value2 value3 1000)))
     (prnl (ixx (- value1 (* value1 value2) value2)))
     (prnl (ixx (* value1 value2)))
