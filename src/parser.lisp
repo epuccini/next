@@ -2204,6 +2204,14 @@
            (store-current-function "set")
            ;; set following arguments-type this type
            (setf *current-type-definition* type)
+           ;; replace elt if exist
+           (if (or (equal (elt expr-list 4) "elt")
+                   (equal (elt expr-list 4) "#"))
+               (setf (elt expr-list 4) "pelt"))
+           (if (or (equal (caddr expr-list) "elt")
+                   (equal (caddr expr-list) "#"))
+               (setf (caddr expr-list) "pelt"))
+           ;; disptach
            (if (or (is-iter-variable-p (cadr expr-list))
                    (is-iter-composition-type-p (cdr expr-list)))
                (progn
@@ -2212,7 +2220,9 @@
                  (add-code "&")
                  (setf omit-comma t))
                (progn
-                 (if (or (search "elt" (caddr expr-list)) (search "#" (caddr expr-list)))
+
+                 (if (or (search "elt" (caddr expr-list))
+                         (search "#" (caddr expr-list)))
                      (progn
                        (add-code (format nil "set_pointer_~a" type))
                        (add-code "("))
@@ -2225,14 +2235,26 @@
          (let ((type (get-next-token-type-string (cdr expr-list)))
                (omit-comma nil))
            (store-current-function "elt")
-           (if (equal (cadr (gethash (get-last-function) *signatures*)) "value")
-               (progn
-                 (add-code "*")
-                 (setf omit-comma t)))
+           (setf omit-comma t)
            (add-code (format nil "elt_~a"
                              (regex-replace "pointer" type "array")))
            (add-code "(")
            (dbg "parse-call: elt Next arg " (cadr expr-list))
+           (setf expr-list (parse-arguments (cdr expr-list)
+                                            (1- (count-elements expr-list))
+                                            omit-comma))))
+        ((equal "pelt" (car expr-list))
+         (let ((type (get-next-token-type-string (cdr expr-list)))
+               (omit-comma nil))
+           (store-current-function "pelt")
+           (if (equal (cadr (gethash (get-last-function) *signatures*)) "value")
+               (progn
+                 (add-code "*")
+                 (setf omit-comma t)))
+           (add-code (format nil "pelt_~a"
+                             (regex-replace "pointer" type "array")))
+           (add-code "(")
+           (dbg "parse-call: pelt Next arg " (cadr expr-list))
            (setf expr-list (parse-arguments (cdr expr-list)
                                             (1- (count-elements expr-list))
                                             omit-comma))))
@@ -2291,8 +2313,6 @@
            (setf expr-list (parse-arguments (cdr expr-list) 2))))
         ((equal "of" (car expr-list))
          (add-code "(")
-         (if (equal "set" (get-current-function))
-             (add-code "&"))
          (store-current-function "of")
          (setf expr-list (cdr expr-list))
          (setf expr-list (parse-expression expr-list t))

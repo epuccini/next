@@ -147,58 +147,98 @@ void print_format(cstring fmt, ...) {
     printf("\n");
 }
 
+#define define_elt_array(T) \
+T elt_array_##T(T* a, i32 idx) { \
+	return a[idx]; \
+} \
 
-bool* elt_array_bool(bool* ptr, i32 idx) {
-	return (bool*)&ptr[idx];
-}
+define_elt_array(bool)
+define_elt_array(i16)
+define_elt_array(i32)
+define_elt_array(i64)
+define_elt_array(ui16)
+define_elt_array(ui32)
+define_elt_array(ui64)
+define_elt_array(f32)
+define_elt_array(f64)
+define_elt_array(f80)
+define_elt_array(ixx_cast)
+define_elt_array(string)
+define_elt_array(file)
 
-b8* elt_array_b8(b8* ptr, i32 idx) {
-	return (b8*)&ptr[idx];
-}
+#define define_pelt_array(T) \
+T* pelt_array_##T(T* a, i32 idx) { \
+	return &a[idx]; \
+} \
 
-c8* elt_array_c8(c8* ptr, i32 idx) {
-	return (c8*)&ptr[idx];
-}
+define_pelt_array(bool)
+define_pelt_array(i16)
+define_pelt_array(i32)
+define_pelt_array(i64)
+define_pelt_array(ui16)
+define_pelt_array(ui32)
+define_pelt_array(ui64)
+define_pelt_array(f32)
+define_pelt_array(f64)
+define_pelt_array(f80)
+define_pelt_array(ixx_cast)
+define_pelt_array(string)
+define_pelt_array(file)
 
-i16* elt_array_i16(i16* ptr, i32 idx) {
-	return (i16*)&ptr[idx];
-}
+#define define_elt_list(T) \
+T elt_list_##T(node_##T* list, i32 idx) { \
+	int cnt = 0; \
+	do { \
+		cnt++; \
+		if (list->next != NULL) { \
+			list = list->next; \
+		} \
+	} while(cnt != idx); \
+	return (T)list->value; \
+} \
 
-i32* elt_array_i32(i32* ptr, i32 idx) {
-	return (i32*)&ptr[idx];
-}
+define_elt_list(b8)
+define_elt_list(c8)
+define_elt_list(i16)
+define_elt_list(i32)
+define_elt_list(i64)
+define_elt_list(ui16)
+define_elt_list(ui32)
+define_elt_list(ui64)
+define_elt_list(f32)
+define_elt_list(f64)
+define_elt_list(f80)
+define_elt_list(ixx_cast)
+define_elt_list(string)
+define_elt_list(file)
 
-i64* elt_array_i64(i64* ptr, i16 idx) {
-	return (i64*)&ptr[idx];
-}
+#define define_pelt_list(T) \
+T* pelt_list_##T(node_##T* list, i32 idx) { \
+	int cnt = 0; \
+	do { \
+		cnt++; \
+		if (list->next != NULL) { \
+			list = list->next; \
+		} \
+	} while(cnt != idx); \
+	return (T*)&list->value; \
+} \
 
-ui16* elt_array_ui16(ui16* ptr, i32 idx) {
-	return (ui16*)&ptr[idx];
-}
+define_pelt_list(b8)
+define_pelt_list(c8)
+define_pelt_list(i16)
+define_pelt_list(i32)
+define_pelt_list(i64)
+define_pelt_list(ui16)
+define_pelt_list(ui32)
+define_pelt_list(ui64)
+define_pelt_list(f32)
+define_pelt_list(f64)
+define_pelt_list(f80)
+define_pelt_list(ixx_cast)
+define_pelt_list(string)
+define_pelt_list(file)
 
-ui32* elt_array_ui32(ui32* ptr, i32 idx) {
-	return (ui32*)&ptr[idx];
-}
-
-ui64* elt_array_ui64(ui64* ptr, i16 idx) {
-	return (ui64*)&ptr[idx];
-}
-
-f32* elt_array_f32(f32* ptr, i16 idx) {
-	return (f32*)&ptr[idx];
-}
-
-f64* elt_array_f64(f64* ptr, i32 idx) {
-	return (f64*)&ptr[idx];
-}
-
-f80* elt_array_f80(f80* ptr, i32 idx) {
-	return (f80*)&ptr[idx];
-}
-
-c8** elt_array_string(c8** ptr, i32 idx) {
-	return (c8**)&ptr[idx];
-}
 
 void set_pointer_bool(bool* ptr, bool val) {
 	*ptr = val;
@@ -1576,30 +1616,6 @@ define_print_pointer(ui64)
 define_print_pointer(f32)
 define_print_pointer(f64)
 define_print_pointer(f80)
-
-#define define_elt_list(T) \
-T* elt_list_##T(node_##T* list, i32 idx) { \
-	int cnt = 0; \
-	do { \
-		cnt++; \
-		if (list->next != NULL) { \
-			list = list->next; \
-		} \
-	} while(cnt != idx); \
-	return (T*)&list->value; \
-} \
-
-define_elt_list(b8)
-define_elt_list(c8)
-define_elt_list(i16)
-define_elt_list(i32)
-define_elt_list(i64)
-define_elt_list(ui16)
-define_elt_list(ui32)
-define_elt_list(ui64)
-define_elt_list(f32)
-define_elt_list(f64)
-define_elt_list(f80)
 
 #define define_set_list(T) \
 void set_list_##T(node_##T* list, T val) { \

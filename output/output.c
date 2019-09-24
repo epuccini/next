@@ -90,7 +90,7 @@ append_ptr(chars_2, sizeof(chars_2)/sizeof(c8), ARRAY);
 c8 new_string_2[]="Just a string";
 append_ptr(new_string_2, sizeof(new_string_2)/sizeof(c8), ARRAY);
 f32 (*myfun_2)(f32)=mapit_0_f32;
-set_pointer_f32((f32*)elt_array_f32(my_new_floats_2,0),888.0);
+set_pointer_f32((f32*)pelt_array_f32(my_new_floats_2,0),888.0);
 print_string("my-new-floats set 1. element: ");
 println_pointer_f32(my_new_floats_2);
 print_string("array: ");
@@ -147,8 +147,8 @@ print_string("My list append ");
 append_list_f32(my_list_2,666.0);
 println_list_f32(my_list_2);
 print_string("My list element ");
-println_f32((f32)*elt_list_f32(my_list_2,3));
-set_pointer_f32((f32*)elt_list_f32(my_list_2,3),100.0);
+println_f32((f32)elt_list_f32(my_list_2,3));
+set_pointer_f32((f32*)pelt_list_f32(my_list_2,3),100.0);
 print_string("My list set ");
 println_list_f32(my_list_2);
 print_string("My values ");
@@ -175,7 +175,7 @@ delete_ptr(my_new_array3_2);
 i32 cnt_3=0;
 for(cnt_3=0;cnt_3<max_i32(length_array_i32(array_2),1);cnt_3++)
 {
-set_pointer_i32(elt_array_i32(array_2,cnt_3),(cnt_3*1000));
+set_pointer_i32(pelt_array_i32(array_2,cnt_3),(cnt_3*1000));
 if(or_bool(equal_i32(cnt_3,3),eq_i32(cnt_3,4)))
 {
 println_string("COUNT IS 3||4");
@@ -185,7 +185,7 @@ else
 println_string("COUNT NOT 3||4");
 }
 printf("2^cnt = %f\n",pow(2,cnt_3));
-printf("ELT = %d\n",*elt_array_i32(array_2,cnt_3));
+printf("ELT = %d\n",elt_array_i32(array_2,cnt_3));
 printf("CNT: %d\n",cnt_3);
 }
 delete_ptr(array_2);
@@ -354,7 +354,7 @@ i32 c_2=0;
 i32 i_3=0;
 for(i_3=0;i_3<max_2;i_3++)
 {
-set_pointer_i32(elt_array_i32(r_2,i_3),2000);
+set_pointer_i32(pelt_array_i32(r_2,i_3),2000);
 }
 i32 k_3=max_2;
 for(k_3=max_2;k_3>0;k_3--)
@@ -363,9 +363,9 @@ set_pointer_i32(&d_2,0);
 set_pointer_i32(&i_3,k_3);
 for(;;)
 {
-set_pointer_i32(&d_2,(d_2+(*elt_array_i32(r_2,i_3)*10000)));
+set_pointer_i32(&d_2,(d_2+(elt_array_i32(r_2,i_3)*10000)));
 set_pointer_i32(&b_2,((2*i_3)-1));
-set_pointer_i32(elt_array_i32(r_2,i_3),mod(d_2,b_2));
+set_pointer_i32(pelt_array_i32(r_2,i_3),mod(d_2,b_2));
 set_pointer_i32(&d_2,(d_2/b_2));
 set_pointer_i32(&i_3,(i_3-1));
 if(i_3==0)

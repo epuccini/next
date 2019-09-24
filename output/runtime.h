@@ -56,19 +56,97 @@ void prnl_ixx(ixx num);
 void prn_ixx(ixx num);
 void print_format(const c8* fmt, ...);
 
-bool* elt_array_bool(bool* ptr, i32 idx);
-b8* elt_array_b8(b8* ptr, i32 idx);
-c8* elt_array_c8(c8* ptr, i32 idx);
-i16* elt_array_i16(i16* ptr, i32 idx);
-i32* elt_array_i32(i32* ptr, i32 idx);
-i64* elt_array_i64(i64* ptr, i16 idx);
-ui16* elt_array_ui16(ui16* ptr, i32 idx);
-ui32* elt_array_ui32(ui32* ptr, i32 idx);
-ui64* elt_array_ui64(ui64* ptr, i16 idx);
-f32* elt_array_f32(f32* ptr, i16 idx);
-f64* elt_array_f64(f64* ptr, i32 idx);
-f80* elt_array_f80(f80* ptr, i32 idx);
-c8** elt_array_string(c8** ptr, i32 idx);
+#define define_header_node(T) \
+typedef struct node_##T { \
+    T value; \
+    struct node_##T * next; \
+} node_##T;\
+
+define_header_node(bool)
+define_header_node(c8)
+define_header_node(b8)
+define_header_node(i16)
+define_header_node(i32)
+define_header_node(i64)
+define_header_node(ui16)
+define_header_node(ui32)
+define_header_node(ui64)
+define_header_node(f32)
+define_header_node(f64)
+define_header_node(f80)
+define_header_node(string)
+define_header_node(file)
+define_header_node(ixx_cast)
+
+#define define_header_elt_array(T) \
+T elt_array_##T(T* a, i32 idx); \
+
+define_header_elt_array(bool)
+define_header_elt_array(i16)
+define_header_elt_array(i32)
+define_header_elt_array(i64)
+define_header_elt_array(ui16)
+define_header_elt_array(ui32)
+define_header_elt_array(ui64)
+define_header_elt_array(f32)
+define_header_elt_array(f64)
+define_header_elt_array(f80)
+define_header_elt_array(ixx_cast)
+define_header_elt_array(string)
+define_header_elt_array(file)
+
+#define define_header_pelt_array(T) \
+T* pelt_array_##T(T* a, i32 idx); \
+
+define_header_pelt_array(bool)
+define_header_pelt_array(i16)
+define_header_pelt_array(i32)
+define_header_pelt_array(i64)
+define_header_pelt_array(ui16)
+define_header_pelt_array(ui32)
+define_header_pelt_array(ui64)
+define_header_pelt_array(f32)
+define_header_pelt_array(f64)
+define_header_pelt_array(f80)
+define_header_pelt_array(ixx_cast)
+define_header_pelt_array(string)
+define_header_pelt_array(file)
+
+#define define_header_elt_list(T) \
+T elt_list_##T(node_##T* list, i32 idx); \
+
+define_header_elt_list(b8)
+define_header_elt_list(c8)
+define_header_elt_list(i16)
+define_header_elt_list(i32)
+define_header_elt_list(i64)
+define_header_elt_list(ui16)
+define_header_elt_list(ui32)
+define_header_elt_list(ui64)
+define_header_elt_list(f32)
+define_header_elt_list(f64)
+define_header_elt_list(f80)
+define_header_elt_list(ixx_cast)
+define_header_elt_list(string)
+define_header_elt_list(file)
+
+#define define_header_pelt_list(T) \
+T* pelt_list_##T(node_##T* list, i32 idx); \
+
+define_header_pelt_list(b8)
+define_header_pelt_list(c8)
+define_header_pelt_list(i16)
+define_header_pelt_list(i32)
+define_header_pelt_list(i64)
+define_header_pelt_list(ui16)
+define_header_pelt_list(ui32)
+define_header_pelt_list(ui64)
+define_header_pelt_list(f32)
+define_header_pelt_list(f64)
+define_header_pelt_list(f80)
+define_header_pelt_list(ixx_cast)
+define_header_pelt_list(string)
+define_header_pelt_list(file)
 
 void set_pointer_bool(bool* ptr, bool val);
 void set_pointer_b8(b8* ptr, b8 val);
@@ -273,27 +351,6 @@ void remove_ptr(void* pointer);
 void inc_length(void* pointer);
 void delete_ptr(void* pointer);
 int destroy_ptr(node_ptr_t* e);
-
-#define define_header_node(T) \
-typedef struct node_##T { \
-    T value; \
-    struct node_##T * next; \
-} node_##T;\
-
-define_header_node(bool)
-define_header_node(c8)
-define_header_node(b8)
-define_header_node(i16)
-define_header_node(i32)
-define_header_node(i64)
-define_header_node(ui16)
-define_header_node(ui32)
-define_header_node(ui64)
-define_header_node(f32)
-define_header_node(f64)
-define_header_node(f80)
-define_header_node(string)
-define_header_node(file)
 
 #define define_header_length_list(T) \
 i32 length_list_##T(node_##T* list);  \
@@ -913,21 +970,6 @@ define_header_print_pointer(ui64)
 define_header_print_pointer(f32)
 define_header_print_pointer(f64)
 define_header_print_pointer(f80)
-
-#define define_header_elt_list(T) \
-T* elt_list_##T(node_##T* list, i32 idx); \
-
-define_header_elt_list(b8)
-define_header_elt_list(c8)
-define_header_elt_list(i16)
-define_header_elt_list(i32)
-define_header_elt_list(i64)
-define_header_elt_list(ui16)
-define_header_elt_list(ui32)
-define_header_elt_list(ui64)
-define_header_elt_list(f32)
-define_header_elt_list(f64)
-define_header_elt_list(f80)
 
 #define define_header_set_list(T) \
 void set_list_##T(node_##T* list, T val); \
