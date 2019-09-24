@@ -410,9 +410,6 @@
 (defun get-current-function ()
   (gethash *paranteses* *current-function*))
 
-(defun get-last-function ()
-  (gethash (1- *paranteses*) *current-function*))
-
 (defun store-current-function (fun)
   (setf (gethash *paranteses* *current-function*) fun))
 
@@ -929,6 +926,11 @@
                  (add-code (format nil ";~%")))
                ;; initialisation
                (add-code "="))
+           ;; if pointer auto ref variables
+           (if (search ">" (cadr def))
+               (if (or (is-variable-split-name-p (car expr-list))
+                       (is-iter-variable-p (car expr-list)))
+                   (add-code "&")))
            ;; error ?
            (dbg "parse-variable: OPEN ARG")
            (if (equal (car expr-list) "]")
@@ -2235,7 +2237,6 @@
          (let ((type (get-next-token-type-string (cdr expr-list)))
                (omit-comma nil))
            (store-current-function "elt")
-           (setf omit-comma t)
            (add-code (format nil "elt_~a"
                              (regex-replace "pointer" type "array")))
            (add-code "(")
@@ -2247,10 +2248,6 @@
          (let ((type (get-next-token-type-string (cdr expr-list)))
                (omit-comma nil))
            (store-current-function "pelt")
-           (if (equal (cadr (gethash (get-last-function) *signatures*)) "value")
-               (progn
-                 (add-code "*")
-                 (setf omit-comma t)))
            (add-code (format nil "pelt_~a"
                              (regex-replace "pointer" type "array")))
            (add-code "(")
@@ -3111,9 +3108,6 @@
                   (var-name (regex-replace ">>.*" (car expr-list) "")))
               (dbg "parse-expression: VARIABLE "
                    (get-iter-variable-name var-name))
-              (if (and (equal "let" (get-current-function))
-                       (search ">" *current-type-definition*))
-                  (add-code "&"))
               (if (search ">>" (car expr-list))
                   (add-code comp-name)
                   (add-code (get-iter-variable-name var-name)))
@@ -3159,6 +3153,7 @@
         (if (equal "(" (car expr-list))
             (let ((space nil)
                   (no-parens nil))
+              
               ;; add macro
               (if (equal (get-last-code) (format nil ";~%"))
                   (progn
