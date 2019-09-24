@@ -8,6 +8,22 @@
 
 (in-package :next)
 
+(defun setup-data-structures ()
+  (setf *code_list* '(""))
+  (setf *implementation_list* '(""))
+  (setf *definition_list* '(""))
+  (setf *paranteses* 0)
+  (setf  *block* 0)
+  (setf *main_buffer* (make-hash-table :test 'equal))
+  (setf (gethash *paranteses* *main_buffer*) '(""))
+  (setf *definition_buffer* (make-hash-table :test 'equal))
+  (setf *function-args* (make-hash-table :test 'equal))
+  (setf *function-type* (make-hash-table :test 'equal))
+  (setf *variable-type* (make-hash-table :test 'equal))
+  (setf *compositions* (make-hash-table :test 'equal))
+  (setf *function-map* (make-hash-table :test 'equal))
+  (setf *signatures* (make-hash-table :test 'equal)))
+
 (defun setup-signatures ()
   (setf (gethash "elt" *signatures*) '("pointer" "pointer" "value"))
   (setf (gethash "set" *signatures*) '("void" "pointer" "value"))
