@@ -332,7 +332,8 @@ by Edward Puccini |;
   (let [value1:ixx 5000
         value2:ixx 2
         value3:ixx 3
-        value4:i64 B5000]
+        value4:i64 B5000
+        value5:ixx (+ 100 100)]
     (prnl "Bigints!!!")
     (prnl B10000)
     (prn "Value1: ")

@@ -3,7 +3,7 @@
 (defp num:ixx 1)
 
 (defn extract-digit:ixx [nth:ixx]
-  (return (/ (+ (* num nth) acc) den)))
+  (return (ixx (/ (+ (* num nth) acc) den))))
 
 (defn eliminate-digit:void [d:ixx]
   (:: acc (- acc (* den d)))
@@ -36,4 +36,3 @@
         (prnl i))
       (eliminate-digit d))
   (return 0)))
-    

@@ -640,9 +640,6 @@ int destroy_ptr(node_ptr_t* e) {
             node_ptr_t* temp = e->next;
             do
             {
-				//if (e->type == IXX) {
-				//	mpz_clear(e->value);
-				//}
 				if (e->type != ARRAY && e->type != VARIABLE && e->type != INTERMEDIATE_ARRAY
 					&& e->type != INTERMEDIATE_LIST && e->type != INTERMEDIATE_POINTER)
                     free(e);
@@ -652,9 +649,6 @@ int destroy_ptr(node_ptr_t* e) {
             } while (e->next != NULL);
         }
         else {
-			//if (e->type == IXX) {
-			//	mpz_clear(e->value);
-			//}
 			if (e->type != ARRAY && e->type != VARIABLE && e->type != INTERMEDIATE_ARRAY
 				&& e->type != INTERMEDIATE_LIST && e->type != INTERMEDIATE_POINTER)
                 free(e);
