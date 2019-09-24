@@ -1235,12 +1235,14 @@
   (setf expr-list (parse-if-vector expr-list))
   (setf expr-list (parse-close-square-bracket expr-list))
   (add-code (format nil "{~%"))
+  (set-insert-points)
   (setf expr-list (parse-expression expr-list))
   (add-code (format nil "}~%"))
   (if (not (equal ")" (car expr-list)))
       (progn
         (add-code "else")
         (add-code (format nil "~%{~%"))
+        (set-insert-points)
         (setf expr-list (parse-expression expr-list))
         (add-code (format nil "}~%"))))
   (set-insert-points)
@@ -3154,16 +3156,20 @@
                    " omit-semicolon " omit-semicolon)
               (if (car expr-list)
                   (setf expr-list (parse-close-parens expr-list)))
+              ;; output parens?
               (if (and (not space)
                        (not no-parens)
                        (= *start-operation* -1))
                   (add-code ")"))
               (dec-parens)
+              ;; output semicolon ?
               (if (and (not space) (not omit-semicolon))
                   (progn
                     (setf *current-type-definition* nil)
-                    (add-code (format nil ";~%"))
-                    (set-insert-points)))
+                    (add-code (format nil ";~%"))))
+              ;; save pos
+              (if (not omit-semicolon)
+                  (set-insert-points))
               ;; exit
               (return-from parse-expression expr-list))))))
 
