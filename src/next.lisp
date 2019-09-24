@@ -215,6 +215,7 @@
   (set-function-type "floor" "f64")
   (set-function-type "ceil" "f64")
   (set-function-type "round" "f64")
+  (set-function-type "mod" "i32")
   (set-function-type "fmod" "f64")
   (set-function-type "shiftl" "i32")
   (set-function-type "shiftr" "i32")

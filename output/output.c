@@ -176,7 +176,7 @@ i32 cnt_3=0;
 for(cnt_3=0;cnt_3<max_i32(length_array_i32(array_2),1);cnt_3++)
 {
 set_pointer_i32(pelt_array_i32(array_2,cnt_3),(cnt_3*1000));
-if(or_bool(equal_i32(cnt_3,3),eq_i32(cnt_3,4)))
+if(or_bool(eq_i32(cnt_3,3),eq_i32(cnt_3,4)))
 {
 println_string("COUNT IS 3||4");
 }
@@ -261,7 +261,7 @@ println_f64(sin_f64(b_2));
 println_string("");
 print_string("100.0 * cos(35) = ");
 println_f64((f64)(100.0*cos_f32(35.0)));
-if(a_2>not_i32(0))
+if(gt_f64(a_2,not_i32(0)))
 {
 println_string("a > not 0");
 }
@@ -326,7 +326,7 @@ string mode_write_2="w";
 file test_file_2=open(read_name_2,mode_read_2);
 string line_2=(c8*)1;
 println_string("files!!!");
-while(line_2!=0)
+while(neq_string(line_2,0))
 {
 set_pointer_string(&line_2,read_line(test_file_2));
 print_string("line: ");
@@ -368,14 +368,14 @@ set_pointer_i32(&b_2,((2*i_3)-1));
 set_pointer_i32(pelt_array_i32(r_2,i_3),mod(d_2,b_2));
 set_pointer_i32(&d_2,(d_2/b_2));
 set_pointer_i32(&i_3,(i_3-1));
-if(i_3==0)
+if(eq_i32(i_3,0))
 {
 break;
 }
 set_pointer_i32(&d_2,(d_2*i_3));
 }
 printf("%.4d",(i32)(c_2+(d_2/10000)));
-if(mod(k_3,10)==0)
+if(eq_i32(mod(k_3,10),0))
 {
 printf(" %d\n",((max_2-k_3)/7));
 }

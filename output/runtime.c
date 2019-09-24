@@ -340,6 +340,16 @@ define_lt(f32)
 define_lt(f64)
 define_lt(f80)
 
+bool lt_ixx(ixx vala, ixx valb) {
+	i32 result = mpz_cmp(vala, valb);
+	return result < 0;
+}
+
+bool lt_string(string vala, string valb) {
+	i32 result = strncmp(vala, valb, length(vala));
+	return result < 0;
+}
+
 define_leqt(bool)
 define_leqt(i16)
 define_leqt(i32)
@@ -350,6 +360,17 @@ define_leqt(ui64)
 define_leqt(f32)
 define_leqt(f64)
 define_leqt(f80)
+
+bool leqt_ixx(ixx vala, ixx valb) {
+	i32 result = mpz_cmp(vala, valb);
+	return result <= 0;
+}
+
+bool leqt_string(string vala, string valb) {
+	i32 result = strncmp(vala, valb, length(vala));
+	return result <= 0;
+}
+
 
 define_gt(bool)
 define_gt(i16)
@@ -362,6 +383,16 @@ define_gt(f32)
 define_gt(f64)
 define_gt(f80)
 
+bool gt_ixx(ixx vala, ixx valb) {
+	i32 result = mpz_cmp(vala, valb);
+	return result > 0;
+}
+
+bool gt_string(string vala, string valb) {
+	i32 result = strncmp(vala, valb, length(vala));
+	return result > 0;
+}
+
 define_geqt(bool)
 define_geqt(i16)
 define_geqt(i32)
@@ -373,6 +404,16 @@ define_geqt(f32)
 define_geqt(f64)
 define_geqt(f80)
 
+bool geqt_ixx(ixx vala, ixx valb) {
+	i32 result = mpz_cmp(vala, valb);
+	return result >= 0;
+}
+
+bool geqt_string(string vala, string valb) {
+	i32 result = strncmp(vala, valb, length(vala));
+	return result >= 0;
+}
+
 define_neq(bool)
 define_neq(i16)
 define_neq(i32)
@@ -380,6 +421,16 @@ define_neq(i64)
 define_neq(f32)
 define_neq(f64)
 define_neq(f80)
+
+bool neq_ixx(ixx vala, ixx valb) {
+	i32 result = mpz_cmp(vala, valb);
+	return result != 0;
+}
+
+bool neq_string(string vala, string valb) {
+	i32 result = strncmp(vala, valb, length(vala));
+	return result != 0;
+}
 
 define_eq(bool)
 define_eq(i16)
@@ -391,6 +442,17 @@ define_eq(ui64)
 define_eq(f32)
 define_eq(f64)
 define_eq(f80)
+
+bool eq_ixx(ixx vala, ixx valb) {
+	i32 result = mpz_cmp(vala, valb);
+	return result == 0;
+}
+
+bool eq_string(string vala, string valb) {
+	i32 result = strncmp(vala, valb, length(vala));
+	return result == 0;
+}
+
 
 #define define_sqrt(T) \
 T sqrt_##T(T a){ \
