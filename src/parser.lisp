@@ -2869,7 +2869,7 @@
            (if (and (not *current-function*)
                     (equal (cadr def) "ixx"))
                (progn
-                 (setf *target* 'implementation)
+                 (set-target 'implementation)
                  (add-code "static")
                  (add-code " ")
                  (add-code "ixx")
@@ -2881,7 +2881,6 @@
                  (setf expr-list (cdr expr-list))
                  ;; switch target - clear buffer
                  (set-target 'main-buffer)
-                 (setf (gethash *paranteses* *main_buffer*) '(""))
                  ;; move to value)
                  (setf expr-list (cdr expr-list))
                  ;; add initialisation
@@ -3172,6 +3171,7 @@
     (setf *paranteses* 0)
     (setf  *block* 0)
     (setf *main_buffer* (make-hash-table :test 'equal))
+    (setf (gethash *paranteses* *main_buffer*) '(""))
     (setf *definition_buffer* (make-hash-table :test 'equal))
     (setf *function-args* (make-hash-table :test 'equal))
     (setf *function-type* (make-hash-table :test 'equal))

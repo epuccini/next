@@ -186,11 +186,11 @@ static node_ptr_t* pointer_list = NULL;
 #define define_header_lt(T) \
 bool lt_##T(T a, T b);
 #define define_header_leqt(T) \
-bool let_##T(T a, T b);
+bool leqt_##T(T a, T b);
 #define define_header_gt(T) \
 bool gt_##T(T a, T b);
 #define define_header_geqt(T) \
-bool get_##T(T a, T b);
+bool geqt_##T(T a, T b);
 #define define_header_neq(T) \
 bool neq_##T(T a, T b);
 #define define_header_eq(T) \
@@ -1363,6 +1363,9 @@ int write_line(file outfile, cstring line);
 c8* read_line(file infile);
 i32 close(file file);
 
+ixx_cast or_ixx(ixx vala, ixx valb);
+ixx_cast and_ixx(ixx vala, ixx valb);
+
 #define define_header_or(T) \
 T or_##T(T vala, T valb); \
 
@@ -1412,7 +1415,7 @@ define_header_and(f64)
 define_header_and(f80)
 
 #define define_header_equal(T) \
-T equal_##T(T vala, T valb); \
+bool equal_##T(T vala, T valb); \
 
 define_header_equal(bool)
 define_header_equal(b8)

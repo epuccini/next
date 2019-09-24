@@ -2207,6 +2207,11 @@ i32 close(file file) {
 	return fclose(file);
 }
 
+ixx_cast or_ixx(ixx vala, ixx valb) {
+	mpz_ior(vala, vala, valb);
+	return vala;
+}
+
 #define define_or(T) \
 T or_##T(T vala, T valb) { \
     return (vala || valb); \
@@ -2224,8 +2229,6 @@ define_or(ui64)
 define_or(f32)
 define_or(f64)
 define_or(f80)
-define_or(string)
-define_or(file)
 
 #define define_not(T) \
 T not_##T(T val) { \
@@ -2244,8 +2247,6 @@ define_not(ui64)
 define_not(f32)
 define_not(f64)
 define_not(f80)
-define_not(string)
-define_not(file)
 
 #define define_and(T) \
 T and_##T(T vala, T valb) { \
@@ -2264,11 +2265,14 @@ define_and(ui64)
 define_and(f32)
 define_and(f64)
 define_and(f80)
-define_and(string)
-define_and(file)
+
+ixx_cast and_ixx(ixx vala, ixx valb) {
+	mpz_and(vala, vala, valb);
+	return vala;
+}
 
 #define define_equal(T) \
-T equal_##T(T vala, T valb) { \
+bool equal_##T(T vala, T valb) { \
     return (vala == valb); \
 } \
 
