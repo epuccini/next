@@ -25,9 +25,8 @@ typedef mpz_t ixx;
 typedef __mpz_struct* ixx_cast;
 
 i32 mod(i32 a, i32 b);
-i32 i32_mod_i32(i32 a, i32 b);
-bool bool_not_bool(bool a);
-i32 i32_not_i32(i32 a);
+i32 mod_i32(i32 a, i32 b);
+ixx_cast mod_ixx(ixx a, ixx b);
 void print_b8(c8 val);
 void print_c8(c8 val);
 void print_i16(i16 val);

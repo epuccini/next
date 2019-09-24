@@ -4,16 +4,13 @@ i32 mod(i32 a, i32 b) {
 	return a % b;
 }
 
-i32 i32_mod_i32(i32 a, i32 b) {
-    return a % b;
+i32 mod_i32(i32 a, i32 b) {
+	return a % b;
 }
 
-bool bool_not_bool(bool a) {
-    return !a;
-}
-
-i32 i32_not_i32(i32 a) {
-    return !a;
+ixx_cast mod_ixx(ixx a, ixx b) {
+	mpz_mod(a, a, b);
+	return a;
 }
 
 void print_c8(c8 val) {
@@ -2227,6 +2224,8 @@ define_or(ui64)
 define_or(f32)
 define_or(f64)
 define_or(f80)
+define_or(string)
+define_or(file)
 
 #define define_not(T) \
 T not_##T(T val) { \
@@ -2245,6 +2244,8 @@ define_not(ui64)
 define_not(f32)
 define_not(f64)
 define_not(f80)
+define_not(string)
+define_not(file)
 
 #define define_and(T) \
 T and_##T(T vala, T valb) { \
@@ -2263,6 +2264,8 @@ define_and(ui64)
 define_and(f32)
 define_and(f64)
 define_and(f80)
+define_and(string)
+define_and(file)
 
 #define define_equal(T) \
 T equal_##T(T vala, T valb) { \
@@ -2283,7 +2286,11 @@ define_equal(f64)
 define_equal(f80)
 
 bool equal_string(string vala, string valb) {
-    return strncmp(vala, valb, length(vala));
+	return strncmp(vala, valb, length(vala));
+}
+
+bool equal_ixx(ixx vala, ixx valb) {
+	return mpz_cmp(vala, valb);
 }
 
 #define define_equal_array(T) \
