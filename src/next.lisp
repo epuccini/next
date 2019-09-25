@@ -14,8 +14,6 @@
   (setf *definition_list* '(""))
   (setf *paranteses* 0)
   (setf  *block* 0)
-  (setf *main_buffer* (make-hash-table :test 'equal))
-  (setf (gethash *paranteses* *main_buffer*) '(""))
   (setf *definition_buffer* (make-hash-table :test 'equal))
   (setf *function-args* (make-hash-table :test 'equal))
   (setf *function-type* (make-hash-table :test 'equal))
