@@ -1304,6 +1304,7 @@
   (set-insert-points)
   (setf expr-list (parse-let-vector expr-list))
   (setf expr-list (parse-close-square-bracket expr-list))
+  (set-insert-points)
   (setf expr-list (parse-block expr-list))
   (dec-block)
   (add-code (format nil "}~%"))

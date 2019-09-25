@@ -6,14 +6,14 @@
   (:: result (/ (+ (* num nth) acc) den)))
 
 (defn eliminate-digit:void [d:ui64]
-  (:: acc (- acc (* den d)))
-  (:: acc (* acc B10))
+  (:: acc (* B10 (- acc (* den d))))
+
   (:: num (* num B10)))
 
 (defn next-term:void [k:ui64]
   (let [k2:ui64 (+ 1 (* k 2))]
-    (:: acc (+ acc (* num B2)))
-    (:: acc (* acc k2))
+    (:: acc (* k2 (+ acc (* num B2))))
+
     (:: den (* den k2))
     (:: num (* num k))))
 
