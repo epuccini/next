@@ -25,13 +25,13 @@ set_pointer_ixx(acc_0,(G554));
 mpz_t G560;
 mpz_init_set(G560,acc_0);
 mpz_t G561;
-mpz_init_set_str(G561,"10",10);
+mpz_init_set_si(G561,10);
 mpz_mul(G560,G560,G561);
 set_pointer_ixx(acc_0,(G560));
 mpz_t G563;
 mpz_init_set(G563,num_0);
 mpz_t G564;
-mpz_init_set_str(G564,"10",10);
+mpz_init_set_si(G564,10);
 mpz_mul(G563,G563,G564);
 set_pointer_ixx(num_0,(G563));
 }
@@ -43,7 +43,7 @@ mpz_init_set(G566,acc_0);
 mpz_t G569;
 mpz_init(G569);
 mpz_t G570;
-mpz_init_set_str(G570,"2",10);
+mpz_init_set_si(G570,2);
 mpz_mul(G569,num_0,G570);
 mpz_add(G566,G566,G569);
 ui64 k2_2=(1+(k_1*2));
@@ -69,7 +69,7 @@ mpz_init_set_si(den_0,1);
 mpz_init_set_si(num_0,1);
 {
 mpz_t G581;
-mpz_init_set_str(G581,"0",10);
+mpz_init_set_si(G581,0);
 ui64 d_2=0;
 ui64 k_2=0;
 ui64 i_2=0;
@@ -86,11 +86,11 @@ if(gt_ixx(num_0,acc_0))
 continue;
 }
 mpz_t G582;
-mpz_init_set_str(G582,"3",10);
+mpz_init_set_si(G582,3);
 extract_digit_0_ixx(result_2,G582);
 set_pointer_ui64(&d_2,mpz_get_ui(result_2));
 mpz_t G583;
-mpz_init_set_str(G583,"4",10);
+mpz_init_set_si(G583,4);
 extract_digit_0_ixx(result_2,G583);
 if(neq_ui64(d_2,mpz_get_ui(result_2)))
 {

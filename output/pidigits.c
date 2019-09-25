@@ -15,6 +15,7 @@ ui extract_digit(mpz_t result, ui nth) {
   mpz_add(tmp2, tmp1, acc);
   mpz_div(tmp1, tmp2, den);
   mpz_set(result, tmp1);
+  return 0;
 }
 
 void eliminate_digit(ui d) {
@@ -70,6 +71,5 @@ int main(int argc, char **argv) {
          printf("\t:%u\n", i);
       eliminate_digit(d);
    }
-
    return 0;
 }

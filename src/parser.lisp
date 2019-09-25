@@ -1936,7 +1936,21 @@
   (add-code ")")
   (add-code (format nil ";~%")))
 
-(defun add-bigint-declaration (tmp-var &optional (value "0"))
+(defun add-bigint-declaration (tmp-var &optional (value 0))
+  (setf (gethash (get-variable-name tmp-var) *variable-type*) "ixx")
+  (add-code "mpz_t")
+  (add-code " ")
+  (add-code tmp-var)
+  (add-code (format nil ";~%"))
+  (add-code "mpz_init_set_si")
+  (add-code "(")
+  (add-code tmp-var)
+  (add-code ",")
+  (add-code value)
+  (add-code ")")
+  (add-code (format nil ";~%")))
+
+(defun add-bigint-declaration-string (tmp-var &optional (value "0"))
   (setf (gethash (get-variable-name tmp-var) *variable-type*) "ixx")
   (add-code "mpz_t")
   (add-code " ")
@@ -2042,7 +2056,7 @@
     ;; add modulator var
     (if (equal "mpz_powm" operator)
         (progn
-          (add-bigint-declaration op3 (format nil "~a" (expt 2 128)))))
+          (add-bigint-declaration-string op3 (format nil "~a" (expt 2 128)))))
     
     ;; add mpz_call
     (add-code operator)
