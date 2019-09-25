@@ -3,11 +3,9 @@
 (defp num:ixx 1)
 
 (defn extract-digit:void [result:ixx nth:ixx]
-  (if [!= den B0]
-    (:: result (/ (+ (* num nth) acc) den))
-    (:: result B1)))
+  (:: result (/ (+ (* num nth) acc) den)))
 
-(defn eliminate-digit:void [d:ixx]
+(defn eliminate-digit:void [d:ui64]
   (:: acc (- acc (* den d)))
   (:: acc (* acc B10))
   (:: num (* num B10)))
@@ -20,7 +18,7 @@
     (:: num (* num k))))
 
 (defn main:i32 [argc:i32 argv:string>]
-  (let [d:ixx B0 k:ixx B0 i:ixx B0 n:ixx B10000 result:ixx B0]
+  (let [d:ui64 0 k:ixx B0 i:ixx B0 n:ixx B10000 result:ixx B0]
     (while [< i n]
       (:: k (+ k 1))
       (next-term k)
