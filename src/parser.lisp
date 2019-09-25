@@ -95,6 +95,12 @@
       (equal "i16" type) (equal "i32" type) (equal "i64" type)
       (equal "ui16" type) (equal "ui32" type) (equal "ui64" type)))
 
+(defun is-signed-math-type-p (type)
+  (or (equal "i16" type) (equal "i32" type) (equal "i64" type)))
+
+(defun is-unsigned-math-type-p (type)
+  (or (equal "ui16" type) (equal "ui32" type) (equal "ui64" type)))
+
 (defun set-target (target)
   (setf *target* target))
 
@@ -1889,8 +1895,11 @@
          (sym (format nil "~a" sym1)))
     sym))
 
-(defun add-bigint-init (name value)
-  (add-code "mpz_init_set_si")
+(defun add-bigint-init (name value type)
+  (if (is-signed-math-type-p type)
+      (add-code "mpz_init_set_si"))
+  (if (is-unsigned-math-type-p type)
+      (add-code "mpz_init_set_ui"))
   (add-code "(")
   (add-code (get-variable-name name))
   (add-code ",")
@@ -1928,12 +1937,15 @@
   (add-code ")")
   (add-code (format nil ";~%")))
 
-(defun add-bigint-declaration-with-var (tmp-var var-name)
+(defun add-bigint-declaration-with-var (tmp-var var-name type)
   (add-code "mpz_t")
   (add-code " ")
   (add-code tmp-var)
   (add-code (format nil ";~%"))
-  (add-code "mpz_set_si")
+  (if (is-signed-math-type-p type)
+      (add-code "mpz_init_set_si"))
+  (if (is-unsigned-math-type-p type)
+      (add-code "mpz_init_set_ui"))
   (add-code "(")
   (add-code tmp-var)
   (add-code ",")
@@ -1994,7 +2006,7 @@
 
     ;; add declaration with non-ixx-var
     (if (not skip-var-declaration)
-        (add-bigint-declaration-with-var tmp-var2 intz))
+        (add-bigint-declaration-with-var tmp-var2 intz type))
     
     ;; add modulator var
     (if (equal "mpz_powm" operator)
@@ -2093,7 +2105,7 @@
     
     (if init-with-var
         (progn
-          (add-bigint-declaration-with-var tmp-var op1)
+          (add-bigint-declaration-with-var tmp-var op1 type)
           (setf expr-list (cdr expr-list))))
     
     (if (equal "sqrt" operator)
@@ -2226,7 +2238,10 @@
                            (add-code (get-iter-variable-name var-name)))
                        (if (is-fixed-math-type-p *current-type-definition*)
                            (progn
-                             (add-code "mpz_get_si")
+                             (if (is-signed-math-type-p *current-type-definition*)
+                                 (add-code "mpz_get_si"))
+                             (if (is-unsigned-math-type-p *current-type-definition*)
+                                 (add-code "mpz_get_ui"))
                              (add-code "(")
                              (add-code (get-iter-variable-name var-name))
                              (add-code ")")))))
@@ -2240,7 +2255,7 @@
                            (progn
                              (set-target 'definition-buffer)
                              (setf (gethash *paranteses* *definition_buffer*) '(""))
-                             (add-bigint-declaration-with-var (fgensym) var-name)
+                             (add-bigint-declaration-with-var (fgensym) var-name type)
                              (set-target tmp-target)
                              (insert-definition-buffer)))))))
            (setf expr-list (parse-arguments (cdr expr-list) max))
@@ -2985,7 +3000,7 @@
                  ;; move to value)
                  (setf expr-list (cdr expr-list))
                  ;; add initialisation
-                 (add-bigint-init (car def) (car expr-list))
+                 (add-bigint-init (car def) (car expr-list) (cadr def))
                  (set-target tmp-target)
                  ;; move to end
                  (setf expr-list (cdr expr-list))
@@ -3183,7 +3198,10 @@
                            (add-code (get-iter-variable-name var-name)))
                        (if (is-fixed-math-type-p *current-type-definition*)
                            (progn
-                             (add-code "mpz_get_si")
+                             (if (is-signed-math-type-p *current-type-definition*)
+                                 (add-code "mpz_get_si"))
+                             (if (is-unsigned-math-type-p *current-type-definition*)
+                                 (add-code "mpz_get_ui"))
                              (add-code "(")
                              (add-code (get-iter-variable-name var-name))
                              (add-code ")")))))
@@ -3197,7 +3215,7 @@
                            (progn
                              (set-target 'definition-buffer)
                              (setf (gethash *paranteses* *definition_buffer*) '(""))
-                             (add-bigint-declaration-with-var (fgensym) var-name)
+                             (add-bigint-declaration-with-var (fgensym) var-name type)
                              (set-target tmp-target)
                              (insert-definition-buffer)))))))
               (if (not omit-semicolon)
