@@ -24,8 +24,6 @@ typedef FILE* file;
 typedef mpz_t ixx;
 typedef __mpz_struct* ixx_cast;
 
-i32 mod(i32 a, i32 b);
-i32 mod_i32(i32 a, i32 b);
 ixx_cast mod_ixx(ixx a, ixx b);
 void print_b8(c8 val);
 void print_c8(c8 val);
@@ -54,6 +52,20 @@ void println_string(const c8* str);
 void prnl_ixx(ixx num);
 void prn_ixx(ixx num);
 void print_format(const c8* fmt, ...);
+
+#define define_header_mod(T) \
+T mod_##T(T vala, T valb);\
+
+define_header_mod(b8)
+define_header_mod(i16)
+define_header_mod(i32)
+define_header_mod(i64)
+define_header_mod(ui16)
+define_header_mod(ui32)
+define_header_mod(ui64)
+define_header_mod(f32)
+define_header_mod(f64)
+define_header_mod(f80)
 
 #define define_header_node(T) \
 typedef struct node_##T { \

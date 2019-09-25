@@ -1,12 +1,20 @@
 #include "runtime.h"
 
-i32 mod(i32 a, i32 b) {
-	return a % b;
-}
+#define define_mod(T) \
+T mod_##T(T vala, T valb) { \
+	return (i32)vala % (i32)valb; \
+} \
 
-i32 mod_i32(i32 a, i32 b) {
-	return a % b;
-}
+define_mod(b8)
+define_mod(i16)
+define_mod(i32)
+define_mod(i64)
+define_mod(ui16)
+define_mod(ui32)
+define_mod(ui64)
+define_mod(f32)
+define_mod(f64)
+define_mod(f80)
 
 ixx_cast mod_ixx(ixx a, ixx b) {
 	mpz_mod(a, a, b);
@@ -415,6 +423,9 @@ define_neq(bool)
 define_neq(i16)
 define_neq(i32)
 define_neq(i64)
+define_neq(ui16)
+define_neq(ui32)
+define_neq(ui64)
 define_neq(f32)
 define_neq(f64)
 define_neq(f80)

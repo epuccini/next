@@ -644,6 +644,10 @@
          (return-from type-of-number-string nil))))
 
 (defun inspect-function-type (expr-list)
+  (dbg "inspect-function-type: " (cadr expr-list))
+  (dbg "inspect-function-type: " (gethash
+               (get-iter-function-name (car expr-list))
+               *function-type*))
   (if (equal "(" (car expr-list))
       (cond ((is-iter-function-p (cadr expr-list))
              (return-from inspect-function-type
@@ -1019,6 +1023,7 @@
                  (return-from parse-condition expr-list)))
            (setf expr-list (cdr expr-list))
            (let ((type (get-next-token-type-string expr-list)))
+             (setf *current-type-definition* type)
              (add-code (format nil "~a_~a" (get-operator-name operator) type))
              (add-code "(")
              (dbg "parse-condition: parse left-side " (car expr-list))
@@ -1029,6 +1034,7 @@
              (add-code ")")
              (add-code ")")
              (add-code (format nil "~%"))
+             (setf *current-type-definition* nil)
              (dbg "parse-condition: rest " (car expr-list))
              (return-from parse-condition expr-list))))))
     
@@ -1449,7 +1455,8 @@
   (let ((type "")
         (len (length expr-list)))
     (if (or (= x (- len 2))
-            (equal ")" (car expr-list)))
+            (equal ")" (car expr-list))
+            (equal "]" (car expr-list)))
         (progn
           (setf x (1+ x))
           (return-from infer-parens x))
@@ -1463,7 +1470,8 @@
 (defun skip-parens (expr-list x)
   (let ((len (length expr-list)))
     (if (or (= x (- len 2))
-            (equal ")" (car expr-list)))
+            (equal ")" (car expr-list))
+            (equal "]" (car expr-list)))
         (progn
           (setf x (1+ x))
           (return-from skip-parens x))
@@ -1476,7 +1484,6 @@
         (default-type "f64")
         (type "")
         (len (length expr-list)))
-    (dbg "infer-math-type: enter " (car expr-list))
     (loop for x from 0 to (- len 2) do
          (let ((obj (elt expr-list x))
                (next (elt expr-list (1+ x))))
@@ -1501,16 +1508,21 @@
                      (progn
                        (return-from infer-math-type default-type)))))
            (if (and (not (equal "(" obj))
+                    (not (equal "[" obj))
                     (not (equal ")" obj))
+                    (not (equal "]" obj))
                     (not (is-math-operator-p obj)))
                (progn
                  (setf type (determine-type-of-symbol
                              (subseq expr-list x len)))
-                 (dbg "infer-math-type: >" type "<")
+                 (dbg "infer-math-type: >" type "<" (subseq expr-list x len))
                  (if (equal type "ixx")
                      (return-from infer-math-type type))
+                 (if (and type (not (equal type "ixx")))
+                     (setf default-type type))
                  (if (not type)
                      (return-from infer-math-type default-type))))))
+    (dbg "infer-math-type: loop end " type)
     default-type))
   
 (defun count-elements (expr-list)
@@ -1652,16 +1664,16 @@
         (progn
           (setf inspect-type (infer-math-type expr-list))
           (setf *current-type-definition* inspect-type)))
-    ;(if literal-type
-    ;    (dbg "literal-type " literal-type))
-    ;(if variable-type
-    ;    (dbg "variable-type " variable-type))
-    ;(if number-type
-    ;    (dbg "number-type " (format nil "~a" number-type)))
-    ;(if inspect-type
-    ;    (dbg "inspect-type " inspect-type))
-    ;(if function-type
-    ;    (dbg "function-type " (format nil "~a" function-type)))
+    (if inspect-type
+        (dbg "inspect-type " inspect-type))
+    (if literal-type
+        (dbg "literal-type " literal-type))
+    (if variable-type
+        (dbg "variable-type " variable-type))
+    (if number-type
+        (dbg "number-type " (format nil "~a" number-type)))
+    (if function-type
+        (dbg "function-type " (format nil "~a" function-type)))
     (cond ((is-iter-composition-type-p expr-list)
            (setf type-str (compose-iter-composition-type expr-list)))
           ((is-type-p variable-type)
@@ -1878,7 +1890,7 @@
     sym))
 
 (defun add-bigint-init (name value)
-  (add-code "mpz_init_set_ui")
+  (add-code "mpz_init_set_si")
   (add-code "(")
   (add-code (get-variable-name name))
   (add-code ",")
@@ -1902,7 +1914,7 @@
   (add-code ")")
   (add-code (format nil ";~%")))
 
-(defun add-bigint-declaration-with-var (tmp-var var-name)
+(defun add-bigint-declaration-with-ixx-var (tmp-var var-name)
   (setf (gethash (get-variable-name tmp-var) *variable-type*) "ixx")
   (add-code "mpz_t")
   (add-code " ")
@@ -1916,14 +1928,29 @@
   (add-code ")")
   (add-code (format nil ";~%")))
 
+(defun add-bigint-declaration-with-var (tmp-var var-name)
+  (add-code "mpz_t")
+  (add-code " ")
+  (add-code tmp-var)
+  (add-code (format nil ";~%"))
+  (add-code "mpz_set_si")
+  (add-code "(")
+  (add-code tmp-var)
+  (add-code ",")
+  (add-code (get-iter-variable-name var-name))
+  (add-code ")")
+  (add-code (format nil ";~%")))
+
 (defun add-bigint-term (expr-list tmp-var operator)
   (let ((tmp-target *target*)
         (op1 tmp-var)
         (op2)
         (skip-progress nil)
-        (skip-declaration nil)
+        (skip-value-declaration nil)
+        (skip-var-declaration nil)
         (tmp-var2 (fgensym))
         (op3 (fgensym))
+        (type (determine-type-of-symbol expr-list))
         (intz 0))
 
     (dbg "add-bigint-term: " (car expr-list))
@@ -1935,26 +1962,40 @@
           (dbg "add-bigint-term: 2 " (car expr-list))
           (setf op2 *tmp-var*)
           (setf skip-progress t)
-          (setf skip-declaration t))
+          (setf skip-var-declaration t)
+          (setf skip-value-declaration t))
         (if (not (is-iter-variable-p (car expr-list)))
             (if (is-bigint-p (car expr-list))
                 (progn
+                  (setf skip-var-declaration t)
                   (setf intz (get-bigint (car expr-list)))
                   (setf op2 tmp-var2)) ;; mpz_t
                 (progn
+                  (setf skip-var-declaration t)
                   (setf intz (car expr-list))
                   (setf op2 tmp-var2))) ;; integer
             (progn
-              (setf op2 (get-iter-variable-name (car expr-list))))))
+              (if (equal type "ixx")
+                  (progn
+                    (setf skip-var-declaration t)
+                    (setf op2 (get-iter-variable-name (car expr-list))))
+                  (progn
+                    (setf intz (car expr-list))
+                    (setf op2 tmp-var2)
+                    (setf skip-value-declaration t))))))
     
     ;; switch target - clear buffer
     (set-target 'definition-buffer)
     (setf (gethash *paranteses* *definition_buffer*) '(""))
 
-    ;; add declaration
-    (if (not skip-declaration)
+    ;; add declaration with string value
+    (if (not skip-value-declaration)
         (add-bigint-declaration tmp-var2 intz))
 
+    ;; add declaration with non-ixx-var
+    (if (not skip-var-declaration)
+        (add-bigint-declaration-with-var tmp-var2 intz))
+    
     ;; add modulator var
     (if (equal "mpz_powm" operator)
         (progn
@@ -2002,8 +2043,10 @@
         (tmp-var (fgensym))
         (bigint-operator (get-bigint-operator operator))
         (op1)
-        (skip-declaration nil)
-        (init-with-var nil))
+        (type (determine-type-of-symbol expr-list))
+        (skip-value-declaration nil)
+        (init-with-var nil)
+        (init-with-ixx-var nil))
     
     (dbg "parse-bigint-operation: " bigint-operator " next " (car expr-list))
     ;; set start marker
@@ -2017,7 +2060,7 @@
           (setf expr-list (parse-expression expr-list t))
           (dbg "add-bigint-operands: 2 " (car expr-list))
           (setf tmp-var *tmp-var*)
-          (setf skip-declaration t))
+          (setf skip-value-declaration t))
         (if (not (is-iter-variable-p (car expr-list)))
             (if (is-bigint-p (car expr-list))
                 (progn
@@ -2025,19 +2068,29 @@
                 (progn
                   (setf op1 (car expr-list))))
             (progn
-              (setf op1 (car expr-list))
-              (setf init-with-var t)
-              (setf skip-declaration t)))) ;; integer
+              (if (equal "ixx" type)
+                  (progn
+                    (setf op1 (car expr-list))
+                    (setf init-with-ixx-var t))
+                  (progn
+                    (setf op1 (car expr-list))
+                    (setf init-with-var t)))
+              (setf skip-value-declaration t)))) ;; integer
 
     ;; switch target - clear buffer
     (set-target 'definition-buffer)
     (setf (gethash *paranteses* *definition_buffer*) '(""))        
 
     ;; add declaration
-    (if (not skip-declaration)
+    (if (not skip-value-declaration)
         (progn
           (add-bigint-declaration tmp-var op1)
           (setf expr-list (cdr expr-list))))
+    (if init-with-ixx-var
+        (progn
+          (add-bigint-declaration-with-ixx-var tmp-var op1)
+          (setf expr-list (cdr expr-list))))
+    
     (if init-with-var
         (progn
           (add-bigint-declaration-with-var tmp-var op1)
@@ -2069,6 +2122,8 @@
           (setf *start-operation* -1)))
     (setf *tmp-var* tmp-var)
     (return-from parse-bigint-operation expr-list)))
+
+(defvar *stop* nil)
 
 (defun parse-arguments (expr-list max &optional (omit-comma nil))
   (dbg "parse-arguments: >" (car expr-list) "<")
@@ -2153,14 +2208,41 @@
         ((or (is-variable-split-name-p (car expr-list))
              (is-iter-variable-p (car expr-list)))
          (let ((comp-name (build-dotted-type (car expr-list)))
-               (var-name (regex-replace ">>.*" (car expr-list) "")))
+               (var-name (regex-replace ">>.*" (car expr-list) ""))
+               (tmp-target *target*)
+               (type (determine-type-of-symbol expr-list)))
            (if (and (not (equal "(" (get-last-code)))
                     (not omit-comma))
                (add-code ","))
            (dbg "parse-arguments: VARIABLE " (get-iter-variable-name var-name))
            (if (search ">>" (car expr-list))
                (add-code comp-name)
-               (add-code (get-iter-variable-name var-name)))
+               (progn
+                 (if (equal "ixx" type)
+                     (progn
+                       (if (equal type *current-type-definition*)
+                           (add-code (get-iter-variable-name var-name)))
+                       (if (not *current-type-definition*)
+                           (add-code (get-iter-variable-name var-name)))
+                       (if (is-fixed-math-type-p *current-type-definition*)
+                           (progn
+                             (add-code "mpz_get_si")
+                             (add-code "(")
+                             (add-code (get-iter-variable-name var-name))
+                             (add-code ")")))))
+                 (if (is-fixed-math-type-p type)
+                     (progn
+                       (if (is-fixed-math-type-p *current-type-definition*)
+                           (add-code (get-iter-variable-name var-name)))
+                       (if (not *current-type-definition*)
+                           (add-code (get-iter-variable-name var-name)))
+                       (if (equal "ixx" *current-type-definition*)
+                           (progn
+                             (set-target 'definition-buffer)
+                             (setf (gethash *paranteses* *definition_buffer*) '(""))
+                             (add-bigint-declaration-with-var (fgensym) var-name)
+                             (set-target tmp-target)
+                             (insert-definition-buffer)))))))
            (setf expr-list (parse-arguments (cdr expr-list) max))
            (return-from parse-arguments expr-list)))
         ((is-iter-function-p (car expr-list))
@@ -2347,44 +2429,54 @@
         ((or (equal "mod" (car expr-list))
              (equal "%" (car expr-list)))
          (let ((type (get-next-token-type-string (cdr expr-list))))
-           (if (equal type "ixx")
-               (add-code "mod_ixx")
-               (add-code "mod"))
+           (add-code (format nil "mod_~a" type))
            (add-code "(")
            (dbg "parse-call: MOD block " *block* " PARENS " *paranteses*)
            (setf expr-list (parse-arguments (cdr expr-list) 2))))
         ((equal "<" (car expr-list))
          (let ((type (get-next-token-type-string (cdr expr-list))))
+           (if (not *current-type-definition*)
+               (setf *current-type-definition* type))
            (add-code (format nil "lt_~a" type))
            (add-code "(")
            (setf expr-list (parse-arguments (cdr expr-list) 2))
            (return-from parse-call expr-list)))
         ((equal "<=" (car expr-list))
          (let ((type (get-next-token-type-string (cdr expr-list))))
+           (if (not *current-type-definition*)
+               (setf *current-type-definition* type))
            (add-code (format nil "leqt_~a" type))
            (add-code "(")
            (setf expr-list (parse-arguments (cddr expr-list) 2))
            (return-from parse-call expr-list)))
         ((equal ">" (car expr-list))
          (let ((type (get-next-token-type-string (cdr expr-list))))
+           (if (not *current-type-definition*)
+               (setf *current-type-definition* type))
            (add-code (format nil "gt_~a" type))
            (add-code "(")
            (setf expr-list (parse-arguments (cdr expr-list) 2))
            (return-from parse-call expr-list)))
         ((equal ">=" (car expr-list))
          (let ((type (get-next-token-type-string (cdr expr-list))))
+           (if (not *current-type-definition*)
+               (setf *current-type-definition* type))
            (add-code (format nil "geqt_~a" type))
            (add-code "(")
            (setf expr-list (parse-arguments (cdr expr-list) 2))
            (return-from parse-call expr-list)))
         ((equal "!=" (car expr-list))
          (let ((type (get-next-token-type-string (cdr expr-list))))
+           (if (not *current-type-definition*)
+               (setf *current-type-definition* type))
            (add-code (format nil "neq_~a" type))
            (add-code "(")
            (setf expr-list (parse-arguments (cdr expr-list) 2))
            (return-from parse-call expr-list)))
         ((equal "==" (car expr-list))
          (let ((type (get-next-token-type-string (cdr expr-list))))
+           (if (not *current-type-definition*)
+               (setf *current-type-definition* type))
            (add-code (format nil "eq_~a" type))
            (add-code "(")
            (setf expr-list (parse-arguments (cdr expr-list) 2))
@@ -3075,12 +3167,39 @@
         (if (or (is-variable-split-name-p (car expr-list))
                 (is-iter-variable-p (car expr-list)))
             (let ((comp-name (build-dotted-type (car expr-list)))
-                  (var-name (regex-replace ">>.*" (car expr-list) "")))
+                  (var-name (regex-replace ">>.*" (car expr-list) ""))
+                  (tmp-target *target*)
+                  (type (determine-type-of-symbol expr-list)))
               (dbg "parse-expression: VARIABLE "
                    (get-iter-variable-name var-name))
-              (if (search ">>" (car expr-list))
-                  (add-code comp-name)
-                  (add-code (get-iter-variable-name var-name)))
+           (if (search ">>" (car expr-list))
+               (add-code comp-name)
+               (progn
+                 (if (equal "ixx" type)
+                     (progn
+                       (if (equal type *current-type-definition*)
+                           (add-code (get-iter-variable-name var-name)))
+                       (if (not *current-type-definition*)
+                           (add-code (get-iter-variable-name var-name)))
+                       (if (is-fixed-math-type-p *current-type-definition*)
+                           (progn
+                             (add-code "mpz_get_si")
+                             (add-code "(")
+                             (add-code (get-iter-variable-name var-name))
+                             (add-code ")")))))
+                 (if (is-fixed-math-type-p type)
+                     (progn
+                       (if (is-fixed-math-type-p *current-type-definition*)
+                           (add-code (get-iter-variable-name var-name)))
+                       (if (not *current-type-definition*)
+                           (add-code (get-iter-variable-name var-name)))
+                       (if (equal "ixx" *current-type-definition*)
+                           (progn
+                             (set-target 'definition-buffer)
+                             (setf (gethash *paranteses* *definition_buffer*) '(""))
+                             (add-bigint-declaration-with-var (fgensym) var-name)
+                             (set-target tmp-target)
+                             (insert-definition-buffer)))))))
               (if (not omit-semicolon)
                   (add-code (format nil ";~%")))
               (dbg "parse-expression: VAR END " var-name)
