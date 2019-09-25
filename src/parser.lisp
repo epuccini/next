@@ -97,7 +97,8 @@
       (search "ui16" type) (search "ui32" type) (search "ui64" type)))
 
 (defun is-signed-math-type-p (type)
-  (or (search "i16" type) (search "i32" type) (search "i64" type)))
+  (and (not (search "ui" type))
+       (or (search "i16" type) (search "i32" type) (search "i64" type))))
 
 (defun is-unsigned-math-type-p (type)
   (or (search "ui16" type) (search "ui32" type) (search "ui64" type)))
@@ -2005,10 +2006,15 @@
                 (if (equal type "ixx")
                     (progn
                       (setf op2 (get-iter-variable-name (car expr-list))))
-                    (progn
-                      (setf intz (car expr-list))
-                      (setf op2 tmp-var2)
-                      (setf init-with-string t))))))
+                    (if (and (not (equal operator "mpz_powm"))
+                             (not (equal operator "mpz_sqrt")))
+                             (progn
+                               (setf operator (format nil "~a_si" operator))
+                               (setf op2 (get-iter-variable-name (car expr-list))))
+                             (progn
+                               (setf intz (car expr-list))
+                               (setf op2 tmp-var2)
+                               (setf init-with-string t)))))))
     
     ;; switch target - clear buffer
     (set-target 'definition-buffer)
@@ -2075,6 +2081,7 @@
         (init-with-ixx-var nil))
     
     (dbg "parse-bigint-operation: " bigint-operator " next " (car expr-list))
+
     ;; set start marker
     (if (= *start-operation* -1)
         (setf *start-operation* *paranteses*))
@@ -2113,6 +2120,7 @@
         (progn
           (add-bigint-declaration tmp-var op1)
           (setf expr-list (cdr expr-list))))
+    
     (if init-with-ixx-var
         (progn
           (add-bigint-declaration-with-ixx-var tmp-var op1)

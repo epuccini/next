@@ -32,9 +32,8 @@
         (continue))
       
       (prn d)
-      (prn " ")
       (:: i (+ 1 i))      
       (if [== (mod i 10) 0]
-        (prnl i))
+        (prnfmt " %lu\n" i))
       (eliminate-digit d))
   (return 0)))
