@@ -1530,7 +1530,7 @@
                      (return-from infer-math-type default-type))))))
     (dbg "infer-math-type: loop end " type)
     default-type))
-  
+
 (defun count-elements (expr-list)
   (let ((count 0)
         (parens 0))
@@ -1658,7 +1658,7 @@
 (defun determine-type-of-symbol (expr-list &optional (skip-infer nil))
   (dbg "determine-type-of-symbol: symbol " (car expr-list))
   (dbg "operator " (cadr expr-list))
-  (dbg "infer " (not skip-infer))
+  (dbg "infer " (not skip-infer) " not infer " skip-infer) 
   (dbg "name " (get-iter-variable-name (car expr-list)))
   (dbg "type " (get-iter-variable-type (car expr-list)))
   (let* ((symbol-value (car expr-list))
@@ -1675,8 +1675,6 @@
         (progn
           (setf inspect-type (infer-math-type expr-list))
           (setf *current-type-definition* inspect-type)))
-    (if inspect-type
-        (dbg "inspect-type " inspect-type))
     (if literal-type
         (dbg "literal-type " literal-type))
     (if variable-type
@@ -1685,6 +1683,8 @@
         (dbg "number-type " (format nil "~a" number-type)))
     (if function-type
         (dbg "function-type " (format nil "~a" function-type)))
+    (if inspect-type
+        (dbg "inspect-type " inspect-type))
     (cond ((is-iter-composition-type-p expr-list)
            (setf type-str (compose-iter-composition-type expr-list)))
           ((is-type-p variable-type)
@@ -1968,7 +1968,7 @@
         (skip-var-declaration nil)
         (tmp-var2 (fgensym))
         (op3 (fgensym))
-        (type (determine-type-of-symbol expr-list))
+        (type (determine-type-of-symbol expr-list t))
         (intz 0))
 
     (dbg "add-bigint-term: " (car expr-list))
@@ -2061,7 +2061,7 @@
         (tmp-var (fgensym))
         (bigint-operator (get-bigint-operator operator))
         (op1)
-        (type (determine-type-of-symbol expr-list))
+        (type (determine-type-of-symbol expr-list t))
         (skip-value-declaration nil)
         (init-with-var nil)
         (init-with-ixx-var nil))
@@ -2167,12 +2167,13 @@
              (if (not *current-type-definition*)
                  (add-code (get-iter-variable-name var-name)))
              (if (equal "ixx" *current-type-definition*)
-                 (progn
+                 (let ((tmp-var (fgensym)))
                    (set-target 'definition-buffer)
                    (setf (gethash *paranteses* *definition_buffer*) '(""))
-                   (add-bigint-declaration-with-var (fgensym) var-name type)
+                   (add-bigint-declaration-with-var tmp-var var-name type)
                    (set-target tmp-target)
-                   (insert-definition-buffer)))))
+                   (insert-definition-buffer)
+                   (add-code tmp-var)))))
           (t
            (add-code (get-iter-variable-name var-name))))))
 
@@ -2367,11 +2368,13 @@
           (dbg "parse-call: prnfmt Next arg " (cadr expr-list))
           (setf expr-list (cdr expr-list))
           (setf expr-list (parse-arguments expr-list *infinite-arguments*)))
-        ((equal "prnl" (car expr-list))
+         ((equal "prnl" (car expr-list))
+          (dbg "parse-call: prnl before " (car expr-list))
          (let ((type (get-next-token-type-string (cdr expr-list))))
            (dbg "parse-call: prnl next " (caddr expr-list))
            ;; set following arguments-type this type
            (setf *current-type-definition* type)
+           (dbg "parse-call: prnl current type " *current-type-definition*)
            (if (search "ixx" type)
                (progn
                  (add-code "prnl_ixx")
