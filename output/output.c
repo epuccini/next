@@ -7,8 +7,8 @@ static ixx num_0;
 void extract_digit_0_ixx(ixx result_1,ixx nth_1)
 {
 mpz_t G547;
-mpz_init_set(G547,num_0);
-mpz_mul(G547,G547,nth_1);
+mpz_init(G547);
+mpz_mul(G547,num_0,nth_1);
 mpz_add(G547,G547,acc_0);
 mpz_div(G547,G547,den_0);
 set_pointer_ixx(result_1,(G547));
@@ -18,8 +18,8 @@ void eliminate_digit_0_ui64(ui64 d_1)
 mpz_t G554;
 mpz_init_set(G554,acc_0);
 mpz_t G557;
-mpz_init_set(G557,den_0);
-mpz_mul_si(G557,G557,d_1);
+mpz_init(G557);
+mpz_mul_si(G557,den_0,d_1);
 mpz_sub(G554,G554,G557);
 set_pointer_ixx(acc_0,(G554));
 mpz_t G560;
@@ -41,10 +41,10 @@ void next_term_0_ui64(ui64 k_1)
 mpz_t G566;
 mpz_init_set(G566,acc_0);
 mpz_t G569;
-mpz_init_set(G569,num_0);
+mpz_init(G569);
 mpz_t G570;
 mpz_init_set_str(G570,"2",10);
-mpz_mul(G569,G569,G570);
+mpz_mul(G569,num_0,G570);
 mpz_add(G566,G566,G569);
 ui64 k2_2=(1+(k_1*2));
 set_pointer_ixx(acc_0,(G566));

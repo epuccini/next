@@ -2135,7 +2135,7 @@
     
     (if init-with-ixx-var
         (progn
-          (if (= *start-operation* -1)
+          (if (not (= *paranteses* *start-operation*))
               (progn
                 (add-bigint-tmp-init tmp-var)
                 (setf op1 (get-iter-variable-name (car expr-list))))
@@ -2169,7 +2169,7 @@
           (parse-bigint-operation-next expr-list tmp-var op1 bigint-operator))
 
     ;; end add var
-    (if (= (- *paranteses* *start-operation*) 0)
+    (if (= *paranteses* *start-operation*)
         (progn
           (add-code "(")
           (add-code tmp-var)
