@@ -1912,6 +1912,18 @@
          (sym (format nil "~a" sym1)))
     sym))
 
+(defun add-bigint-tmp-init (tmp-var)
+  (setf (gethash (get-variable-name tmp-var) *variable-type*) "ixx")
+  (add-code "mpz_t")
+  (add-code " ")
+  (add-code tmp-var)
+  (add-code (format nil ";~%"))
+  (add-code "mpz_init")
+  (add-code "(")
+  (add-code tmp-var)
+  (add-code ")")
+  (add-code (format nil ";~%")))
+
 (defun add-bigint-init (name value type)
   (if (is-unsigned-math-type-p type)
       (add-code "mpz_init_set_ui")
@@ -1971,9 +1983,8 @@
   (add-code ")")
   (add-code (format nil ";~%")))
 
-(defun add-bigint-term (expr-list tmp-var operator)
+(defun add-bigint-term (expr-list tmp-var op1 operator)
   (let ((tmp-target *target*)
-        (op1 tmp-var)
         (op2)
         (skip-progress nil)
         (init-with-string nil)
@@ -2062,12 +2073,12 @@
         (setf expr-list (cdr expr-list)))
     expr-list))
   
-(defun parse-bigint-operation-next (expr-list tmp-var operator)
+(defun parse-bigint-operation-next (expr-list tmp-var op1 operator)
   (if (not (equal ")" (car expr-list)))
       (progn
-        (setf expr-list (add-bigint-term expr-list tmp-var operator))
+        (setf expr-list (add-bigint-term expr-list tmp-var op1 operator))
         (setf expr-list (parse-bigint-operation-next
-                         expr-list tmp-var operator)))
+                         expr-list tmp-var op1 operator)))
       (return-from parse-bigint-operation-next expr-list)))
 
 (defun parse-bigint-operation (expr-list operator)
@@ -2075,6 +2086,7 @@
         (tmp-var (fgensym))
         (bigint-operator (get-bigint-operator operator))
         (op1)
+        (intz)
         (type (determine-type-of-symbol expr-list t))
         (skip-value-declaration nil)
         (init-with-var nil)
@@ -2093,21 +2105,20 @@
           (setf expr-list (parse-expression expr-list t))
           (dbg "add-bigint-operands: 2 " (car expr-list))
           (setf tmp-var *tmp-var*)
+          (setf op1 tmp-var)
           (setf skip-value-declaration t))
         (if (not (is-iter-variable-p (car expr-list)))
             (if (is-bigint-p (car expr-list))
                 (progn
-                  (setf op1 (get-bigint (car expr-list)))) ; mpz_t
+                  (setf intz (get-bigint (car expr-list)))) ; mpz_t
                 (progn
-                  (setf op1 (car expr-list))))
+                  (setf intz (car expr-list))))
             (if (is-iter-variable-p (car expr-list))
               (if (equal "ixx" type)
                   (progn
-                    (setf op1 (car expr-list))
                     (setf init-with-ixx-var t)
                     (setf skip-value-declaration t))
                   (progn
-                    (setf op1 (car expr-list))
                     (setf init-with-var t)
                     (setf skip-value-declaration t)))))) ;; integer
 
@@ -2118,17 +2129,25 @@
     ;; add declaration
     (if (not skip-value-declaration)
         (progn
-          (add-bigint-declaration tmp-var op1)
+          (add-bigint-declaration tmp-var intz)
+          (setf op1 tmp-var)
           (setf expr-list (cdr expr-list))))
     
     (if init-with-ixx-var
         (progn
-          (add-bigint-declaration-with-ixx-var tmp-var op1)
+          (if (= *start-operation* -1)
+              (progn
+                (add-bigint-tmp-init tmp-var)
+                (setf op1 (get-iter-variable-name (car expr-list))))
+              (progn
+                (add-bigint-declaration-with-ixx-var tmp-var (car expr-list))
+                (setf op1 tmp-var)))
           (setf expr-list (cdr expr-list))))
     
     (if init-with-var
         (progn
-          (add-bigint-declaration-with-var tmp-var op1 type)
+          (add-bigint-declaration-with-var tmp-var (car expr-list) type)
+          (setf op1 tmp-var)
           (setf expr-list (cdr expr-list))))
     
     (if (equal "sqrt" operator)
@@ -2147,7 +2166,7 @@
           
     ;; next var
     (setf expr-list
-          (parse-bigint-operation-next expr-list tmp-var bigint-operator))
+          (parse-bigint-operation-next expr-list tmp-var op1 bigint-operator))
 
     ;; end add var
     (if (= (- *paranteses* *start-operation*) 0)
