@@ -466,6 +466,7 @@ mpz_t G576;
 mpz_init_set(G576,value1_2);
 mpz_div(G576,G576,value2_2);
 prnl_ixx((ixx_cast)(G576));
+println_i32(((100000/100)*(1000-500)*sqrt(9)));
 mpz_t G580;
 mpz_init_set_si(G580,100000);
 mpz_t G581;

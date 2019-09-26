@@ -9,11 +9,9 @@ SRC_PIDIGITS	= ../src/pidigits.next
 
 $(APPLICATION): $(OBJ)
 	$(NEXT) -c $(SRC_EXAMPLE) -o ../output/$(APPLICATION)
-pidigits:
+pi:
 	$(NEXT) -c $(SRC_PIDIGITS) -o ../output/$(APPLICATION)
 
-#%.o: %.next:
-#     $(NEXT) -c $<
 
 clean:
 	rm -f ../output/$(APPLICATION)

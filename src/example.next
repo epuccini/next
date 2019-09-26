@@ -353,6 +353,7 @@ by Edward Puccini |;
     (prnl (ixx (- value1 (* value1 value2) value2)))
     (prnl (ixx (* value1 value2)))
     (prnl (ixx (/ value1 value2)))
+    (prnl (* (/ 100000 100) (- 1000 500) (sqrt 9)))
     (prnl (* (/ 100000 100) (- 1000 500) (sqrt 9) (bigint-add 1)))
     (prnl (* (/ 100000 100) (- 1000 B500) (sqrt 9) (bigint-add B1)))
     (prnl (* 10 (^ 2 16)))
