@@ -2,18 +2,16 @@
 (defp den:ixx 1)
 (defp num:ixx 1)
 
-(defn extract-digit:void [result:ixx nth:ui64]
-  (:: result (/ (+ (* num nth) acc) den)))
+(defn extract-digit:ixx [nth:ui64]
+  (return (/ (+ (* num nth) acc) den)))
 
 (defn eliminate-digit:void [d:ui64]
   (:: acc (* B10 (- acc (* den d))))
-;  (:: acc (* acc B10))
   (:: num (* num B10)))
 
 (defn next-term:void [k:ui64]
   (let [k2:ui64 (+ 1 (* k 2))]
     (:: acc (* k2 (+ acc (* num B2))))
-;    (:: acc (* acc k2))
     (:: den (* den k2))
     (:: num (* num k))))
 
@@ -25,10 +23,8 @@
       (if [> num acc]
         (continue))
 
-      (extract-digit result 3)
-      (:: d result)
-      (extract-digit result 4)
-      (if [!= d result]
+      (:: d (extract-digit B3))
+      (if [!= d (extract-digit B4)]
         (continue))
       
       (prn d)

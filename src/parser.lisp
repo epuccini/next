@@ -588,10 +588,50 @@
                    (append (gethash *paranteses* *definition_buffer*)
                                                (list expression))))
             ((equal *target* 'mainbuffer)
-             (dbg "HIT " (list expression))
              (setf *main_buffer*
                    (append *main_buffer* (list expression)))))))
 
+(defun get-split-fn-name (split-name)
+  (let ((split-list (split ":" split-name)))
+    (return-from get-split-fn-name (car split-list))))
+
+(defun get-split-fn-type (split-name)
+  (let ((split-list (split ":" split-name)))
+    (return-from get-split-fn-type (cadr split-list))))
+
+(defun get-result-name (name)
+  (if (equal *current-module* "")
+      (format nil "result_~a_~a_ixx" (filter-expression name) *block*)
+      (format nil "result_~a__~a_~a_ixx" *current-module* (filter-expression name) *block*)))
+
+(defun get-iter-result-name-x (name cnt)
+  (let ((hash  ""))
+    (if (>= cnt 0)
+        (progn
+          (if (equal *current-module* "")
+              (setf hash (format nil "result_~a_~a_ixx" (filter-expression name) cnt))
+              (setf hash (format nil "result_~a__~a_~a_ixx" *current-module*
+                                 (filter-expression name) cnt)))
+          (if (gethash hash *variable-type*)
+              (progn
+                (return-from get-iter-result-name-x hash))
+              (progn
+                (setf cnt (- cnt 1))
+                (get-iter-result-name-x name cnt)))))))
+
+(defun get-iter-result-name (name)
+  (get-iter-result-name-x name *block*))
+
+(defun add-result-type (split-name)
+  (setf (gethash (get-function-name (get-split-fn-name split-name)) *function-type*) "ixx")
+  (setf (gethash (get-result-name (get-split-fn-name split-name)) *variable-type*) "ixx")
+  (add-code "static")
+  (add-code " ")
+  (add-code "ixx")
+  (add-code " ")
+  (add-code (get-result-name (get-split-fn-name split-name)))
+  (add-code (format nil ";~%")))
+      
 (defun get-last-code ()
   (cond ((equal *target* 'code)
          (car (reverse *code_list*)))
@@ -791,7 +831,8 @@
              (not (is-type-p type))
              (not (is-iter-composition-p type)))
         (error-function-type-unkown expr-list type))
-    (setf (gethash (get-function-name fn-name) *function-type*) type)
+    (if (not (search "ixx" (gethash (get-function-name fn-name) *function-type*)))
+        (setf (gethash (get-function-name fn-name) *function-type*) type))
   expr-list))
 
 (defun set-function-arg (name type)
@@ -1331,17 +1372,13 @@
     (dbg "parse-compose " (car expr-list))
     (setf *current-composition* "")
     expr-list))
-
-(defun get-split-fn-name (split-name)
-  (let ((split-list (split ":" split-name)))
-    (return-from get-split-fn-name (car split-list))))
-
-(defun get-split-fn-type (split-name)
-  (let ((split-list (split ":" split-name)))
-    (return-from get-split-fn-type (cadr split-list))))
-
+      
 (defun parse-def-function (expr-list)
   (let ((fn-name (get-split-fn-name (car expr-list))))
+    (if (search "ixx" (get-split-fn-type (car expr-list)))
+        (progn
+          (setf (car expr-list) (concatenate 'string fn-name ":void"))
+          (add-result-type (car expr-list))))
     (dbg "parse-def-function: name and type block " *block* " parens " *paranteses*)
     (setf expr-list (parse-function-name-and-type expr-list))
     (inc-block)
@@ -1533,7 +1570,7 @@
                (progn
                  (setf type (determine-type-of-symbol
                              (subseq expr-list x len)))
-                 (dbg "infer-math-type: >" type "<" (subseq expr-list x len))
+                 (dbg "infer-math-type: >" type "<")
                  (if (equal type "ixx")
                      (return-from infer-math-type type))
                  (if (and type (not (equal type "ixx")))
@@ -1745,8 +1782,8 @@
 (defun parse-bigint-number (expr-list number)
   (let ((tmp-var (fgensym))
         (tmp-target *target*))
+    (set-target 'definition-buffer)
     (setf (gethash *paranteses* *definition_buffer*) '(""))
-    (setf *target* 'definition-buffer)
     (add-bigint-declaration tmp-var number)
     ;; last real target
     (set-target tmp-target)
@@ -2294,7 +2331,8 @@
            (if (and (not (equal "(" (get-last-code)))
                     (not omit-comma))
                (add-code ","))
-           (setf expr-list (parse-bigint-number expr-list (get-bigint (car expr-list))))
+           (setf expr-list (parse-bigint-number expr-list
+                                                (get-bigint (car expr-list))))
            (setf expr-list (cdr expr-list))
            (setf expr-list (parse-arguments expr-list max))))
         ((numberp (parse-integer (car expr-list) :junk-allowed t))
@@ -2304,6 +2342,13 @@
                (add-code ","))
            (progn
              ; convert lisp double-float to c double
+             ;(if (equal "ixx" *current-type-definition*)
+              ;   (progn
+               ;    (setf expr-list (parse-bigint-number expr-list (car expr-list))))
+                ; (progn
+                 ;  (dbg "parse-expression: NUM block " *block*
+                  ;      " number " (car expr-list))
+                   ;(add-code (regex-replace-all "d0" (car expr-list) "f"))))
              (setf (car expr-list) (regex-replace-all "d0" (car expr-list) "f"))
              (add-code (car expr-list))
              (setf expr-list (parse-arguments (cdr expr-list) max)))))
@@ -2495,10 +2540,20 @@
          (setf expr-list (parse-compose (cdr expr-list)))
          (setf *target* 'code))
         ((equal "return" (car expr-list))
-         (add-code "return")
-         (add-code "(")
-         (setf expr-list (parse-arguments (cdr expr-list) 1))
-         (return-from parse-call expr-list))
+         (let ((type (get-next-token-type-string (cdr expr-list))))
+           (if (search "ixx" (get-iter-function-type *current-function*))
+               (progn
+                 (setf *current-type-definition* type)
+                 (add-code "mpz_set")
+                 (add-code "(")
+                 (add-code (get-iter-result-name *current-function*))
+                 (setf *tmp-var* (get-iter-result-name *current-function*)))
+               (progn
+                 (add-code "return")
+                 (add-code "(")))
+           (setf expr-list (parse-arguments (cdr expr-list) 1))
+           (setf *current-type-definition* nil)
+           (return-from parse-call expr-list)))
         ((equal "while" (car expr-list))
          (add-code "while")
          (add-code "(")
@@ -3114,17 +3169,67 @@
          (return-from parse-call expr-list))
         ((is-iter-function-p (car expr-list))
          (let* ((fn-name (car expr-list))
-                (fn-type (get-next-token-type-string (cdr expr-list))))
+                (ret-type (get-next-token-type-string (cdr expr-list)))
+                (fn-type *current-type-definition*)
+                (tmp-target *target*))
            (if (is-iter-function-p (cadr expr-list))
                (setf fn-type "fun"))
            (dbg "parse-call: FN: " (get-iter-function-name fn-name))
-           (if (is-function-map-p fn-name)
-               (add-code (get-iter-function-name fn-name))
-               (add-code (format nil "~a_~a"
-                                 (get-iter-function-name fn-name) fn-type)))
-           (add-code "(")
-           (setf expr-list (cdr expr-list))
-           (setf expr-list (parse-arguments expr-list *infinite-arguments*))))
+           (dbg "parse-call: TYPE: " fn-type)
+           (if (not (search ret-type "ixx"))
+               (progn
+                 (if (equal fn-type "fun")
+                     (setf ret-type "fun"))
+                 (if (is-function-map-p fn-name)
+                     (add-code (get-iter-function-name fn-name))
+                     (add-code (format nil "~a_~a"
+                                       (get-iter-function-name fn-name) ret-type)))
+                 (add-code "(")
+                 (setf expr-list (cdr expr-list))
+                 (setf expr-list (parse-arguments expr-list *infinite-arguments*))))
+           (if (search "ixx" ret-type)
+               (progn
+                 (setf expr-list (cdr expr-list))
+                 (setf expr-list (parse-arguments expr-list *infinite-arguments* t))
+                 (setf *current-type-definition* "ixx")
+                 (set-target 'definition-buffer)
+                 (setf (gethash *paranteses* *definition_buffer*) '(""))
+                 (if (is-function-map-p fn-name)
+                     (add-code (get-iter-function-name fn-name))
+                     (add-code (format nil "~a_~a"
+                                       (get-iter-function-name fn-name) fn-type)))
+                 (if (search "ixx" fn-type)
+                     (progn
+                       (add-code "(")
+                       (add-code *tmp-var*)
+                       (add-code ")")
+                       (add-code (format nil ";~%"))
+                       (add-code "mpz_set")
+                       (add-code "(")
+                       (add-code *tmp-var*)
+                       (add-code ",")
+                       (add-code (get-iter-result-name fn-name))
+                       (add-code ")")
+                       (add-code (format nil ";~%")))
+                     (progn
+                       (add-code "(")
+                       (add-code "mpz_get_si")
+                       (add-code "(")
+                       (add-code *tmp-var*)
+                       (add-code ")")
+                       (add-code ")")
+                       (add-code (format nil ";~%"))
+                       (add-code "mpz_set")
+                       (add-code "(")
+                       (add-code *tmp-var*)
+                       (add-code ",")
+                       (add-code (get-iter-result-name fn-name))
+                       (add-code ")")
+                       (add-code (format nil ";~%"))))
+                 (set-target tmp-target)
+                 (insert-definition-buffer)
+                 (setf *current-type-definition* nil)
+                 (dbg "parse-call: is-iter-function-p " (get-iter-result-name fn-name))))))
         ((is-iter-variable-p (car expr-list))
          (dbg "parse-call: FN emit: " (get-function-name (car expr-list)))
          (add-code "(")
@@ -3297,6 +3402,7 @@
               (return-from parse-expression expr-list)))
         (if (equal "(" (car expr-list))
             (let ((space nil)
+                  (fn-name (cadr expr-list))
                   (no-parens nil))
               
               ;; parse-open-parens
@@ -3334,9 +3440,12 @@
               ;; output parens?
               (if (and (not space)
                        (not no-parens)
+                       (not (equal "ixx" (get-iter-function-type fn-name)))
                        (= *start-operation* -1))
                   (add-code ")"))
               (dec-parens)
+              (dbg "HALT " (get-iter-function-type fn-name))
+              (dbg "HALT " fn-name)
               ;; output semicolon ?
               (if (and (not space) (not omit-semicolon))
                   (progn
