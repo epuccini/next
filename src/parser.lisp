@@ -2415,7 +2415,7 @@
          (fn-type (get-iter-function-args fn-name))
          (tmp-target *target*))
     (if (is-iter-function-p (cadr expr-list))
-        (setf fn-type "fun"))
+        (setf type "fun"))
     (dbg "parse-call: FN: " (get-iter-function-name fn-name))
     (dbg "parse-call: TYPE: " fn-type)
     (setf *current-type-definition* fn-type)
@@ -2426,7 +2426,7 @@
           (if (is-function-map-p fn-name)
               (add-code (get-iter-function-name fn-name))
               (add-code (format nil "~a_~a"
-                                (get-iter-function-name fn-name) fn-type)))
+                                (get-iter-function-name fn-name) type)))
           (add-code "(")
           (setf expr-list (cdr expr-list))
           (setf expr-list (parse-arguments expr-list *infinite-arguments*))))
@@ -2449,7 +2449,9 @@
                       (add-code "(")
                       (add-code *tmp-var*)
                       (set-target tmp-target)
-                      (insert-definition-buffer))
+                      (insert-definition-buffer)
+                      (if *current-math-operation*
+                          (swallow-last-code)))
                     (progn
                       (set-target 'definition-buffer)
                       (setf (gethash *paranteses* *definition_buffer*) '(""))
