@@ -328,6 +328,9 @@ by Edward Puccini |;
     (prnl "")
     (return 0)))
 
+(defn bigint-add:ixx [val:ixx]
+  (return (* val B2)))
+
 (defn bigints:void []
   (let [value1:ixx 5000
         value2:ixx 2
@@ -350,8 +353,8 @@ by Edward Puccini |;
     (prnl (ixx (- value1 (* value1 value2) value2)))
     (prnl (ixx (* value1 value2)))
     (prnl (ixx (/ value1 value2)))
-    (prnl (* (/ 100000 100) (- 1000 500) (sqrt 9)))
-    (prnl (* (/ 100000 100) (- 1000 B500) (sqrt 9)))
+    (prnl (* (/ 100000 100) (- 1000 500) (sqrt 9) (bigint-add 1)))
+    (prnl (* (/ 100000 100) (- 1000 B500) (sqrt 9) (bigint-add B1)))
     (prnl (* 10 (^ 2 16)))
     (prnl (* B10 (^ 2 64)))
     (:: value1 (* 990 B1000))

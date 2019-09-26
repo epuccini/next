@@ -46,6 +46,7 @@
 (defvar *current-composition* nil)
 (defvar *current-type-variable* nil)
 (defvar *current-type-definition* nil)
+(defvar *current-math-operation* nil)
 (defvar *current-module* "")
 (defvar *start-operation* -1)
 
@@ -632,6 +633,16 @@
   (add-code (get-result-name (get-split-fn-name split-name)))
   (add-code (format nil ";~%")))
       
+(defun swallow-last-code ()
+  (cond ((equal *target* 'code)
+         (setf *code_list* (subseq *code_list* 0 (1- (length *code_list*)))))
+        ((equal *target* 'implementation)
+         (setf *implementation_list*
+               (subseq *implementation_list* 0 (1- (length *implementation_list*)))))
+        ((equal *target* 'definition)
+         (setf *definition_list*
+               (subseq *definition_list* 0 (1- (length *definition_list*)))))))
+
 (defun get-last-code ()
   (cond ((equal *target* 'code)
          (car (reverse *code_list*)))
@@ -1789,6 +1800,7 @@
     (set-target tmp-target)
     (insert-definition-buffer)
     (setf (gethash *paranteses* *definition_buffer*) '(""))
+    (dbg "parse-bigint-number: type " *current-type-definition*)
     (if (or (not *current-type-definition*)
             (equal "ixx" *current-type-definition*))
         (add-code tmp-var))
@@ -1910,7 +1922,6 @@
         (setf *implementation_list* (append
                                      *implementation_list*
                                      *main_buffer*))
-        (dbg "List " *implementation_list*)
         (setf *main-start-implementation*
               (+ *main-start-implementation*
                  (length *main_buffer*))))))
@@ -2148,7 +2159,9 @@
 
     ;; set start marker
     (if (= *start-operation* -1)
-        (setf *start-operation* *paranteses*))
+        (progn
+               (setf *current-math-operation* t)
+               (setf *start-operation* *paranteses*)))
 
     ;; add mpz_t and init with 0 +/- or 1 */ 
     (if (equal "(" (car expr-list))
@@ -2225,6 +2238,7 @@
         (progn
           (add-code "(")
           (add-code tmp-var)
+          (setf *current-math-operation* nil)
           (setf *start-operation* -1)))
     (setf *tmp-var* tmp-var)
     (return-from parse-bigint-operation expr-list)))
@@ -2342,15 +2356,13 @@
                (add-code ","))
            (progn
              ; convert lisp double-float to c double
-             ;(if (equal "ixx" *current-type-definition*)
-              ;   (progn
-               ;    (setf expr-list (parse-bigint-number expr-list (car expr-list))))
-                ; (progn
-                 ;  (dbg "parse-expression: NUM block " *block*
-                  ;      " number " (car expr-list))
-                   ;(add-code (regex-replace-all "d0" (car expr-list) "f"))))
-             (setf (car expr-list) (regex-replace-all "d0" (car expr-list) "f"))
-             (add-code (car expr-list))
+             (if (equal "ixx" *current-type-definition*)
+                 (progn
+                   (setf expr-list (parse-bigint-number expr-list (car expr-list))))
+                 (progn
+                   (dbg "parse-expression: NUM block " *block*
+                        " number " (car expr-list))
+                   (add-code (regex-replace-all "d0" (car expr-list) "f"))))
              (setf expr-list (parse-arguments (cdr expr-list) max)))))
         ((or (is-variable-split-name-p (car expr-list))
              (is-iter-variable-p (car expr-list)))
@@ -2406,6 +2418,7 @@
         (setf fn-type "fun"))
     (dbg "parse-call: FN: " (get-iter-function-name fn-name))
     (dbg "parse-call: TYPE: " fn-type)
+    (setf *current-type-definition* fn-type)
     (if (not (search ret-type "ixx"))
         (progn
           (if (equal fn-type "fun")
@@ -2421,22 +2434,39 @@
         (progn
           (if (not (search "ixx" type))
               (progn
-                (set-target 'definition-buffer)
-                (setf (gethash *paranteses* *definition_buffer*) '(""))
-                (if (equal fn-type "fun")
-                    (setf ret-type "fun"))
-                (if (is-function-map-p fn-name)
-                    (add-code (get-iter-function-name fn-name))
-                    (add-code (format nil "~a_~a"
-                                      (get-iter-function-name fn-name) fn-type)))
-                (add-code "(")
-                (setf expr-list (cdr expr-list))
-                (setf expr-list (parse-arguments expr-list *infinite-arguments* t))
-                (set-target tmp-target)
-                (insert-definition-buffer))
-              (progn
-                (setf expr-list (cdr expr-list))
-                (setf expr-list (parse-arguments expr-list *infinite-arguments* t))))
+                (if *current-math-operation*
+                    (progn
+                      (setf expr-list (cdr expr-list))
+                      (setf expr-list (parse-arguments expr-list *infinite-arguments* t))
+                      (set-target 'definition-buffer)
+                      (setf (gethash *paranteses* *definition_buffer*) '(""))
+                      (if (equal fn-type "fun")
+                          (setf ret-type "fun"))
+                      (if (is-function-map-p fn-name)
+                          (add-code (get-iter-function-name fn-name))
+                          (add-code (format nil "~a_~a"
+                                            (get-iter-function-name fn-name) fn-type)))
+                      (add-code "(")
+                      (add-code *tmp-var*)
+                      (set-target tmp-target)
+                      (insert-definition-buffer))
+                    (progn
+                      (set-target 'definition-buffer)
+                      (setf (gethash *paranteses* *definition_buffer*) '(""))
+                      (if (equal fn-type "fun")
+                          (setf ret-type "fun"))
+                      (if (is-function-map-p fn-name)
+                          (add-code (get-iter-function-name fn-name))
+                          (add-code (format nil "~a_~a"
+                                            (get-iter-function-name fn-name) fn-type)))
+                      (add-code "(")
+                      (setf expr-list (cdr expr-list))
+                      (setf expr-list (parse-arguments expr-list *infinite-arguments* t))
+                      (set-target tmp-target)
+                      (insert-definition-buffer))))
+                (progn
+                  (setf expr-list (cdr expr-list))
+                  (setf expr-list (parse-arguments expr-list *infinite-arguments* t))))
           (if (search "ixx" type)
               (progn
                 (set-target 'definition-buffer)
@@ -2445,13 +2475,20 @@
                     (add-code (get-iter-function-name fn-name))
                     (add-code (format nil "~a_~a"
                                       (get-iter-function-name fn-name) fn-type)))
-                (add-code "(")
-                (add-code "mpz_get_si")
-                (add-code "(")
-                (add-code *tmp-var*)
-                (add-code ")")
-                (add-code ")")
-                (add-code (format nil ";~%"))
+                (if (equal "ixx" fn-type)
+                    (progn
+                      (add-code "(")
+                      (add-code *tmp-var*)
+                      (add-code ")")
+                      (add-code (format nil ";~%")))
+                    (progn
+                      (add-code "(")
+                      (add-code "mpz_get_si")
+                      (add-code "(")
+                      (add-code *tmp-var*)
+                      (add-code ")")
+                      (add-code ")")
+                      (add-code (format nil ";~%"))))
                 (add-code "mpz_set")
                 (add-code "(")
                 (add-code *tmp-var*)
@@ -2460,7 +2497,9 @@
                 (add-code ")")
                 (add-code (format nil ";~%"))
                 (set-target tmp-target)
-                (insert-definition-buffer))
+                (insert-definition-buffer)
+                (if *current-math-operation*
+                    (swallow-last-code)))
               (progn
                 (set-target 'definition-buffer)
                 (setf (gethash *paranteses* *definition_buffer*) '(""))
@@ -2468,14 +2507,17 @@
                 (add-code (format nil ";~%"))
                 (set-target tmp-target)
                 (insert-definition-buffer)
-                (if (not (equal "ixx" *current-type-definition*))
-                    (progn
-                      (add-code "mpz_get_si")
-                      (add-code "(")
-                      (add-code (get-iter-result-name fn-name))
-                      (add-code ")"))
-                    (progn
-                      (add-code (get-iter-result-name fn-name))))))
+                (setf *tmp-var* (get-iter-result-name fn-name))
+                (if (not *current-math-operation*)
+                    (if (not (equal "ixx" *current-type-definition*))
+                        (progn
+                          (add-code "mpz_get_si")
+                          (add-code "(")
+                          (add-code (get-iter-result-name fn-name))
+                          (add-code ")"))
+                        (progn
+                          (add-code (get-iter-result-name fn-name)))))))
+          (setf *current-type-definition* nil)
           (dbg "parse-call: is-iter-function-p " (get-iter-result-name fn-name)))))
   expr-list)
 
