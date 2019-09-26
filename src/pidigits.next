@@ -23,7 +23,7 @@
       (if [> num acc]
         (continue))
 
-      (:: d (extract-digit B3))
+      (:: d (extract-digit 3))
       (if [!= d (extract-digit B4)]
         (continue))
       
