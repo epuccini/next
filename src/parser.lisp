@@ -1795,7 +1795,7 @@
         (tmp-target *target*))
     (set-target 'definition-buffer)
     (setf (gethash *paranteses* *definition_buffer*) '(""))
-    (add-bigint-declaration tmp-var number)
+    (add-bigint-declaration-string tmp-var number)
     ;; last real target
     (set-target tmp-target)
     (insert-definition-buffer)
