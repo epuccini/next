@@ -2017,7 +2017,11 @@
   (add-code ")")
   (add-code (format nil ";~%")))
 
-(defun add-bigint-declaration-with-ixx-var (tmp-var var-name)
+(defun add-bigint-declaration-with-ixx-var (tmp-var name)
+  (add-bigint-declaration-with-ixx-noname-var tmp-var
+                                              (get-iter-variable-name name)))
+  
+(defun add-bigint-declaration-with-ixx-noname-var (tmp-var var-name)
   (setf (gethash (get-variable-name tmp-var) *variable-type*) "ixx")
   (add-code "mpz_t")
   (add-code " ")
@@ -2027,7 +2031,7 @@
   (add-code "(")
   (add-code tmp-var)
   (add-code ",")
-  (add-code (get-iter-variable-name var-name))
+  (add-code var-name)
   (add-code ")")
   (add-code (format nil ";~%")))
 
@@ -2465,7 +2469,8 @@
                       (if (equal fn-type "fun")
                           (setf ret-type "fun"))
                       (if (is-function-map-p fn-name)
-                          (add-code (get-iter-function-name fn-name))
+                          (add-code
+                           (get-iter-function-name fn-name))
                           (add-code (format nil "~a_~a"
                                             (get-iter-function-name fn-name) fn-type)))
                       (add-code "(")
@@ -2495,7 +2500,7 @@
                       (insert-definition-buffer)
                       (if *current-math-operation*
                           (swallow-last-code)))
-                    (progn
+                    (let ((tmp-var (fgensym)))
                       (set-target 'definition-buffer)
                       (setf (gethash *paranteses* *definition_buffer*) '(""))
                       (if (equal fn-type "fun")
@@ -2509,29 +2514,30 @@
                       (setf expr-list (parse-arguments expr-list *infinite-arguments* t))
                       (add-code ")")
                       (add-code (format nil ";~%"))
+                      (add-bigint-declaration-with-ixx-noname-var tmp-var (get-iter-result-name fn-name))
                       (set-target tmp-target)
                       (insert-definition-buffer)
                       (add-code "mpz_get_si")
                       (add-code "(")
-                      (add-code (get-iter-result-name fn-name))
+                      (add-code tmp-var)
                       (add-code ")"))))
-              (progn
+              (let ((tmp-var (fgensym)))
                 (set-target 'definition-buffer)
                 (setf (gethash *paranteses* *definition_buffer*) '(""))
                 (add-code ")")
                 (add-code (format nil ";~%"))
+                (add-bigint-declaration-with-ixx-noname-var tmp-var (get-iter-result-name fn-name))
                 (set-target tmp-target)
                 (insert-definition-buffer)
-                (setf *tmp-var* (get-iter-result-name fn-name))
                 (if (not *current-math-operation*)
                     (if (not (equal "ixx" *current-type-definition*))
                         (progn
                           (add-code "mpz_get_si")
                           (add-code "(")
-                          (add-code (get-iter-result-name fn-name))
+                          (add-code tmp-var)
                           (add-code ")"))
                         (progn
-                          (add-code (get-iter-result-name fn-name)))))))
+                          (add-code tmp-var))))))
           (setf *current-type-definition* nil)
           (dbg "parse-call: is-iter-function-p " (get-iter-result-name fn-name)))))
   expr-list)
