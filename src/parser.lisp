@@ -1795,7 +1795,9 @@
         (tmp-target *target*))
     (set-target 'definition-buffer)
     (setf (gethash *paranteses* *definition_buffer*) '(""))
-    (add-bigint-declaration-string tmp-var number)
+    (if (is-bigint-p number)
+        (add-bigint-declaration-string tmp-var (get-bigint number))
+        (add-bigint-declaration-string tmp-var number))
     ;; last real target
     (set-target tmp-target)
     (insert-definition-buffer)
@@ -2345,8 +2347,13 @@
            (if (and (not (equal "(" (get-last-code)))
                     (not omit-comma))
                (add-code ","))
-           (setf expr-list (parse-bigint-number expr-list
-                                                (get-bigint (car expr-list))))
+           (if (equal "ixx" *current-type-definition*)
+               (progn
+                 (setf expr-list (parse-bigint-number expr-list (car expr-list))))
+               (progn
+                 (dbg "parse-expression: NUM block " *block*
+                      " number " (car expr-list))
+                 (add-code (get-bigint (car expr-list)))))
            (setf expr-list (cdr expr-list))
            (setf expr-list (parse-arguments expr-list max))))
         ((numberp (parse-integer (car expr-list) :junk-allowed t))
@@ -2468,39 +2475,46 @@
                       (insert-definition-buffer)))))
           (if (search "ixx" type)
               (progn
-                (setf expr-list (cdr expr-list))
-                (setf expr-list (parse-arguments expr-list *infinite-arguments* t))
-                (set-target 'definition-buffer)
-                (setf (gethash *paranteses* *definition_buffer*) '(""))
-                (if (is-function-map-p fn-name)
-                    (add-code (get-iter-function-name fn-name))
-                    (add-code (format nil "~a_~a"
-                                      (get-iter-function-name fn-name) fn-type)))
-                (if (equal "ixx" fn-type)
+                (if (equal "ixx" *current-type-definition*)
                     (progn
+                      (setf expr-list (cdr expr-list))
+                      (setf expr-list (parse-arguments expr-list *infinite-arguments* t))
+                      (set-target 'definition-buffer)
+                      (setf (gethash *paranteses* *definition_buffer*) '(""))
+                      (if (equal fn-type "fun")
+                          (setf ret-type "fun"))
+                      (if (is-function-map-p fn-name)
+                          (add-code (get-iter-function-name fn-name))
+                          (add-code (format nil "~a_~a"
+                                            (get-iter-function-name fn-name) fn-type)))
                       (add-code "(")
                       (add-code *tmp-var*)
                       (add-code ")")
-                      (add-code (format nil ";~%")))
+                      (add-code (format nil ";~%"))
+                      (set-target tmp-target)
+                      (insert-definition-buffer)
+                      (if *current-math-operation*
+                          (swallow-last-code)))
                     (progn
+                      (set-target 'definition-buffer)
+                      (setf (gethash *paranteses* *definition_buffer*) '(""))
+                      (if (equal fn-type "fun")
+                          (setf ret-type "fun"))
+                      (if (is-function-map-p fn-name)
+                          (add-code (get-iter-function-name fn-name))
+                          (add-code (format nil "~a_~a"
+                                            (get-iter-function-name fn-name) fn-type)))
                       (add-code "(")
+                      (setf expr-list (cdr expr-list))
+                      (setf expr-list (parse-arguments expr-list *infinite-arguments* t))
+                      (add-code ")")
+                      (add-code (format nil ";~%"))
+                      (set-target tmp-target)
+                      (insert-definition-buffer)
                       (add-code "mpz_get_si")
                       (add-code "(")
-                      (add-code *tmp-var*)
-                      (add-code ")")
-                      (add-code ")")
-                      (add-code (format nil ";~%"))))
-                (add-code "mpz_set")
-                (add-code "(")
-                (add-code *tmp-var*)
-                (add-code ",")
-                (add-code (get-iter-result-name fn-name))
-                (add-code ")")
-                (add-code (format nil ";~%"))
-                (set-target tmp-target)
-                (insert-definition-buffer)
-                (if *current-math-operation*
-                    (swallow-last-code)))
+                      (add-code (get-iter-result-name fn-name))
+                      (add-code ")"))))
               (progn
                 (set-target 'definition-buffer)
                 (setf (gethash *paranteses* *definition_buffer*) '(""))
@@ -3400,20 +3414,24 @@
               (return-from parse-expression expr-list)))
         (if (is-bigint-p (car expr-list))
             (progn
-              (setf expr-list (parse-bigint-number expr-list (get-bigint (car expr-list))))
+              (if (equal "ixx" *current-type-definition*)
+                  (progn
+                    (setf expr-list (parse-bigint-number expr-list (car expr-list))))
+                  (progn
+                    (add-code (get-bigint (car expr-list)))))
               (if (not omit-semicolon)
                   (add-code (format nil ";~%")))
               (setf expr-list (cdr expr-list))
               (return-from parse-expression expr-list)))
         (if (numberp (parse-integer (car expr-list) :junk-allowed t))
             (progn
-              (if (equal "ixx" *current-type-definition*)
-                  (progn
-                    (setf expr-list (parse-bigint-number expr-list (car expr-list))))
-                  (progn
-                    (dbg "parse-expression: NUM block " *block*
-                         " number " (car expr-list))
-                    (add-code (car expr-list))))
+             (if (equal "ixx" *current-type-definition*)
+                 (progn
+                   (setf expr-list (parse-bigint-number expr-list (car expr-list))))
+                 (progn
+                   (dbg "parse-expression: NUM block " *block*
+                        " number " (car expr-list))
+                   (add-code (regex-replace-all "d0" (car expr-list) "f"))))
               (if (not omit-semicolon)
                   (add-code (format nil ";~%")))
               (return-from parse-expression (cdr expr-list))))

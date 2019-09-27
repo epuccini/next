@@ -24,7 +24,7 @@
         (continue))
 
       (:: d (extract-digit 3))
-      (if [!= d (extract-digit 4)]
+      (if [!= d (extract-digit B4)]
         (continue))
       
       (prn d)
