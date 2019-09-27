@@ -2434,7 +2434,7 @@
         (progn
           (if (not (search "ixx" type))
               (progn
-                (if *current-math-operation*
+                (if (equal "ixx" *current-type-definition*)
                     (progn
                       (setf expr-list (cdr expr-list))
                       (setf expr-list (parse-arguments expr-list *infinite-arguments* t))
