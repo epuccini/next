@@ -2465,12 +2465,11 @@
                       (setf expr-list (cdr expr-list))
                       (setf expr-list (parse-arguments expr-list *infinite-arguments* t))
                       (set-target tmp-target)
-                      (insert-definition-buffer))))
-                (progn
-                  (setf expr-list (cdr expr-list))
-                  (setf expr-list (parse-arguments expr-list *infinite-arguments* t))))
+                      (insert-definition-buffer)))))
           (if (search "ixx" type)
               (progn
+                (setf expr-list (cdr expr-list))
+                (setf expr-list (parse-arguments expr-list *infinite-arguments* t))
                 (set-target 'definition-buffer)
                 (setf (gethash *paranteses* *definition_buffer*) '(""))
                 (if (is-function-map-p fn-name)
